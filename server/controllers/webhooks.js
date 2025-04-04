@@ -2,7 +2,7 @@ import {Webhook} from "svix"
 export const clerkWebhooks = async(req, res) => {
     try {
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
-        await whook.verfiy(JSON.stringify(req.body), {
+        await whook.verify(JSON.stringify(req.body), {
             "svix-id":req.headers["svix-id"],
             "svix-timestap": req.headers["svixx-timestamp"],
             "svix-signature": req.headers["svixx-signature"]
