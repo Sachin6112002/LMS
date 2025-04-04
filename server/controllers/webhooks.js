@@ -1,4 +1,4 @@
-import {webhook} from "svix"
+import {Webhook} from "svix"
 export const clerkWebhooks = async(req, res) => {
     try {
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
