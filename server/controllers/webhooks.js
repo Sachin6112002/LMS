@@ -1,18 +1,21 @@
 import { Webhook } from "svix"
-import User from '../models/User.js';
+import User from '../models/User.js'
 
 // API Controller Function to Manage Clerk User with database  
 export const clerkWebhooks = async (req, res) => {
   try {
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
 
-    await whook.verify(JSON.stringify(req.body), {
+    // Verify signature
+    await whook.verify(req.body, {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"]
     })
 
-    const { data, type } = req.body
+    // Parse raw body to JSON
+    const payload = JSON.parse(req.body)
+    const { data, type } = payload
 
     switch (type) {
       case 'user.created': {
