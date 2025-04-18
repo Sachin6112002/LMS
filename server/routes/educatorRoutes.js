@@ -9,4 +9,4 @@ educatorRouter.get('/update-role', updateRoleToEducator)
 // educatorRouter.get('/courses', protectEducator, getEducatorCourses)
 // educatorRouter.get('/dashboard', protectEducator, educatorDahboardData )
 // educatorRouter.get('/enrolled-students', protectEducator, getEnrolledStudentsData)
-export default educatorRouter;
+// export default educatorRouter;
