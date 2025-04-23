@@ -37,7 +37,7 @@ export const userErolledCourses = async (req ,res) =>{
     }
 }
 //Purchase Course
-export const purchaseCourse = async (req ,res )=>{
+export const purchaseCourse = async (req , res )=>{
     try {
         const { courseId } = req.body
         const { origin } = req.headers
@@ -73,7 +73,8 @@ export const purchaseCourse = async (req ,res )=>{
             cancel_url: `${origin}/` ,
             line_items: line_items,
             mode: 'payment',
-            metadata: {purchaseId: newPurchase._id.toString()
+            metadata: {
+                purchaseId: newPurchase._id.toString()
                  }
              }) 
              res.json({success: true , session_url: session.url})

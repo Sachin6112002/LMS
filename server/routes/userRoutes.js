@@ -4,4 +4,4 @@ const userRouter = express.Router()
 userRouter.get('/data', getUserData)
 userRouter.get('/enrolled-courses',userErolledCourses)
 userRouter.post('/purchase', purchaseCourse)
-export default userRouter;
+export default userRouter; 

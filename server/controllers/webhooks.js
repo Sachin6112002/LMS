@@ -85,7 +85,7 @@ export const  stripeWebhooks = async(request , response)=>{
        await courseData.save()
        userData.enrolledStudents.push(userData._id)
        await userData.save()
-       purchaseData.status = 'completed'
+       purchaseData.status = 'completed' 
        await purchaseData.save()
       break;}
 
@@ -96,11 +96,12 @@ export const  stripeWebhooks = async(request , response)=>{
             payment_intent : paymentIntentId
           }) 
           const { purchaseId } = session.data[0].metadata;
-          const purchaseData = await purchaseId.find(purchaseId)
+          const purchaseData = await Purchase.findById(purchaseId)
           purchaseData.status = 'failed'
           await purchaseData.save()
+          break;
     }
-      break;
+    
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
