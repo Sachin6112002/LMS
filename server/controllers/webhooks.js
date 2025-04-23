@@ -3,6 +3,7 @@ import {Webhook} from "svix"
 import User from '../models/User.js';
 import Stripe from "stripe"
 import Course from "../models/Course.js";
+import { Purchase } from "../models/Purchase.js";
 
 export const clerkWebhooks = async(req, res) => {
     try {
@@ -70,12 +71,14 @@ export const  stripeWebhooks = async(request , response)=>{
   switch (event.type) {
     case 'payment_intent.succeeded':{
       const paymentIntent = event.data.object;
-      const paymentIntentId = paymentIntent.Id ;
+      const paymentIntentId = paymentIntent.id ;
       const session = await stripeInstance.checkout.session.list({
         payment_intent : paymentIntentId
       }) 
       const { purchaseId } = session.data[0].metadata;
-      const purchaseData = await purchaseId.findById(purchaseId)
+      const purchaseData = await Purchase.findById(purchaseId)
+
+
       const userData = await User.findById(purchaseData.userId)
        const courseData = await Course.findById(purchaseData.courseId.toString())
        courseData.enrolledStudents.push(userData)
@@ -88,7 +91,7 @@ export const  stripeWebhooks = async(request , response)=>{
 
     case 'payment_intent.payment_failed':{
         const paymentIntent = event.data.object;
-        const paymentIntentId = paymentIntent.Id;
+        const paymentIntentId = paymentIntent.id;
         const session = await stripeInstance.checkout.session.list({
             payment_intent : paymentIntentId
           }) 
