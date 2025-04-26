@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const courseProgressSchema = new mongoose.Schema({
-    userId : { type : string , required : true},
-    courseId : { type : string , required : true},
-    completed: { type : string , default : false},
+    userId : { type : String , required : true},
+    courseId : { type : String , required : true},
+    completed: { type : String , default : false},
     lectureCompleted : []
 }, {
     minimize: false
