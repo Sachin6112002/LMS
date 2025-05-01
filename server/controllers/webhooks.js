@@ -48,8 +48,6 @@ import { Purchase } from "../models/Purchase.js";
 //     res.json({ success: false, message: error.message });
 //   }
 // };
-import { Webhook } from "svix";
-import User from "../models/User.js";
 
 export const clerkWebhooks = async (req, res) => {
   try {
