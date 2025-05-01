@@ -4,15 +4,67 @@ import Stripe from "stripe";
 import Course from "../models/Course.js";
 import { Purchase } from "../models/Purchase.js";
 
+// export const clerkWebhooks = async (req, res) => {
+//   try {
+//     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+//     await whook.verify(JSON.stringify(req.body), {
+//       "svix-id": req.headers["svix-id"],
+//       "svix-timestamp": req.headers["svix-timestamp"],
+//       "svix-signature": req.headers["svix-signature"],
+//     });
+//     const { data, type } = req.body;
+//     switch (type) {
+//       case "user.created": {
+//         const userData = {
+//           _id: data.id,
+//           email: data.email_addresses[0].email_address,
+//           name: data.first_name + " " + data.last_name,
+//           imageUrl: data.image_url,
+//         };
+//         await User.create(userData);
+//         res.json({});
+//         break;
+//       }
+//       case "user.updated": {
+//         const userData = {
+//           email: data.email_addresses[0].email_address,
+//           name: data.first_name + " " + data.last_name,
+//           imageUrl: data.image_url,
+//         };
+//         await User.findByIdAndUpdate(data.id, userData);
+//         res.json({});
+
+//         break;
+//       }
+//       case "user.selected": {
+//         await User.findByIdAndDelete(data.id);
+//         res.json({});
+//         break;
+//       }
+//       default:
+//         break;
+//     }
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+import { Webhook } from "svix";
+import User from "../models/User.js";
+
 export const clerkWebhooks = async (req, res) => {
   try {
-    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-    await whook.verify(JSON.stringify(req.body), {
+    const payload = req.body; // raw buffer
+    const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
-    });
-    const { data, type } = req.body;
+    };
+
+    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    const evt = wh.verify(payload, headers);
+
+    const { data, type } = evt;
+
     switch (type) {
       case "user.created": {
         const userData = {
@@ -22,7 +74,6 @@ export const clerkWebhooks = async (req, res) => {
           imageUrl: data.image_url,
         };
         await User.create(userData);
-        res.json({});
         break;
       }
       case "user.updated": {
@@ -32,22 +83,22 @@ export const clerkWebhooks = async (req, res) => {
           imageUrl: data.image_url,
         };
         await User.findByIdAndUpdate(data.id, userData);
-        res.json({});
-
         break;
       }
-      case "user.selected": {
+      case "user.deleted": {
         await User.findByIdAndDelete(data.id);
-        res.json({});
         break;
       }
       default:
-        break;
+        console.log("Unhandled Clerk event type:", type);
     }
+
+    res.status(200).json({ success: true });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
+
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const stripeWebhooks = async (request, response) => {
   const sig = request.headers["stripe-signature"];

@@ -34,29 +34,29 @@ export const AppContexProvider = (props)=>{
     }
 
     //Fetch user Data 
-    const fetchUserData = async () =>{
-         if(user.publicMetadata.role === 'educator'){
-            setIsEducator(true)
-         }
-        try{
-            const token = await getToken()
-            console.log(token);
+    // const fetchUserData = async () =>{
+    //      if(user.publicMetadata.role === 'educator'){
+    //         setIsEducator(true)
+    //      }
+    //     try{
+    //         const token = await getToken()
+    //         console.log(token);
             
-            const {data} = await axios.get(backendUrl + '/api/user/data' , {headers: {
-                Authorization : `Bearer ${token}`
-            }})
-            if(data.success){
-                setUserData(data.user)
-            }
-            else{
-                toast.error(data.message)
-            }
-        } 
-        catch(error){
-            toast.error(error.message)
-        }
+    //         const {data} = await axios.get(backendUrl + '/api/user/data' , {headers: {
+    //             Authorization : `Bearer ${token}`
+    //         }})
+    //         if(data.success){
+    //             setUserData(data.user)
+    //         }
+    //         else{
+    //             toast.error(data.message)
+    //         }
+    //     } 
+    //     catch(error){
+    //         toast.error(error.message)
+    //     }
 
-    }
+    // }
     //Function to calculate  average rating of course 
     const calculateRating = (course) => {
        if(course.courseRatings.length === 0)
@@ -121,7 +121,7 @@ const fetchUserEnrolledCourses  = async ()=>{
     useEffect(()=>{
         if(user){
             logToken()
-fetchUserData()
+//fetchUserData()
 
             
         }
