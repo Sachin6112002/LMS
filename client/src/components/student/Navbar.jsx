@@ -3,10 +3,38 @@ import {assets} from '../../assets/assets'
 import { Link } from 'react-router-dom'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { AppContext } from '../../context/AppContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+
 
 
 const Navbar = () => {
-  const {navigate , isEducator , setIsEducator } = useContext(AppContext)
+  const {navigate , isEducator , backendUrl, setIsEducator , getToken} = useContext(AppContext)
+  const becomeEducator = async ()=>{
+    try{
+      if(isEducator){
+        navigate("/educator")
+        return;
+      }
+      const token = await getToken()
+      const {data } = await axios.get(backendUrl + '/api/educator/update-role' , 
+        {
+          headers : {Authorization : `Bearer ${token}`}
+        }
+      )
+      if(data.success){
+        setIsEducator(true)
+        toast.success(data.message)
+      }
+      else{
+        toast.error(data.message)
+      }
+
+    } catch (error){
+      toast.error(error.message)
+
+    }
+  }
     const isCourseListPage = location.pathname.includes('/course-list')
     const {openSignIn} = useClerk()
     const {user} = useUser()
@@ -18,7 +46,7 @@ const Navbar = () => {
         <div className='flex items-center gap-5
         '>
             { user && <>
-              <button onClick={()=>{navigate('/educator')}}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
+              <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
               <Link to = '/my-enrollments'>My Enrollments</Link>
             </>}
               
@@ -31,8 +59,8 @@ const Navbar = () => {
         {/* for phone screen */}
         <div className='md:hidden flex items-center gap-2 sm:gap-5 text-gray-500'>
 
-      { <> <div className='md:hidden flex items-center gap-1 sm:gap-2 max-sm:text-xs'>
-        <button onClick= {()=>{navigate('/educator')}}>{isEducator ? 'Educator Dashboard' : 'Become Educator '}</button>
+      { user && <> <div className='md:hidden flex items-center gap-1 sm:gap-2 max-sm:text-xs'>
+        <button onClick= {becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator '}</button>
         <Link to = '/my-enrollments'>My Enrollments</Link>
         
         </div>
