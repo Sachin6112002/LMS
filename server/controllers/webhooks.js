@@ -9,8 +9,8 @@ export const clerkWebhooks = async(req, res) => {
       const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
       await whook.verify(JSON.stringify(req.body), {
           "svix-id":req.headers["svix-id"],
-          "svix-timestap": req.headers["svixx-timestamp"],
-          "svix-signature": req.headers["svixx-signature"]
+          "svix-timestap": req.headers["svix-timestamp"],
+          "svix-signature": req.headers["svix-signature"]
       })
       const {data, type} = req.body
       switch (type){
