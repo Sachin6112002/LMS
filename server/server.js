@@ -14,7 +14,7 @@ const app = express();
 // Connect DB and Cloudinary
 await connectDB();
 await connectCloudinary();
-app.post('/'  , express.json() , clerkWebhooks)
+app.post("/clerk"  , express.json() , clerkWebhooks)
 app.post("/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Clerk middleware should be applied AFTER webhook routes
