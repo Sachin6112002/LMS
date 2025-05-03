@@ -14,12 +14,7 @@ const app = express();
 // Connect DB and Cloudinary
 await connectDB();
 await connectCloudinary();
-
-// Apply only for non-raw routes
-app.use(cors());
-
-// ✅ Raw body middleware must come BEFORE json middleware for these routes
-app.post("/clerk", express.raw({ type: "application/json" }), clerkWebhooks);
+app.post('/'  , express.json() , clerkWebhooks)
 app.post("/stripe", express.raw({ type: "application/json" }), stripeWebhooks);
 
 // Clerk middleware should be applied AFTER webhook routes
