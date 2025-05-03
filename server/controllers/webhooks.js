@@ -73,7 +73,7 @@ export const  stripeWebhooks = async(request , response)=>{
     case 'payment_intent.succeeded':{
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id ;
-      const session = await stripeInstance.checkout.session.list({
+      const session = await stripeInstance.checkout.sessions.list({
         payment_intent : paymentIntentId
       }) 
       const { purchaseId } = session.data[0].metadata;
@@ -82,7 +82,7 @@ export const  stripeWebhooks = async(request , response)=>{
 
       const userData = await User.findById(purchaseData.userId)
        const courseData = await Course.findById(purchaseData.courseId.toString())
-       courseData.enrolledStudents.push(userData)
+       courseData.enrolledStudents.push(userData._id)
        await courseData.save()
        userData.enrolledStudents.push(userData._id)
        await userData.save()
@@ -93,7 +93,7 @@ export const  stripeWebhooks = async(request , response)=>{
     case 'payment_intent.payment_failed':{
         const paymentIntent = event.data.object;
         const paymentIntentId = paymentIntent.id;
-        const session = await stripeInstance.checkout.session.list({
+        const session = await stripeInstance.checkout.sessions.list({
             payment_intent : paymentIntentId
           }) 
           const { purchaseId } = session.data[0].metadata;
