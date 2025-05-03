@@ -84,7 +84,7 @@ export const  stripeWebhooks = async(request , response)=>{
        const courseData = await Course.findById(purchaseData.courseId.toString())
        courseData.enrolledStudents.push(userData._id)
        await courseData.save()
-       userData.enrolledStudents.push(userData._id)
+       userData.enrolledCourses.push(courseData._id)
        await userData.save()
        purchaseData.status = 'completed'
        await purchaseData.save()
@@ -97,7 +97,7 @@ export const  stripeWebhooks = async(request , response)=>{
             payment_intent : paymentIntentId
           }) 
           const { purchaseId } = session.data[0].metadata;
-          const purchaseData = await purchaseId.find(purchaseId)
+          const purchaseData = await Purchase.findById(purchaseId)
           purchaseData.status = 'failed'
           await purchaseData.save()
     }
