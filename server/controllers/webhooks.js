@@ -24,7 +24,7 @@ switch(type){
 
     }
     await User.create(userData)
-    req.json({})
+    res.json({})
     break
   }
   case 'user.updated' : {
@@ -35,7 +35,7 @@ switch(type){
 
     }
 await User.findByIdAndUpdate(data.id , userData)
-    req.json({})
+    res.json({})
     break
   }
   case 'user.deleted' : {
