@@ -7,7 +7,7 @@ import { Purchase } from "../models/Purchase.js";
 //API Controller Function to Manage Clerk User with database
 export const clerkWebhooks = async (req  , res ) => {
   try {
-const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRETE)
+const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
 await whook.verify(JSON.stringify(req.body),{
   "svix-id": req.headers["svix-id"],
   "svix-timestamp": req.headers["svix-timestamp"],
