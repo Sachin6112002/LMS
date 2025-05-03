@@ -38,7 +38,7 @@ await User.findByIdAndUpdate(data.id , userData)
     req.json({})
     break
   }
-  case 'user.deleted ' : {
+  case 'user.deleted' : {
     await User.findByIdAndDelete(data.id)
     res.json({})
     break
