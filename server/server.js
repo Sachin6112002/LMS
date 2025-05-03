@@ -10,7 +10,7 @@ import courseRouter from "./routes/courseRoute.js";
 import userRouter from "./routes/userRoutes.js";
 
 const app = express();
-
+app.use(cors())
 // Connect DB and Cloudinary
 await connectDB();
 await connectCloudinary();
