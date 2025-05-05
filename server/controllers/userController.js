@@ -113,7 +113,7 @@ export const updateUserCourseProgress = async(req, res )=>{
 }
 
 // get User Course Progress 
-export const getUserCourseProgess = async(req, res ) => {
+export const getUserCourseProgress = async(req, res ) => {
     try {
         const userId = req.auth.userId
         const {courseId , lectureId} = req.body 
@@ -129,7 +129,7 @@ export const addUserRating = async(req, res) =>{
     const userId = req.auth.userId ;
     const {courseId , rating } = req.body ;
     if(!courseId || !userId || !rating || rating < 1 || rating > 5){
-        return rse.json({success : false , message : 'inValid Details '})
+        return res.json({success : false , message : 'inValid Details '})
     }
     try {
         const course = await Course.findById(courseId);
@@ -137,8 +137,8 @@ export const addUserRating = async(req, res) =>{
             res.json({success : false , message : 'Course not found '})
         }
         const user = await User.findById(userId)
-        if(! user || user.enrolledCourses.includes(courseId)){
-            return res.json({ success_url: false , message : 'User has not purchased this course '})
+        if(!user || !user.enrolledCourses.includes(courseId)){
+            return res.json({ success: false, message : 'User has not purchased this course '})
         }
          const existingRatingIndex = course.courseRatings.findIndex( r => r.userId === userId )
          if(existingRatingIndex > -1 ){
