@@ -133,8 +133,8 @@ export const addUserRating = async(req, res) =>{
     }
     try {
         const course = await Course.findById(courseId);
-        if(!course ){
-            res.json({success : false , message : 'Course not found '})
+        if(!course){
+          return  res.json({success : false , message : 'Course not found '})
         }
         const user = await User.findById(userId)
         if(!user || !user.enrolledCourses.includes(courseId)){
