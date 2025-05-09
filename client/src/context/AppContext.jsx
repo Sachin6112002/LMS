@@ -2,7 +2,7 @@ import { createContext,  useEffect,  useState } from "react";
 import { dummyCourses } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import humanizeDuration from "humanize-duration";
-import {useAuth , useUser} from '@clerk/clerk-react';
+import {useAuth , useUser } from '@clerk/clerk-react';
 import axios from 'axios';
 import { toast } from "react-toastify";
 
@@ -16,10 +16,10 @@ export const AppContexProvider = (props)=>{
 
     const [allCourses , setAllCourses] = useState([])
     const [isEducator , setIsEducator] = useState(false)
-    const [enrolledCourses ,setEnrolledCourses ] = useState([])
+    const [enrolledCourses , setEnrolledCourses ] = useState([])
     const [userData ,setUserData ] = useState(null)
     //Fetch All Courses
-    const fetchAllCourses = async ()=>{
+    const fetchAllCourses = async () =>{
        try {
         const {data} =   await axios.get(backendUrl + '/api/course/all')
         if(data.success){
@@ -43,18 +43,27 @@ export const AppContexProvider = (props)=>{
             const token = await getToken()
             console.log(token);
             
-            const {data} = await axios.get(backendUrl + '/api/user/data' , {headers: {
-                Authorization : `Bearer ${token}`
+            const {data} = await axios.get
+            (backendUrl + '/api/user/data' , {headers: {
+                Authorization: `Bearer ${token}`
+                
             }})
+            console.log(data);
+            console.log("Token expiration:", token.expiration);
+            
             if(data.success){
+                console.log("i am herre1");
+                
                 setUserData(data.user)
             }
             else{
                 toast.error(data.message)
+                console.log("i am herre2");
             }
         } 
         catch(error){
             toast.error(error.message)
+            console.log("i am herre");
         }
 
     }
@@ -83,7 +92,7 @@ export const AppContexProvider = (props)=>{
 
     }
     //Function to calculate the number of lecture
-   const calcualteNoOfLecture = (course) =>{
+   const calculateNoOfLectures = (course) =>{
     let totalLectures = 0;
     course.courseContent.forEach(chapter =>{
         if(Array.isArray(chapter.chapterContent)){
@@ -97,7 +106,7 @@ const fetchUserEnrolledCourses  = async ()=>{
   try {
     const token = await getToken();
     const { data } = await axios.get(backendUrl + '/api/user/enrolled-courses' , {headers : {
-     Authorization : `Bearer ${token}`}
+     Authorization: `Bearer ${token}`}
     })
     if(data.success){
      setEnrolledCourses(data.enrolledCourses.reverse())
@@ -118,17 +127,15 @@ const fetchUserEnrolledCourses  = async ()=>{
     useEffect(()=>{
         if(user){
            
-fetchUserData()
+ fetchUserData(user)
 fetchUserEnrolledCourses()
             
         }
     },[user])
     const value = {
         currency, allCourses,navigate , calculateRating,
-        isEducator, setIsEducator, calcualteNoOfLecture , calculateChapterTime, calculateCourseDuration,
-        enrolledCourses , fetchUserEnrolledCourses
-        ,
-         backendUrl , userData, setUserData , getToken , fetchAllCourses
+        isEducator, setIsEducator, calculateNoOfLectures , calculateChapterTime, calculateCourseDuration,
+        enrolledCourses , fetchUserEnrolledCourses,backendUrl , userData, setUserData , getToken , fetchAllCourses
 
     }
     return (

@@ -17,7 +17,7 @@ const CourseDetails = () => {
   const {
     allCourses,
     calculateRating,
-    calcualteNoOfLecture,
+    calculateNoOfLectures,
     calculateChapterTime,
     calculateCourseDuration,
     currency, backendUrl , userData , getToken
@@ -123,7 +123,7 @@ else{
             </p>
           </div>
           <p className="text-sm">
-            Course by <span className="text-blue-600">{courseData.educator.name}</span>
+            Course by <span className="text-blue-600">{"sachin"}</span>
           </p>
           <div className="pt-8 text-gray-800">
             <h2 className="text-xl font-semibold">Course Structure</h2>
@@ -234,7 +234,7 @@ else{
               <div className="h-4 w-px bg-gray-500/40"></div>
               <div className="flex items-center gap-1">
                 <img src={assets.lesson_icon} alt="clock icon " />
-                <p>{calcualteNoOfLecture(courseData)} Lessons</p>
+                <p>{ calculateNoOfLectures(courseData)} Lessons</p>
               </div>
               
               
