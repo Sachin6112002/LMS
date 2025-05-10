@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-const StarRating = () => {
-  const [rating, setRating] = useState(0);
+const Rating = ({ initialRating, onRate }) => {
 
-  const handleRating = (index) => {
-    setRating(index + 1);
-  };
+    const [rating, setRating] = useState(initialRating || 0);
 
-  return (
-    <div style={{ display: "flex", cursor: "pointer" }}>
-      {[...Array(5)].map((_, index) => (
-        <span
-          key={index}
-          onClick={() => handleRating(index)}
-          style={{
-            fontSize: "2rem",
-            color: index < rating ? "gold" : "lightgray",
-            margin: "0 5px",
-          }}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
+    const handleRating = (value) => {
+        setRating(value);
+        if (onRate) onRate(value);
+    };
+
+    useEffect(() => {
+        if (initialRating) {
+            setRating(initialRating);
+        }
+    }, [initialRating]);
+
+    return (
+        <div className="flex gap-2">
+            {Array.from({ length: 5 }, (_, index) => {
+                const starValue = index + 1;
+                return (
+                    <span
+                        key={index}
+                        className={`text-xl sm:text-2xl cursor-pointer transition-colors ${starValue <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
+                        onClick={() => handleRating(starValue)}
+                    >
+                        &#9733;
+                    </span>
+                );
+            })}
+        </div>
+    );
 };
 
-export default StarRating;
+export default Rating;
