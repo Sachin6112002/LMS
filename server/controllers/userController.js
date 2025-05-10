@@ -4,7 +4,7 @@ import { Purchase } from "../models/Purchase.js";
 import User from "../models/User.js"
 import Stripe from "stripe"
 
-export const getUserData = async (req  , res) => {
+export const getUserData = async (req, res) => {
     try {
         console.log("req.auth ->", req.auth)
 
