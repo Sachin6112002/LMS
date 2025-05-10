@@ -4,7 +4,8 @@ import { assets } from '../../assets/assets'
 import CourseCard from '../../components/student/CourseCard';
 import { AppContext } from '../../context/AppContext';
 import { useParams } from 'react-router-dom';
-import SearchBar from '../components/student/SearchBar';
+import SearchBar from '../../components/student/Searchbar';
+
 
 const CoursesList = () => {
 
