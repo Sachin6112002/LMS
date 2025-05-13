@@ -17,6 +17,11 @@ const Navbar = ({ bgColor }) => {
       <div className="flex items-center gap-5 text-gray-500 relative">
         <p>Hi! {user.fullName}</p>
         <UserButton />
+        {user.isAdmin && (
+          <Link to="/admin" className="text-blue-500 hover:underline">
+            Admin Panel
+          </Link>
+        )}
       </div>
     </div>
   );
