@@ -1,29 +1,21 @@
-import React from 'react'
-import { Route, Routes, useMatch } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Routes, Route, useLocation, useMatch } from 'react-router-dom'
+import Navbar from './components/student/Navbar'
 import Home from './pages/student/Home'
-import CoursesList from './pages/student/CoursesList'
 import CourseDetails from './pages/student/CourseDetails'
-import MyEnrollments from './pages/student/MyEnrollments'
-import Player from './pages/student/Player'
-import Loading from './components/student/Loading'
-import Educator from './pages/educator/Educator'
+import CoursesList from './pages/student/CoursesList'
 import Dashboard from './pages/educator/Dashboard'
 import AddCourse from './pages/educator/AddCourse'
 import MyCourses from './pages/educator/MyCourses'
 import StudentsEnrolled from './pages/educator/StudentsEnrolled'
 import Navbar from './components/student/Navbar'
-import Admin from './pages/admin/Admin';
-import AdminDashboard from './pages/admin/AdminDahboard';
-import AdminSettings from './pages/admin/AdminSettings';
-import ManageCourses from './pages/admin/ManageCourses';
-import ManageUsers from './pages/admin/ManageUsers';
+import "quill/dist/quill.snow.css";
 
 const App = () => {
   const isEducatorRoute = useMatch('/educator/*')
-  const isAdminRoute = useMatch('/admin/*')
   return (
     <div className='text-default min-h-screen bg-white'>
-      {!isAdminRoute && !isEducatorRoute && <Navbar/>}
+      {!isEducatorRoute && <Navbar/>}
       
     <Routes>
     <Route path = '/' element = {<Home/>}/>
@@ -39,14 +31,7 @@ const App = () => {
       <Route path='my-courses' element={<MyCourses/>}/>
       <Route path='student-enrolled' element={<StudentsEnrolled/>}/>
       </Route>
-      <Route path='/admin' element={<Admin/>}>
-      <Route path='dashboard' element={<AdminDashboard/>}/>
-      <Route path='settings' element={<AdminSettings/>}/>
-      <Route path='manage-courses' element={<ManageCourses/>}/>
-      <Route path='manage-users' element={<ManageUsers/>}/>
-      </Route>
     </Routes>
-    
 
     </div>
   )
