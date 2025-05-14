@@ -1,10 +1,10 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
  // Admin-specific Navbar
-import Footer from '../../components/admin/Footer'; // Admin-specific Footer
-import AdminSidebar from '../../components/admin/SideBar';
-import AdminNavbar from '../../components/admin/Navbar'; // Admin-specific Navbar
-import AdminProfile from '../../components/admin/Profile'; // Admin-specific Profile Component
+import Footer from './components/admin/Footer'; // Admin-specific Footer
+import AdminSidebar from './components/admin/SideBar';
+import AdminNavbar from './components/admin/Navbar'; // Admin-specific Navbar
+import AdminProfile from './components/admin/Profile'; // Admin-specific Profile Component
 
 const Admin = () => {
   return (
