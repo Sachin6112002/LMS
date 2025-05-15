@@ -6,6 +6,8 @@ import AdminNavbar from '../../components/admin/Navbar';
 import AdminProfile from '../../components/admin/Profile';
 
 const Admin = () => {
+  console.log('Rendering Admin Component');
+
   return (
     <div className="text-default min-h-screen bg-white">
       <AdminNavbar />

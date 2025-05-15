@@ -21,6 +21,7 @@ export const AppContextProvider = (props) => {
     const [allCourses, setAllCourses] = useState([])
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -46,10 +47,6 @@ export const AppContextProvider = (props) => {
 
         try {
 
-            if (user.publicMetadata.role === 'educator') {
-                setIsEducator(true)
-            }
-
             const token = await getToken();
 
             const { data } = await axios.get(backendUrl + '/api/user/data',
@@ -57,6 +54,9 @@ export const AppContextProvider = (props) => {
 
             if (data.success) {
                 setUserData(data.user)
+                if (data.user.publicMetadata.role === 'educator') {
+                    setIsEducator(true)
+                }
             } else (
                 toast.error(data.message)
             )
@@ -132,18 +132,53 @@ export const AppContextProvider = (props) => {
         return totalLectures;
     }
 
-
+    // Added debugging logs to identify where the application is getting stuck
     useEffect(() => {
-        fetchAllCourses()
-    }, [])
+        const initializeApp = async () => {
+            console.log('Initializing AppContext...');
+            try {
+                const token = await getToken();
+                console.log('Token retrieved:', token);
 
-    // Fetch User's Data if User is Logged In
-    useEffect(() => {
-        if (user) {
-            fetchUserData()
-            fetchUserEnrolledCourses()
-        }
-    }, [user])
+                const [coursesResponse, userResponse] = await Promise.all([
+                    axios.get(backendUrl + '/api/course/all'),
+                    axios.get(backendUrl + '/api/user/data', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                ]);
+
+                console.log('Courses Response:', coursesResponse);
+                console.log('User Response:', userResponse);
+
+                if (coursesResponse.data.success) {
+                    setAllCourses(coursesResponse.data.courses);
+                } else {
+                    toast.error(coursesResponse.data.message);
+                }
+
+                if (userResponse.data.success) {
+                    setUserData(userResponse.data.user);
+                    if (userResponse.data.user.publicMetadata.role === 'educator') {
+                        setIsEducator(true);
+                    }
+                } else {
+                    toast.error(userResponse.data.message);
+                }
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                toast.error(error.message);
+            } finally {
+                setIsLoading(false);
+                console.log('AppContext initialization complete.');
+            }
+        };
+
+        initializeApp();
+    }, [getToken]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     const value = {
         showLogin, setShowLogin,
