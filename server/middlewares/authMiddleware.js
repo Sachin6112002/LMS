@@ -38,12 +38,20 @@ export const authenticate = async (req, res, next) => {
 export const authorizeAdmin = async (req, res, next) => {
     try {
         const userId = req.auth?.userId;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'Unauthorized: No user ID' });
+        }
+
         const user = await clerkClient.users.getUser(userId);
+        console.log('User metadata:', user.publicMetadata); // Debugging log
+
         if (user.publicMetadata.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Forbidden: Admins only' });
         }
+
         next();
     } catch (error) {
+        console.error('Error in authorizeAdmin middleware:', error); // Debugging log
         res.status(500).json({ success: false, message: error.message });
     }
 };
