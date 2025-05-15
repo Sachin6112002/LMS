@@ -21,6 +21,7 @@ export const AppContextProvider = (props) => {
     const [allCourses, setAllCourses] = useState([])
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
+    const [users, setUsers] = useState([])
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -82,6 +83,78 @@ export const AppContextProvider = (props) => {
         )
 
     }
+
+    // Admin: Fetch All Users
+    const fetchAllUsers = async () => {
+        try {
+            const token = await getToken();
+            const { data } = await axios.get(`${backendUrl}/api/admin/users`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (Array.isArray(data)) {
+                setUsers(data);
+            } else {
+                toast.error('Failed to fetch users.');
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            toast.error(error.response?.data?.message || 'Failed to fetch users.');
+        }
+    };
+
+    // Admin: Manage Courses
+    const manageCourses = async (action, courseId, courseData) => {
+        try {
+            const token = await getToken();
+            const url = `${backendUrl}/api/admin/courses`;
+            let response;
+
+            if (action === 'delete') {
+                response = await axios.delete(url, {
+                    headers: { Authorization: `Bearer ${token}` },
+                    data: { courseId },
+                });
+            } else if (action === 'update') {
+                response = await axios.put(url, { courseId, ...courseData }, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            } else if (action === 'create') {
+                response = await axios.post(url, courseData, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+            } else {
+                throw new Error('Invalid action');
+            }
+
+            if (response.data.success) {
+                toast.success(response.data.message);
+                fetchAllCourses(); // Refresh courses after action
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.error('Error managing courses:', error);
+            toast.error(error.response?.data?.message || 'Failed to manage courses.');
+        }
+    };
+
+    // Admin: Update Settings
+    const updateAdminSettings = async (settings) => {
+        try {
+            const token = await getToken();
+            const { data } = await axios.put(`${backendUrl}/api/admin/settings`, settings, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (data.success) {
+                toast.success('Settings updated successfully.');
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.error('Error updating settings:', error);
+            toast.error(error.response?.data?.message || 'Failed to update settings.');
+        }
+    };
 
     // Function to Calculate Course Chapter Time
     const calculateChapterTime = (chapter) => {
@@ -153,7 +226,9 @@ export const AppContextProvider = (props) => {
         enrolledCourses, fetchUserEnrolledCourses,
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,
-        isEducator,setIsEducator
+        isEducator,setIsEducator,
+        users, fetchAllUsers,
+        manageCourses, updateAdminSettings
     }
 
     return (
