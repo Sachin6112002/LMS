@@ -758,3 +758,40 @@ export const dummyCourses = [
         "courseThumbnail": "https://img.youtube.com/vi/WbV3zRgpw_E/maxresdefault.jpg"
     }
 ]
+export const dummyAdminData = [
+    {
+        id: 1,
+        name: 'Admin One',
+        email: 'admin1@example.com',
+        role: 'Super Admin',
+        createdAt: '2025-01-15T10:00:00.000Z',
+    },
+    {
+        id: 2,
+        name: 'Admin Two',
+        email: 'admin2@example.com',
+        role: 'Admin',
+        createdAt: '2025-02-20T12:30:00.000Z',
+    },
+    {
+        id: 3,
+        name: 'Admin Three',
+        email: 'admin3@example.com',
+        role: 'Moderator',
+        createdAt: '2025-03-10T14:45:00.000Z',
+    },
+    {
+        id: 4,
+        name: 'Admin Four',
+        email: 'admin4@example.com',
+        role: 'Admin',
+        createdAt: '2025-04-05T09:15:00.000Z',
+    },
+    {
+        id: 5,
+        name: 'Admin Five',
+        email: 'admin5@example.com',
+        role: 'Super Admin',
+        createdAt: '2025-05-01T16:00:00.000Z',
+    },
+];

@@ -65,7 +65,12 @@ export const clerkWebhooks = async (req, res) => {
 }
 
 
-// Stripe Gateway Initialize
+// Ensure the Stripe secret key is provided
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("Missing STRIPE_SECRET_KEY environment variable");
+}
+
+// Initialize Stripe with the secret key
 const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
 
 
