@@ -145,12 +145,16 @@ export const AppContextProvider = (props) => {
             });
             setUsers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
-            console.error('Failed to fetch users:', error);
-            setUsers([]);
+            if (error.response && error.response.status === 403) {
+                console.warn('Access forbidden: Admin privileges required.');
+                setUsers([]); // Show empty table for forbidden access
+            } else {
+                console.error('Failed to fetch users:', error);
+            }
         } finally {
             setIsLoading(false);
         }
-    }, [backendUrl, getToken]); // Add getToken as a dependency
+    }, [backendUrl, getToken]); // Ensure proper dependencies
 
     // Admin: Fetch Courses
     const fetchCourses = useCallback(async () => {
@@ -209,6 +213,21 @@ export const AppContextProvider = (props) => {
 
         initializeApp();
     }, [getToken]);
+
+    useEffect(() => {
+        if (users.length === 0 && !isLoading) { // Prevent repeated calls if users are already fetched or loading
+            fetchUsers();
+        }
+    }, [fetchUsers, users.length, isLoading]); // Add isLoading to dependencies to avoid infinite loop
+
+    // Error Boundary Component
+    const ErrorBoundary = ({ children }) => {
+        return (
+            <React.Suspense fallback={<div>Loading...</div>}>
+                {children}
+            </React.Suspense>
+        );
+    };
 
     if (isLoading) {
         console.log('Rendering loading state...'); // Debugging log

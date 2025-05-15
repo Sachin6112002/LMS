@@ -7,18 +7,6 @@ import Course from '../models/Course.js'; // Import the Course model
 const router = express.Router();
 
 // Route to fetch all users
-router.get('/users', authenticate, authorizeAdmin, getUsers);
-
-// Route to fetch all courses
-router.get('/courses', authenticate, authorizeAdmin, manageCourses);
-
-// Route to manage courses
-router.post('/courses', authenticate, authorizeAdmin, manageCourses);
-
-// Route to update admin settings
-router.put('/settings', authenticate, authorizeAdmin, updateSettings);
-
-// Updated route to fetch all users
 router.get('/users', authenticate, authorizeAdmin, async (req, res) => {
     try {
         const users = await User.find({}, '_id name email imageUrl enrolledCourses'); // Fetch specific fields
@@ -29,7 +17,7 @@ router.get('/users', authenticate, authorizeAdmin, async (req, res) => {
     }
 });
 
-// Updated route to fetch all courses
+// Route to fetch all courses
 router.get('/courses', authenticate, authorizeAdmin, async (req, res) => {
     try {
         const courses = await Course.find({}, 'courseTitle courseDescription courseThumbnail coursePrice isPublished discount'); // Fetch specific fields
@@ -39,5 +27,11 @@ router.get('/courses', authenticate, authorizeAdmin, async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch courses' });
     }
 });
+
+// Route to manage courses
+router.post('/courses', authenticate, authorizeAdmin, manageCourses);
+
+// Route to update admin settings
+router.put('/settings', authenticate, authorizeAdmin, updateSettings);
 
 export default router;
