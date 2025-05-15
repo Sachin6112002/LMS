@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, useUser } from "@clerk/clerk-react";
@@ -21,10 +21,6 @@ export const AppContextProvider = (props) => {
     const [allCourses, setAllCourses] = useState([])
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [users, setUsers] = useState([]);
-    const [courses, setCourses] = useState([]);
-    const [loading, setLoading] = useState(false);
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -50,6 +46,10 @@ export const AppContextProvider = (props) => {
 
         try {
 
+            if (user.publicMetadata.role === 'educator') {
+                setIsEducator(true)
+            }
+
             const token = await getToken();
 
             const { data } = await axios.get(backendUrl + '/api/user/data',
@@ -57,9 +57,6 @@ export const AppContextProvider = (props) => {
 
             if (data.success) {
                 setUserData(data.user)
-                if (data.user.publicMetadata.role === 'educator') {
-                    setIsEducator(true)
-                }
             } else (
                 toast.error(data.message)
             )
@@ -135,108 +132,18 @@ export const AppContextProvider = (props) => {
         return totalLectures;
     }
 
-    // Admin: Fetch Users
-    const fetchUsers = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const token = await getToken(); // Retrieve token
-            const response = await axios.get(`${backendUrl}/api/admin/users`, {
-                headers: { Authorization: `Bearer ${token}` }, // Include token in headers
-            });
-            setUsers(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            if (error.response && error.response.status === 403) {
-                console.warn('Access forbidden: Admin privileges required.');
-                setUsers([]); // Show empty table for forbidden access
-            } else {
-                console.error('Failed to fetch users:', error);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [backendUrl, getToken]); // Ensure proper dependencies
-
-    // Admin: Fetch Courses
-    const fetchCourses = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get(`${backendUrl}/api/admin/courses`); // Use backendUrl
-            setCourses(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-            console.error('Failed to fetch courses:', error);
-            setCourses([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [backendUrl]); // Add backendUrl as a dependency
-
-    // Added debugging logs to identify where the application is getting stuck
-    useEffect(() => {
-        const initializeApp = async () => {
-            console.log('Initializing AppContext...');
-            try {
-                const token = await getToken();
-                console.log('Token retrieved:', token);
-
-                const [coursesResponse, userResponse] = await Promise.all([
-                    axios.get(backendUrl + '/api/course/all'),
-                    axios.get(backendUrl + '/api/user/data', {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }),
-                ]);
-
-                console.log('Courses Response:', coursesResponse);
-                console.log('User Response:', userResponse);
-
-                if (coursesResponse.data.success) {
-                    setAllCourses(coursesResponse.data.courses);
-                } else {
-                    toast.error(coursesResponse.data.message);
-                }
-
-                if (userResponse.data.success) {
-                    setUserData(userResponse.data.user);
-                    if (userResponse.data.user && userResponse.data.user.publicMetadata && userResponse.data.user.publicMetadata.role === 'educator') {
-                        setIsEducator(true);
-                    }
-                } else {
-                    toast.error(userResponse.data.message);
-                }
-            } catch (error) {
-                console.error('Error during initialization:', error);
-                toast.error(error.message);
-            } finally {
-                setIsLoading(false);
-                console.log('AppContext initialization complete.');
-            }
-        };
-
-        initializeApp();
-    }, [getToken]);
 
     useEffect(() => {
-        if (users.length === 0 && !isLoading) { // Prevent repeated calls if users are already fetched or loading
-            fetchUsers();
-        }
-    }, [fetchUsers, users.length, isLoading]); // Add isLoading to dependencies to avoid infinite loop
+        fetchAllCourses()
+    }, [])
 
-    // Error Boundary Component
-    const ErrorBoundary = ({ children }) => {
-        return (
-            <React.Suspense fallback={<div>Loading...</div>}>
-                {children}
-            </React.Suspense>
-        );
-    };
-
-    if (isLoading) {
-        console.log('Rendering loading state...'); // Debugging log
-        if (typeof isLoading !== 'boolean') {
-            console.error('Unexpected isLoading value:', isLoading); // Log unexpected state
-            return <div>Error: Invalid loading state</div>; // Fallback UI for invalid state
+    // Fetch User's Data if User is Logged In
+    useEffect(() => {
+        if (user) {
+            fetchUserData()
+            fetchUserEnrolledCourses()
         }
-        return <div>Loading...</div>;
-    }
+    }, [user])
 
     const value = {
         showLogin, setShowLogin,
@@ -246,8 +153,7 @@ export const AppContextProvider = (props) => {
         enrolledCourses, fetchUserEnrolledCourses,
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,
-        isEducator,setIsEducator,
-        users, fetchUsers, courses, fetchCourses
+        isEducator,setIsEducator
     }
 
     return (
