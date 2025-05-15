@@ -1,8 +1,8 @@
-const User = require('../models/User');
-const Course = require('../models/Course');
+import User from '../models/User.js';
+import Course from '../models/Course.js';
 
 // Fetch all users
-exports.getUsers = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
     console.log('getUsers called'); // Debugging log
     const users = await User.find(); // Fetch all users from the database
@@ -15,7 +15,7 @@ exports.getUsers = async (req, res) => {
 };
 
 // Fetch all courses
-exports.getCourses = async (req, res) => {
+export const getCourses = async (req, res) => {
   try {
     const courses = await Course.find(); // Fetch all courses from the database
     res.status(200).json(courses);
@@ -25,7 +25,7 @@ exports.getCourses = async (req, res) => {
 };
 
 // Manage courses
-exports.manageCourses = async (req, res) => {
+export const manageCourses = async (req, res) => {
   try {
     const { courseId, action, courseData } = req.body;
 
@@ -48,7 +48,7 @@ exports.manageCourses = async (req, res) => {
 };
 
 // Update admin settings
-exports.updateSettings = async (req, res) => {
+export const updateSettings = async (req, res) => {
   try {
     const { settings } = req.body;
     // Assuming settings are stored in a collection or a config file

@@ -1,8 +1,8 @@
 import express from 'express';
-import { getUsers, manageCourses, updateSettings } from '../controllers/adminController';
-import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware';
-import User from '../models/User'; // Import the User model
-import Course from '../models/Course'; // Import the Course model
+import { getUsers, getCourses, manageCourses, updateSettings } from '../controllers/adminController.js';
+import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js';
+import User from '../models/User.js'; // Import the User model with correct path
+import Course from '../models/Course.js'; // Import the Course model
 
 const router = express.Router();
 
