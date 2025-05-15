@@ -1,6 +1,6 @@
-const express = require('express');
-const { getUsers, manageCourses, updateSettings } = require('../controllers/adminController');
-const { authenticate, authorizeAdmin } = require('../middlewares/authMiddleware');
+import express from 'express';
+import { getUsers, manageCourses, updateSettings } from '../controllers/adminController';
+import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -16,4 +16,4 @@ router.post('/courses', authenticate, authorizeAdmin, manageCourses);
 // Route to update admin settings
 router.put('/settings', authenticate, authorizeAdmin, updateSettings);
 
-module.exports = router;
+export default router;
