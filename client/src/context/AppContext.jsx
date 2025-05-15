@@ -24,6 +24,7 @@ export const AppContextProvider = (props) => {
     const [isLoading, setIsLoading] = useState(true)
     const [users, setUsers] = useState([]);
     const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -136,73 +137,31 @@ export const AppContextProvider = (props) => {
 
     // Admin: Fetch Users
     const fetchUsers = useCallback(async () => {
-        if (users.length > 0) {
-            console.log('Users already fetched, skipping API call');
-            return; // Prevent unnecessary API calls if users are already fetched
-        }
-        console.log('fetchUsers called'); // Debugging log
-        setIsLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-
         try {
-            console.log('Requesting /api/admin/users with headers:', axios.defaults.headers);
-            const response = await axios.get(`${apiBaseUrl}/admin/users`);
-            console.log('API Response:', response); // Log API response
-            console.log('Response Data:', response.data); // Log response data structure
-
-            if (response.status === 200 && Array.isArray(response.data)) {
-                setUsers(response.data);
-                console.log('Users state updated:', response.data); // Log state update
-            } else if (typeof response.data === 'string' && response.data.includes('<!doctype html>')) {
-                console.error('Received HTML response instead of JSON. Possible server misconfiguration or authentication issue.');
-                setUsers([]);
-            } else {
-                console.error('Unexpected response format:', response.data);
-                setUsers([]);
-            }
+            setIsLoading(true);
+            const response = await axios.get(`${backendUrl}/api/admin/users`); // Use backendUrl
+            setUsers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Failed to fetch users:', error);
             setUsers([]);
         } finally {
             setIsLoading(false);
-            console.log('Loading state set to false'); // Log loading state
         }
-    }, [users]); // Memoize fetchUsers to prevent unnecessary re-renders
+    }, [backendUrl]); // Add backendUrl as a dependency
 
     // Admin: Fetch Courses
     const fetchCourses = useCallback(async () => {
-        if (courses.length > 0) {
-            console.log('Courses already fetched, skipping API call');
-            return; // Prevent unnecessary API calls if courses are already fetched
-        }
-        console.log('fetchCourses called'); // Debugging log
-        setIsLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-
         try {
-            console.log('Requesting /api/admin/courses with headers:', axios.defaults.headers);
-            const response = await axios.get(`${apiBaseUrl}/admin/courses`);
-            console.log('API Response:', response); // Log API response
-            console.log('Response Data:', response.data); // Log response data structure
-
-            if (response.status === 200 && Array.isArray(response.data)) {
-                setCourses(response.data);
-                console.log('Courses state updated:', response.data); // Log state update
-            } else if (typeof response.data === 'string' && response.data.includes('<!doctype html>')) {
-                console.error('Received HTML response instead of JSON. Possible server misconfiguration or authentication issue.');
-                setCourses([]);
-            } else {
-                console.error('Unexpected response format:', response.data);
-                setCourses([]);
-            }
+            setIsLoading(true);
+            const response = await axios.get(`${backendUrl}/api/admin/courses`); // Use backendUrl
+            setCourses(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Failed to fetch courses:', error);
             setCourses([]);
         } finally {
             setIsLoading(false);
-            console.log('Loading state set to false'); // Log loading state
         }
-    }, [courses]); // Memoize fetchCourses to prevent unnecessary re-renders
+    }, [backendUrl]); // Add backendUrl as a dependency
 
     // Added debugging logs to identify where the application is getting stuck
     useEffect(() => {
