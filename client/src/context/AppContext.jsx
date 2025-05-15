@@ -139,7 +139,10 @@ export const AppContextProvider = (props) => {
     const fetchUsers = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get(`${backendUrl}/api/admin/users`); // Use backendUrl
+            const token = await getToken(); // Retrieve token
+            const response = await axios.get(`${backendUrl}/api/admin/users`, {
+                headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+            });
             setUsers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Failed to fetch users:', error);
@@ -147,7 +150,7 @@ export const AppContextProvider = (props) => {
         } finally {
             setIsLoading(false);
         }
-    }, [backendUrl]); // Add backendUrl as a dependency
+    }, [backendUrl, getToken]); // Add getToken as a dependency
 
     // Admin: Fetch Courses
     const fetchCourses = useCallback(async () => {
