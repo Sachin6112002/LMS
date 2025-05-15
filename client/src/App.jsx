@@ -15,6 +15,10 @@ import { ToastContainer } from 'react-toastify'
 import Player from './pages/student/Player'
 import MyEnrollments from './pages/student/MyEnrollments'
 import Loading from './components/student/Loading'
+import Admin from './pages/admin/Admin'
+import AdminDashboard from './pages/admin/AdminDahboard'
+import ManageUsers from './pages/admin/ManageUsers'
+import AdminSettings from './pages/admin/AdminSettings'
 
 const App = () => {
 
@@ -33,17 +37,22 @@ const App = () => {
         <Route path="/my-enrollments" element={<MyEnrollments />} />
         <Route path="/player/:courseId" element={<Player />} />
         <Route path="/loading/:path" element={<Loading />} />
+        
+        {/* Educator Routes */}
         <Route path='/educator' element={<Educator />}>
           <Route path='/educator' element={<Dashboard />} />
           <Route path='add-course' element={<AddCourse />} />
           <Route path='my-courses' element={<MyCourses />} />
           <Route path='student-enrolled' element={<StudentsEnrolled />} />
-       
-        <Route path='/admin/*' element={<Admin />}></Route>
-          <Route path='/admin/dashboard' element={<AdminDashboard />} />
-          <Route path='/admin/manage-users' element={<ManageUsers />} />
-          <Route path='/admin/settings' element={<AdminSettings />} />
         </Route>
+
+        {/* Admin Routes */}
+  <Route path="/admin" element={<Admin />}>
+    <Route path="dashboard" element={<AdminDashboard />} />
+    <Route path="manage-users" element={<ManageUsers />} />
+    <Route path="manage-courses" element={<ManageCourses />} />
+    <Route path="settings" element={<AdminSettings />} />
+  </Route>
       </Routes>
     </div>
   )
