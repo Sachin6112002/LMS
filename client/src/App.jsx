@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, Component } from 'react';
 import { Routes, Route, useMatch } from 'react-router-dom';
 import Navbar from './components/student/Navbar';
 import Home from './pages/student/Home';
@@ -17,43 +17,122 @@ import MyEnrollments from './pages/student/MyEnrollments';
 import Loading from './components/student/Loading';
 import Admin from './pages/admin/Admin';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageCourses from './pages/admin/ManageCourses'; // Import ManageCourses
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminDashboard from './pages/admin/AdminDahboard';
+import { AppContextProvider } from './context/AppContext';
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log the error and error information to the console
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+
+    // You can also send the error information to a logging service here
+
+    this.setState({ error, errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h1>Something went wrong.</h1>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+class GlobalErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Global Error caught:', error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h1>Something went wrong.</h1>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const App = () => {
   const isEducatorRoute = useMatch('/educator/*');
 
   return (
-    <div className="text-default min-h-screen bg-white">
-      <ToastContainer />
-      {/* Render Student Navbar only if not on educator routes */}
-      {!isEducatorRoute && <Navbar />}
-      <Routes>
-        {/* Student Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/course/:id" element={<CourseDetails />} />
-        <Route path="/course-list" element={<CoursesList />} />
-        <Route path="/course-list/:input" element={<CoursesList />} />
-        <Route path="/my-enrollments" element={<MyEnrollments />} />
-        <Route path="/player/:courseId" element={<Player />} />
-        <Route path="/loading/:path" element={<Loading />} />
+    <GlobalErrorBoundary>
+      <ErrorBoundary>
+        <AppContextProvider>
+          <div className="text-default min-h-screen bg-white">
+            <ToastContainer />
+            {/* Render Student Navbar only if not on educator routes */}
+            {!isEducatorRoute && <Navbar />}
+            <Routes>
+              {/* Student Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/course/:id" element={<CourseDetails />} />
+              <Route path="/course-list" element={<CoursesList />} />
+              <Route path="/course-list/:input" element={<CoursesList />} />
+              <Route path="/my-enrollments" element={<MyEnrollments />} />
+              <Route path="/player/:courseId" element={<Player />} />
+              <Route path="/loading/:path" element={<Loading />} />
 
-        {/* Educator Routes */}
-        <Route path="/educator" element={<Educator />}>
-          <Route path="/educator" element={<Dashboard />} />
-          <Route path="add-course" element={<AddCourse />} />
-          <Route path="my-courses" element={<MyCourses />} />
-          <Route path="student-enrolled" element={<StudentsEnrolled />} />
-        </Route>
+              {/* Educator Routes */}
+              <Route path="/educator" element={<Educator />}>
+                <Route path="/educator" element={<Dashboard />} />
+                <Route path="add-course" element={<AddCourse />} />
+                <Route path="my-courses" element={<MyCourses />} />
+                <Route path="student-enrolled" element={<StudentsEnrolled />} />
+              </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<Admin />}>
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="manage-users" element={<ManageUsers />} />
-          <Route path="settings" element={<AdminSettings />} />
-        </Route>
-      </Routes>
-    </div>
+              {/* Admin Routes */}
+              <Route path="/admin" element={<Admin />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="manage-users" element={<ManageUsers />} />
+                <Route path="manage-courses" element={<ManageCourses />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
+            </Routes>
+          </div>
+        </AppContextProvider>
+      </ErrorBoundary>
+    </GlobalErrorBoundary>
   );
 };
 

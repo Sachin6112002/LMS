@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, useUser } from "@clerk/clerk-react";
@@ -22,6 +22,8 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
     const [isLoading, setIsLoading] = useState(true)
+    const [users, setUsers] = useState([]);
+    const [courses, setCourses] = useState([]);
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -132,6 +134,76 @@ export const AppContextProvider = (props) => {
         return totalLectures;
     }
 
+    // Admin: Fetch Users
+    const fetchUsers = useCallback(async () => {
+        if (users.length > 0) {
+            console.log('Users already fetched, skipping API call');
+            return; // Prevent unnecessary API calls if users are already fetched
+        }
+        console.log('fetchUsers called'); // Debugging log
+        setIsLoading(true);
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
+        try {
+            console.log('Requesting /api/admin/users with headers:', axios.defaults.headers);
+            const response = await axios.get(`${apiBaseUrl}/admin/users`);
+            console.log('API Response:', response); // Log API response
+            console.log('Response Data:', response.data); // Log response data structure
+
+            if (response.status === 200 && Array.isArray(response.data)) {
+                setUsers(response.data);
+                console.log('Users state updated:', response.data); // Log state update
+            } else if (typeof response.data === 'string' && response.data.includes('<!doctype html>')) {
+                console.error('Received HTML response instead of JSON. Possible server misconfiguration or authentication issue.');
+                setUsers([]);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                setUsers([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch users:', error);
+            setUsers([]);
+        } finally {
+            setIsLoading(false);
+            console.log('Loading state set to false'); // Log loading state
+        }
+    }, [users]); // Memoize fetchUsers to prevent unnecessary re-renders
+
+    // Admin: Fetch Courses
+    const fetchCourses = useCallback(async () => {
+        if (courses.length > 0) {
+            console.log('Courses already fetched, skipping API call');
+            return; // Prevent unnecessary API calls if courses are already fetched
+        }
+        console.log('fetchCourses called'); // Debugging log
+        setIsLoading(true);
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
+        try {
+            console.log('Requesting /api/admin/courses with headers:', axios.defaults.headers);
+            const response = await axios.get(`${apiBaseUrl}/admin/courses`);
+            console.log('API Response:', response); // Log API response
+            console.log('Response Data:', response.data); // Log response data structure
+
+            if (response.status === 200 && Array.isArray(response.data)) {
+                setCourses(response.data);
+                console.log('Courses state updated:', response.data); // Log state update
+            } else if (typeof response.data === 'string' && response.data.includes('<!doctype html>')) {
+                console.error('Received HTML response instead of JSON. Possible server misconfiguration or authentication issue.');
+                setCourses([]);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                setCourses([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch courses:', error);
+            setCourses([]);
+        } finally {
+            setIsLoading(false);
+            console.log('Loading state set to false'); // Log loading state
+        }
+    }, [courses]); // Memoize fetchCourses to prevent unnecessary re-renders
+
     // Added debugging logs to identify where the application is getting stuck
     useEffect(() => {
         const initializeApp = async () => {
@@ -158,7 +230,7 @@ export const AppContextProvider = (props) => {
 
                 if (userResponse.data.success) {
                     setUserData(userResponse.data.user);
-                    if (userResponse.data.user.publicMetadata.role === 'educator') {
+                    if (userResponse.data.user && userResponse.data.user.publicMetadata && userResponse.data.user.publicMetadata.role === 'educator') {
                         setIsEducator(true);
                     }
                 } else {
@@ -177,6 +249,11 @@ export const AppContextProvider = (props) => {
     }, [getToken]);
 
     if (isLoading) {
+        console.log('Rendering loading state...'); // Debugging log
+        if (typeof isLoading !== 'boolean') {
+            console.error('Unexpected isLoading value:', isLoading); // Log unexpected state
+            return <div>Error: Invalid loading state</div>; // Fallback UI for invalid state
+        }
         return <div>Loading...</div>;
     }
 
@@ -188,7 +265,8 @@ export const AppContextProvider = (props) => {
         enrolledCourses, fetchUserEnrolledCourses,
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,
-        isEducator,setIsEducator
+        isEducator,setIsEducator,
+        users, fetchUsers, courses, fetchCourses
     }
 
     return (
