@@ -17,10 +17,10 @@ router.post('/courses', authenticate, authorizeAdmin, manageCourses);
 // Route to update admin settings
 router.put('/settings', authenticate, authorizeAdmin, updateSettings);
 
-// Add route to fetch all users
+// Updated route to fetch all users
 router.get('/users', authenticate, authorizeAdmin, async (req, res) => {
     try {
-        const users = await User.find(); // Assuming User is the model for users
+        const users = await User.find({}, '_id name email imageUrl enrolledCourses'); // Fetch specific fields
         res.status(200).json(users);
     } catch (error) {
         console.error('Error fetching users:', error);
