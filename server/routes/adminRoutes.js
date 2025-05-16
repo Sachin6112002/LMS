@@ -52,4 +52,49 @@ router.put('/users/:id', authenticate, authorizeAdmin, async (req, res) => {
     }
 });
 
+// Admin dashboard route
+router.get('/dashboard', authenticate, authorizeAdmin, async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalCourses = await Course.countDocuments();
+
+        // Aggregate total earnings from purchases
+        let totalEarnings = 0;
+        let enrolledStudentsData = [];
+        try {
+            const Purchase = (await import('../models/Purchase.js')).default;
+            const purchases = await Purchase.find({}).sort({ createdAt: -1 }).limit(10).populate('userId').populate('courseId');
+            totalEarnings = await Purchase.aggregate([
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]);
+            totalEarnings = totalEarnings[0]?.total || 0;
+            enrolledStudentsData = purchases.map(p => ({
+                student: {
+                    name: p.userId?.name || 'Unknown',
+                    imageUrl: p.userId?.imageUrl || '',
+                },
+                courseTitle: p.courseId?.courseTitle || 'Unknown',
+                enrollmentDate: p.createdAt ? p.createdAt.toISOString().split('T')[0] : '',
+                status: p.status || 'Completed',
+            }));
+        } catch (e) {
+            // If Purchase model or data is missing, fallback to empty
+            totalEarnings = 0;
+            enrolledStudentsData = [];
+        }
+
+        res.json({
+            success: true,
+            dashboardData: {
+                totalUsers,
+                totalCourses,
+                totalEarnings,
+                enrolledStudentsData
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default router;

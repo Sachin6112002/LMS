@@ -102,7 +102,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  ) : <Loading />
+  ) 
 }
 
 export default Dashboard
