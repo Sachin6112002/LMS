@@ -206,6 +206,20 @@ export const addUserRating = async (req, res) => {
     }
 };
 
-// After user is created (in your registration logic):
-// Example: after creating a new user
-// await assignAdminToFirstUser(newUser._id);
+// Example registration logic (add this after creating a new user):
+export const registerUser = async (req, res) => {
+    try {
+        // ...existing registration logic...
+        const newUser = await User.create({
+            name: req.body.name,
+            email: req.body.email,
+            // ...other fields...
+        });
+        // Assign admin to first user
+        await assignAdminToFirstUser(newUser._id);
+        // ...rest of registration logic...
+        res.status(201).json({ success: true, user: newUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
