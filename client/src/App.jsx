@@ -118,7 +118,13 @@ const App = () => {
               <Route path="/educator/*" element={<Educator />} />
 
               {/* Admin Routes */}
-              <Route path="/admin/*" element={<Admin />} />
+              <Route path="/admin/*" element={<Admin />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="manage-users" element={<ManageUsers />} />
+                <Route path="manage-courses" element={<ManageCourses />} />
+                <Route path="settings" element={<AdminSettings />} />
+                <Route index element={<AdminDashboard />} />
+              </Route>
             </Routes>
           </div>
         </AppContextProvider>

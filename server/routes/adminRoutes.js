@@ -40,6 +40,10 @@ router.put('/users/:id', authenticate, authorizeAdmin, async (req, res) => {
         const { id } = req.params;
         const { role } = req.body;
         if (!role) return res.status(400).json({ success: false, message: 'Role is required' });
+        // Only allow admin to assign admin role
+        if (role === 'admin' && req.user.publicMetadata.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Only admins can assign admin role.' });
+        }
         const user = await User.findByIdAndUpdate(id, { 'publicMetadata.role': role }, { new: true });
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
         res.json({ success: true, message: `User role updated to ${role}` });

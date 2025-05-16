@@ -142,11 +142,13 @@ const ManageUsers = () => {
                                 <td className="px-4 py-2">{user.email}</td>
                                 <td className="px-4 py-2">{user.role}</td>
                                 <td className="px-4 py-2 flex gap-2 justify-center">
-                                    <button 
-                                        onClick={() => handleUpdate(user.id, { role: 'admin' })} 
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                        Make Admin
-                                    </button>
+                                    {userData && userData.publicMetadata?.role === 'admin' && (
+                                      <button 
+                                          onClick={() => handleUpdate(user.id, { role: 'admin' })} 
+                                          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                          Make Admin
+                                      </button>
+                                    )}
                                     <button 
                                         onClick={() => handleDelete(user.id)} 
                                         className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
