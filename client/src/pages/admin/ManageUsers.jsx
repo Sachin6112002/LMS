@@ -76,6 +76,34 @@ const ManageUsers = () => {
         (user.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Add handler for updating user role
+    const handleUpdate = async (userId, updateData) => {
+        try {
+            // You should have an API endpoint for updating user roles, e.g. /api/admin/users/:id
+            // Here is a sample implementation:
+            setLoading(true);
+            setError(null);
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updateData),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                // Optionally, refetch users or update state
+                await fetchAllUsers();
+            } else {
+                setError(result.message || 'Failed to update user.');
+            }
+        } catch (err) {
+            setError('Failed to update user.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading) return <p>Loading...</p>;
 
     if (error) return <p className="text-red-500">{error}</p>; // Display error message
