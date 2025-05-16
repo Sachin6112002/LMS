@@ -1,27 +1,31 @@
-
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { assets, dummyDashboardData } from '../../assets/assets';
+import { assets } from '../../assets/assets';
 import Loading from '../../components/student/Loading';
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
-  const { currency } = useContext(AppContext);
+  const { currency, backendUrl, getToken } = useContext(AppContext);
   const [dashboardData, setDashboardData] = useState(null);
-  const [metrics, setMetrics] = useState({
-    totalUsers: 120,
-    totalCourses: 45,
-    totalEarnings: 15000,
-  });
-  const recentActivities = [
-    { id: 1, activity: 'User John Doe enrolled in JavaScript Basics', timestamp: '2025-05-12 10:00 AM' },
-    { id: 2, activity: 'Course Advanced Python Programming was updated', timestamp: '2025-05-11 03:45 PM' },
-    { id: 3, activity: 'Admin Jane Smith added a new course', timestamp: '2025-05-10 01:30 PM' },
-  ];
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
-    setDashboardData(dummyDashboardData);
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const res = await fetch(`${backendUrl}/api/admin/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+      }
+    } catch (err) {
+      setDashboardData(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -31,6 +35,8 @@ const AdminDashboard = () => {
   const handleNavigation = (path) => {
     navigate(path);
   };
+
+  if (loading) return <Loading />;
 
   return dashboardData ? (
     <div className='min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0'>
@@ -58,8 +64,7 @@ const AdminDashboard = () => {
             <img src={assets.earning_icon} alt='earning_icon' />
             <div>
               <p className='text-2xl font-medium text-gray-600'>
-                {currency}
-                {dashboardData.totalEarnings}
+                {currency}{dashboardData.totalEarnings}
               </p>
               <p className='text-base text-gray-500'>Total Earnings</p>
             </div>
@@ -98,17 +103,6 @@ const AdminDashboard = () => {
               </tbody>
             </table>
           </div>
-        </div>
-        <div className='bg-white shadow-md rounded-lg p-4'>
-          <h2 className='text-lg font-medium mb-4'>Recent Activities</h2>
-          <ul>
-            {recentActivities.map(activity => (
-              <li key={activity.id} className='border-b py-2'>
-                <p>{activity.activity}</p>
-                <p className='text-sm text-gray-500'>{activity.timestamp}</p>
-              </li>
-            ))}
-          </ul>
         </div>
         <div>
           <button onClick={() => handleNavigation('/admin/settings')}>Settings</button>
