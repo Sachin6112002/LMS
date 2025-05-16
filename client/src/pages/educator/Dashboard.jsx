@@ -40,7 +40,11 @@ const Dashboard = () => {
   }, [isEducator])
 
 
-  return dashboardData ? (
+  if (!dashboardData || !dashboardData.enrolledStudentsData || typeof dashboardData.totalCourses === 'undefined' || typeof dashboardData.totalEarnings === 'undefined') {
+    return <div className="p-8 text-red-600 font-semibold">Error: Could not load dashboard data. Please check your backend API response for /api/educator/dashboard.</div>;
+  }
+
+  return (
     <div className='min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0'>
       <div className='space-y-5'>
         <div className='flex flex-wrap gap-5 items-center'>

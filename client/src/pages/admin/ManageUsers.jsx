@@ -42,7 +42,6 @@ const ManageUsers = () => {
                 setLoading(true);
                 await fetchAllUsers();
             } catch (err) {
-                console.error('Error fetching users:', err);
                 setError('Failed to load users. Please try again later.');
             } finally {
                 setLoading(false);
@@ -51,25 +50,6 @@ const ManageUsers = () => {
 
         fetchData();
     }, [fetchAllUsers, userData]);
-
-    useEffect(() => {
-        console.log('Loading state:', loading);
-        console.log('Users state:', users);
-    }, [loading, users]);
-
-    useEffect(() => {
-        console.log('Component mounted');
-        return () => {
-            console.log('Component unmounted');
-        };
-    }, []); // Log component lifecycle for debugging
-
-    useEffect(() => {
-        console.log('Rendering ManageUsers component');
-        console.log('Current loading state:', loading);
-        console.log('Current users state:', users);
-        console.log('Current error state:', error);
-    }, [loading, users, error]); // Log state changes during rendering
 
     const filteredUsers = (users || []).filter(user =>
         (user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
