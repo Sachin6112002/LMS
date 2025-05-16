@@ -34,4 +34,18 @@ router.post('/courses', authenticate, authorizeAdmin, manageCourses);
 // Route to update admin settings
 router.put('/settings', authenticate, authorizeAdmin, updateSettings);
 
+// Update user role (admin action)
+router.put('/users/:id', authenticate, authorizeAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+        if (!role) return res.status(400).json({ success: false, message: 'Role is required' });
+        const user = await User.findByIdAndUpdate(id, { 'publicMetadata.role': role }, { new: true });
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+        res.json({ success: true, message: `User role updated to ${role}` });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default router;
