@@ -25,7 +25,7 @@ class ErrorBoundary extends Component {
 }
 
 const ManageCourses = () => {
-    const { courses, fetchCourses, loading } = useContext(AppContext);
+    const { courses = [], fetchCourses, loading } = useContext(AppContext); // Default courses to empty array
     const [searchQuery, setSearchQuery] = useState('');
     const [editingCourse, setEditingCourse] = useState(null);
     const [selectedCourses, setSelectedCourses] = useState([]);
@@ -66,12 +66,13 @@ const ManageCourses = () => {
         );
     };
 
-    const filteredCourses = courses.filter(course =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredCourses = (courses || []).filter(course =>
+        (course.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (course.instructor || '').toLowerCase().includes(searchQuery.toLowerCase())
+    ); // Defensive: handle undefined/null fields
 
     if (loading) return <p>Loading...</p>;
+    if (!Array.isArray(courses)) return <p>No courses found.</p>; // Defensive: handle non-array courses
 
     return (
         <ErrorBoundary>

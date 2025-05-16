@@ -22,6 +22,7 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null)
     const [enrolledCourses, setEnrolledCourses] = useState([])
     const [users, setUsers] = useState([])
+    const [courses, setCourses] = useState([]); // Ensure courses state is initialized as an empty array
 
     // Fetch All Courses
     const fetchAllCourses = async () => {
@@ -99,6 +100,24 @@ export const AppContextProvider = (props) => {
         } catch (error) {
             console.error('Error fetching users:', error);
             toast.error(error.response?.data?.message || 'Failed to fetch users.');
+        }
+    };
+
+    // Admin: Fetch Courses
+    const fetchCourses = async () => {
+        try {
+            const token = await getToken();
+            const { data } = await axios.get(`${backendUrl}/api/admin/courses`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (Array.isArray(data)) {
+                setCourses(data);
+            } else {
+                toast.error('Failed to fetch courses.');
+            }
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+            toast.error(error.response?.data?.message || 'Failed to fetch courses.');
         }
     };
 
@@ -226,8 +245,9 @@ export const AppContextProvider = (props) => {
         enrolledCourses, fetchUserEnrolledCourses,
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,
-        isEducator,setIsEducator,
+        isEducator, setIsEducator,
         users, fetchAllUsers,
+        courses, fetchCourses, // <-- Ensure fetchCourses is exposed here
         manageCourses, updateAdminSettings
     }
 

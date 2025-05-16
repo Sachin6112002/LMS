@@ -25,23 +25,32 @@ class ErrorBoundary extends Component {
 }
 
 const ManageUsers = () => {
-    const { users, fetchUsers, loading } = useContext(AppContext);
+    const { users = [], fetchAllUsers, userData } = useContext(AppContext); // Get userData from context
     const [searchQuery, setSearchQuery] = useState('');
-    const [error, setError] = useState(null); // New state for error handling
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        // Only allow admins to fetch users
+        if (!userData || userData.publicMetadata?.role !== 'admin') {
+            setError('Forbidden: Admins only');
+            return;
+        }
         const fetchData = async () => {
             try {
-                setError(null); // Reset error state before fetching
-                await fetchUsers();
+                setError(null);
+                setLoading(true);
+                await fetchAllUsers();
             } catch (err) {
                 console.error('Error fetching users:', err);
                 setError('Failed to load users. Please try again later.');
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData();
-    }, [fetchUsers]);
+    }, [fetchAllUsers, userData]);
 
     useEffect(() => {
         console.log('Loading state:', loading);
@@ -63,15 +72,15 @@ const ManageUsers = () => {
     }, [loading, users, error]); // Log state changes during rendering
 
     const filteredUsers = (users || []).filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        (user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     if (loading) return <p>Loading...</p>;
 
     if (error) return <p className="text-red-500">{error}</p>; // Display error message
 
-    if (!users && !loading && !error) {
+    if (!Array.isArray(users) || users.length === 0) {
         return <p className="text-gray-500">No users found. Please try again later.</p>; // Handle empty state gracefully
     }
 
