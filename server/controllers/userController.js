@@ -3,6 +3,7 @@ import { CourseProgress } from "../models/CourseProgress.js"
 import { Purchase } from "../models/Purchase.js"
 import User from "../models/User.js"
 import stripe from "stripe"
+import { assignAdminToFirstUser } from './adminController.js';
 
 
 
@@ -204,3 +205,7 @@ export const addUserRating = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 };
+
+// After user is created (in your registration logic):
+// Example: after creating a new user
+// await assignAdminToFirstUser(newUser._id);

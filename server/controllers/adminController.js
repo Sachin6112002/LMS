@@ -58,3 +58,13 @@ export const updateSettings = async (req, res) => {
     res.status(500).json({ error: 'Failed to update settings' });
   }
 };
+
+// Utility: Assign admin role to first user
+export const assignAdminToFirstUser = async (userId) => {
+  const adminExists = await User.findOne({ 'publicMetadata.role': 'admin' });
+  if (!adminExists) {
+    await User.findByIdAndUpdate(userId, { 'publicMetadata.role': 'admin' });
+    return true;
+  }
+  return false;
+};
