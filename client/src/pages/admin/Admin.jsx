@@ -7,6 +7,7 @@ import AdminSidebar from '../../components/admin/SideBar';
 const Admin = () => {
   return (
     <div className="text-default min-h-screen bg-red">
+      {/* Only render the admin-specific Navbar, not the student one */}
       <Navbar />
       <div className="flex">
         <AdminSidebar />

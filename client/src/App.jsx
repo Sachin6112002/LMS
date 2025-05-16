@@ -94,6 +94,7 @@ class GlobalErrorBoundary extends Component {
 
 const App = () => {
   const isEducatorRoute = useMatch('/educator/*');
+  const isAdminRoute = useMatch('/admin/*');
 
   return (
     <GlobalErrorBoundary>
@@ -101,8 +102,8 @@ const App = () => {
         <AppContextProvider>
           <div className="text-default min-h-screen bg-white">
             <ToastContainer />
-            {/* Render Student Navbar only if not on educator routes */}
-            {!isEducatorRoute && <Navbar />}
+            {/* Render Student Navbar only if not on educator or admin routes */}
+            {!(isEducatorRoute || isAdminRoute) && <Navbar />}
             <Routes>
               {/* Student Routes */}
               <Route path="/" element={<Home />} />
@@ -114,20 +115,10 @@ const App = () => {
               <Route path="/loading/:path" element={<Loading />} />
 
               {/* Educator Routes */}
-              <Route path="/educator" element={<Educator />}>
-                <Route path="/educator" element={<Dashboard />} />
-                <Route path="add-course" element={<AddCourse />} />
-                <Route path="my-courses" element={<MyCourses />} />
-                <Route path="student-enrolled" element={<StudentsEnrolled />} />
-              </Route>
+              <Route path="/educator/*" element={<Educator />} />
 
               {/* Admin Routes */}
-              <Route path="/admin" element={<Admin />}>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="manage-users" element={<ManageUsers />} />
-                <Route path="manage-courses" element={<ManageCourses />} />
-                <Route path="settings" element={<AdminSettings />} />
-              </Route>
+              <Route path="/admin/*" element={<Admin />} />
             </Routes>
           </div>
         </AppContextProvider>
