@@ -1,5 +1,5 @@
 import express from 'express';
-import { getUsers, getCourses, manageCourses, updateSettings } from '../controllers/adminController.js';
+import { getUsers, getCourses, manageCourses, updateSettings, assignAdminToFirstUser } from '../controllers/adminController.js';
 import { authenticate, authorizeAdmin } from '../middlewares/authMiddleware.js';
 import User from '../models/User.js'; // Import the User model with correct path
 import Course from '../models/Course.js'; // Import the Course model
@@ -95,6 +95,16 @@ router.get('/dashboard', authenticate, authorizeAdmin, async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
+});
+
+// Check if any admin exists
+router.get('/check-admin-exists', async (req, res) => {
+  try {
+    const adminExists = await User.findOne({ 'publicMetadata.role': 'admin' });
+    res.json({ exists: !!adminExists });
+  } catch (err) {
+    res.json({ exists: false });
+  }
 });
 
 export default router;

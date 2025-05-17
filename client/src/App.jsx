@@ -21,6 +21,7 @@ import ManageCourses from './pages/admin/ManageCourses'; // Import ManageCourses
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminDashboard from './pages/admin/AdminDahboard';
 import { AppContextProvider } from './context/AppContext';
+import Register from './pages/student/Register';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -113,6 +114,7 @@ const App = () => {
               <Route path="/my-enrollments" element={<MyEnrollments />} />
               <Route path="/player/:courseId" element={<Player />} />
               <Route path="/loading/:path" element={<Loading />} />
+              <Route path="/register" element={<Register />} />
 
               {/* Educator Routes */}
               <Route path="/educator/*" element={<Educator />} />
