@@ -71,8 +71,10 @@ const ManageCourses = () => {
         (course.instructor || '').toLowerCase().includes(searchQuery.toLowerCase())
     ); // Defensive: handle undefined/null fields
 
+    // Defensive: show loading if courses is not loaded
     if (loading) return <p>Loading...</p>;
-    if (!Array.isArray(courses)) return <p>No courses found.</p>; // Defensive: handle non-array courses
+    if (!Array.isArray(courses)) return <p>No courses found.</p>;
+    if (courses.length === 0) return <p className="p-8 text-gray-500">No courses available.</p>;
 
     return (
         <ErrorBoundary>
@@ -114,43 +116,45 @@ const ManageCourses = () => {
                     </thead>
                     <tbody>
                         {filteredCourses.map(course => (
-                            <tr key={course.id} className="border-t">
-                                <td className="px-4 py-2 text-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedCourses.includes(course.id)}
-                                        onChange={() => handleSelectCourse(course.id)}
-                                    />
-                                </td>
-                                <td className="px-4 py-2 text-center">{course.id}</td>
-                                <td className="px-4 py-2">{course.title}</td>
-                                <td className="px-4 py-2">{course.instructor}</td>
-                                <td className="px-4 py-2 text-center">${course.price}</td>
-                                <td className="px-4 py-2 text-center">
-                                    <button
-                                        onClick={() => handleToggleStatus(course.id)}
-                                        className={`px-2 py-1 rounded ${course.status === 'Published' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}
-                                    >
-                                        {course.status}
-                                    </button>
-                                </td>
-                                <td className="px-4 py-2 text-center">{course.rating}</td>
-                                <td className="px-4 py-2 text-center">{course.createdAt}</td>
-                                <td className="px-4 py-2 flex gap-2 justify-center">
-                                    <button
-                                        onClick={() => handleEdit(course)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(course.id)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
+                            course && course.id ? (
+                                <tr key={course.id} className="border-t">
+                                    <td className="px-4 py-2 text-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCourses.includes(course.id)}
+                                            onChange={() => handleSelectCourse(course.id)}
+                                        />
+                                    </td>
+                                    <td className="px-4 py-2 text-center">{course.id}</td>
+                                    <td className="px-4 py-2">{course.title}</td>
+                                    <td className="px-4 py-2">{course.instructor}</td>
+                                    <td className="px-4 py-2 text-center">${course.price}</td>
+                                    <td className="px-4 py-2 text-center">
+                                        <button
+                                            onClick={() => handleToggleStatus(course.id)}
+                                            className={`px-2 py-1 rounded ${course.status === 'Published' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}
+                                        >
+                                            {course.status}
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-2 text-center">{course.rating}</td>
+                                    <td className="px-4 py-2 text-center">{course.createdAt}</td>
+                                    <td className="px-4 py-2 flex gap-2 justify-center">
+                                        <button
+                                            onClick={() => handleEdit(course)}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(course.id)}
+                                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ) : null
                         ))}
                     </tbody>
                 </table>

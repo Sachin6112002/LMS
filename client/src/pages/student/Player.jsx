@@ -43,7 +43,7 @@ const Player = ({ }) => {
 
 
   useEffect(() => {
-    if (enrolledCourses.length > 0) {
+    if (enrolledCourses && enrolledCourses.length > 0) {
       getCourseData()
     }
   }, [enrolledCourses])
@@ -124,7 +124,11 @@ const Player = ({ }) => {
 
   }, [])
 
-  return courseData ? (
+  // Defensive: show loading if courseData is not loaded
+  if (!courseData) return <Loading />;
+  if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
+
+  return (
     <>
     
     <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36' >
@@ -189,7 +193,7 @@ const Player = ({ }) => {
     </div>
     <Footer />
     </>
-  ) : <Loading />
+  )
 }
 
 export default Player

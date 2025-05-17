@@ -88,21 +88,22 @@ const CourseDetails = () => {
   }, [])
 
   useEffect(() => {
-
     if (userData && courseData) {
-      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id))
+      setIsAlreadyEnrolled(userData.enrolledCourses && userData.enrolledCourses.includes(courseData._id))
     }
-
   }, [userData, courseData])
 
-  return courseData ? (
+  if (!courseData) return <Loading />;
+  if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
+
+  return (
     <>
       <div className="flex md:flex-row flex-col-reverse gap-10 relative items-start justify-between md:px-36 px-8 md:pt-20 pt-10 text-left">
         <div className="absolute top-0 left-0 w-full h-section-height -z-1 bg-gradient-to-b from-cyan-100/70"></div>
 
         <div className="max-w-xl z-10 text-gray-500">
           <h1 className="md:text-course-deatails-heading-large text-course-deatails-heading-small font-semibold text-gray-800">
-            {courseData.courseTitle}
+            {courseData.courseTitle || 'Untitled Course'}
           </h1>
           <p className="pt-4 md:text-base text-sm" dangerouslySetInnerHTML={{ __html: courseData.courseDescription.slice(0, 200) }}>
           </p>
@@ -124,7 +125,7 @@ const CourseDetails = () => {
           <div className="pt-8 text-gray-800">
             <h2 className="text-xl font-semibold">Course Structure</h2>
             <div className="pt-5">
-              {courseData.courseContent.map((chapter, index) => (
+              {Array.isArray(courseData.courseContent) && courseData.courseContent.length > 0 ? courseData.courseContent.map((chapter, index) => (
                 <div key={index} className="border border-gray-300 bg-white mb-2 rounded">
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
@@ -156,7 +157,7 @@ const CourseDetails = () => {
                     </ul>
                   </div>
                 </div>
-              ))}
+              )) : <p>No course content available.</p>}
             </div>
           </div>
 
@@ -219,7 +220,7 @@ const CourseDetails = () => {
       </div>
       <Footer />
     </>
-  ) : <Loading />
+  );
 };
 
 export default CourseDetails;
