@@ -224,6 +224,10 @@ export const AppContextProvider = (props) => {
         return totalLectures;
     }
 
+    // Helper to reload userData (e.g., after registration or login)
+    const reloadUserData = async () => {
+        await fetchUserData();
+    };
 
     useEffect(() => {
         fetchAllCourses()
@@ -248,7 +252,8 @@ export const AppContextProvider = (props) => {
         isEducator, setIsEducator,
         users, fetchAllUsers,
         courses, fetchCourses, // <-- Ensure fetchCourses is exposed here
-        manageCourses, updateAdminSettings
+        manageCourses, updateAdminSettings,
+        reloadUserData // <-- Expose reload helper
     }
 
     return (

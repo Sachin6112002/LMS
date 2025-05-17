@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import FirstAdminGuard from './FirstAdminGuard';
+import { AppContext } from '../../context/AppContext';
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', imageUrl: '' });
@@ -9,6 +10,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const { reloadUserData } = useContext(AppContext);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,6 +25,7 @@ const Register = () => {
       const { data } = await axios.post('/api/user/register', form);
       if (data.success) {
         setSuccess('Registration successful! You are now the admin.');
+        await reloadUserData(); // <-- reload userData after registration
         setTimeout(() => navigate('/'), 2000);
       } else {
         setError(data.message || 'Registration failed.');
