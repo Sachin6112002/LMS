@@ -1,68 +1,34 @@
 import axios from 'axios'
 import React, { useContext, useState } from 'react'
-import { DoctorContext } from '../context/DoctorContext'
-import { AdminContext } from '../context/AdminContext'
+import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 
 const Login = () => {
-
-  const [state, setState] = useState('Admin')
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
   const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-  const { setDToken } = useContext(DoctorContext)
-  const { setAToken } = useContext(AdminContext)
+  const { setAToken } = useContext(AppContext)
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-
-    if (state === 'Admin') {
-
-      const { data } = await axios.post(backendUrl + '/api/admin/login', { email, password })
-      if (data.success) {
-        setAToken(data.token)
-        localStorage.setItem('aToken', data.token)
-      } else {
-        toast.error(data.message)
-      }
-
+    const { data } = await axios.post(backendUrl + '/api/admin/login', { email, password })
+    if (data.success) {
+      setAToken(data.token)
+      localStorage.setItem('aToken', data.token)
     } else {
-
-      const { data } = await axios.post(backendUrl + '/api/doctor/login', { email, password })
-      if (data.success) {
-        setDToken(data.token)
-        localStorage.setItem('dToken', data.token)
-      } else {
-        toast.error(data.message)
-      }
-
+      toast.error(data.message)
     }
-
   }
 
   return (
-    <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
-      <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg'>
-        <p className='text-2xl font-semibold m-auto'><span className='text-primary'>{state}</span> Login</p>
-        <div className='w-full '>
-          <p>Email</p>
-          <input onChange={(e) => setEmail(e.target.value)} value={email} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="email" required />
-        </div>
-        <div className='w-full '>
-          <p>Password</p>
-          <input onChange={(e) => setPassword(e.target.value)} value={password} className='border border-[#DADADA] rounded w-full p-2 mt-1' type="password" required />
-        </div>
-        <button className='bg-primary text-white w-full py-2 rounded-md text-base'>Login</button>
-        {
-          state === 'Admin'
-            ? <p>Doctor Login? <span onClick={() => setState('Doctor')} className='text-primary underline cursor-pointer'>Click here</span></p>
-            : <p>Admin Login? <span onClick={() => setState('Admin')} className='text-primary underline cursor-pointer'>Click here</span></p>
-        }
-      </div>
-    </form>
+    <div className='flex justify-center items-center min-h-screen bg-gray-100'>
+      <form onSubmit={onSubmitHandler} className='bg-white p-8 rounded shadow-md w-80'>
+        <h2 className='text-2xl font-bold mb-6 text-center'>Admin Login</h2>
+        <input type='email' value={email} onChange={e => setEmail(e.target.value)} placeholder='Email' className='w-full mb-4 p-2 border rounded' required />
+        <input type='password' value={password} onChange={e => setPassword(e.target.value)} placeholder='Password' className='w-full mb-6 p-2 border rounded' required />
+        <button type='submit' className='w-full bg-primary text-white py-2 rounded'>Login</button>
+      </form>
+    </div>
   )
 }
 

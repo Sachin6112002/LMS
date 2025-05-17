@@ -1,27 +1,18 @@
-import React, { useContext, Component } from 'react';
-import { Routes, Route, useMatch } from 'react-router-dom';
-import Navbar from './components/student/Navbar';
-import Home from './pages/student/Home';
-import CourseDetails from './pages/student/CourseDetails';
-import CoursesList from './pages/student/CoursesList';
-import Dashboard from './pages/educator/Dashboard';
-import AddCourse from './pages/educator/AddCourse';
-import MyCourses from './pages/educator/MyCourses';
-import StudentsEnrolled from './pages/educator/StudentsEnrolled';
-import Educator from './pages/educator/Educator';
-import 'quill/dist/quill.snow.css';
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
-import Player from './pages/student/Player';
-import MyEnrollments from './pages/student/MyEnrollments';
-import Loading from './components/student/Loading';
-import Admin from './pages/admin/Admin';
-import ManageUsers from './pages/admin/ManageUsers';
-import ManageCourses from './pages/admin/ManageCourses'; // Import ManageCourses
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminDashboard from './pages/admin/AdminDahboard';
-import { AppContextProvider } from './context/AppContext';
-import Register from './pages/student/Register';
+import React, { useContext, Component } from "react";
+import { Routes, Route, useMatch } from "react-router-dom";
+import Navbar from "./components/student/Navbar";
+import Home from "./pages/student/Home";
+import CourseDetails from "./pages/student/CourseDetails";
+import CoursesList from "./pages/student/CoursesList";
+import Educator from "./pages/educator/Educator";
+import "quill/dist/quill.snow.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import Player from "./pages/student/Player";
+import MyEnrollments from "./pages/student/MyEnrollments";
+import Loading from "./components/student/Loading";
+import { AppContextProvider } from "./context/AppContext";
+import Register from "./pages/student/Register";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -35,7 +26,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     // Log the error and error information to the console
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
 
     // You can also send the error information to a logging service here
 
@@ -47,7 +38,7 @@ class ErrorBoundary extends Component {
       return (
         <div>
           <h1>Something went wrong.</h1>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details style={{ whiteSpace: "pre-wrap" }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo && this.state.errorInfo.componentStack}
@@ -71,7 +62,7 @@ class GlobalErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Global Error caught:', error, errorInfo);
+    console.error("Global Error caught:", error, errorInfo);
     this.setState({ error, errorInfo });
   }
 
@@ -80,7 +71,7 @@ class GlobalErrorBoundary extends Component {
       return (
         <div>
           <h1>Something went wrong.</h1>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <details style={{ whiteSpace: "pre-wrap" }}>
             {this.state.error && this.state.error.toString()}
             <br />
             {this.state.errorInfo && this.state.errorInfo.componentStack}
@@ -94,8 +85,8 @@ class GlobalErrorBoundary extends Component {
 }
 
 const App = () => {
-  const isEducatorRoute = useMatch('/educator/*');
-  const isAdminRoute = useMatch('/admin/*');
+  const isEducatorRoute = useMatch("/educator/*");
+  const isAdminRoute = useMatch("/admin/*");
 
   return (
     <GlobalErrorBoundary>
@@ -120,13 +111,13 @@ const App = () => {
               <Route path="/educator/*" element={<Educator />} />
 
               {/* Admin Routes */}
-              <Route path="/admin/*" element={<Admin />}>
+              {/* <Route path="/admin/*" element={<Admin />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="manage-users" element={<ManageUsers />} />
                 <Route path="manage-courses" element={<ManageCourses />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route index element={<AdminDashboard />} />
-              </Route>
+              </Route> */}
             </Routes>
           </div>
         </AppContextProvider>
