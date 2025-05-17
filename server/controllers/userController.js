@@ -219,8 +219,9 @@ export const registerUser = async (req, res) => {
         });
         // Assign admin to first user
         await assignAdminToFirstUser(newUser._id);
-        // ...rest of registration logic...
-        res.status(201).json({ success: true, user: newUser });
+        // Re-fetch user to get updated role
+        const updatedUser = await User.findById(newUser._id);
+        res.status(201).json({ success: true, user: updatedUser });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
