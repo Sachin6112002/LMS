@@ -6,9 +6,9 @@ import { AppContext } from '../../context/AppContext'
 
 const Navbar = () => {
   const {navigate , isEducator , setIsEducator, userData} = useContext(AppContext)
-    const isCourseListPage = location.pathname.includes('/course-list')
-    const {openSignIn} = useClerk()
-    const {user} = useUser()
+  const isCourseListPage = location.pathname.includes('/course-list')
+  const {openSignIn} = useClerk()
+  const {user} = useUser()
 
   // Handler for Become Educator
   const becomeEducator = async () => {
@@ -38,7 +38,7 @@ const Navbar = () => {
         <div className='flex items-center gap-5'>
             { user && <>
               <button onClick={isEducator ? ()=>{navigate('/educator')} : becomeEducator} className='text-white'>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
-              {userData?.publicMetadata?.role === 'admin' && (
+              {userData && userData.publicMetadata && userData.publicMetadata.role === 'admin' && (
                 <button onClick={()=>{navigate('/admin')}} className='text-white'>Admin Dashboard</button>
               )}
               <Link to = '/my-enrollments' className='text-white'>My Enrollments</Link>
