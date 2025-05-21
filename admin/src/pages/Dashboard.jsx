@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
+import { assets } from '../assets/assets';
 
 const Dashboard = () => {
   const { backendUrl, aToken } = useContext(AppContext);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -29,6 +32,40 @@ const Dashboard = () => {
 
   return (
     <div className="p-8">
+      <div className="flex flex-col items-center justify-center w-full min-h-[30vh] bg-gradient-to-b from-cyan-100/70 px-7 md:px-0 text-center rounded-xl mb-10">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 max-w-3xl mx-auto mb-6 mt-10 md:mt-20">
+          Welcome to the LMS Admin Panel
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+          Manage users, courses, and platform settings from a single dashboard.
+          <br />
+          Use the quick links below to navigate between admin features.
+        </p>
+        <div className="flex flex-col md:flex-row gap-8 justify-center items-center mt-4">
+          <button
+            onClick={() => navigate('/manage-users')}
+            className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-blue-600 hover:to-blue-800 transition flex flex-col items-center gap-2 text-lg border-2 border-blue-200"
+          >
+            <img src={assets.list_icon} alt="Users" className="w-10 h-10 mb-2" />
+            Manage Users
+          </button>
+          <button
+            onClick={() => navigate('/manage-courses')}
+            className="bg-gradient-to-r from-purple-500 to-indigo-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-purple-600 hover:to-indigo-800 transition flex flex-col items-center gap-2 text-lg border-2 border-purple-200"
+          >
+            <img src={assets.add_icon} alt="Courses" className="w-10 h-10 mb-2" />
+            Manage Courses
+          </button>
+          <button
+            onClick={() => navigate('/settings')}
+            className="bg-gradient-to-r from-green-500 to-teal-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-green-600 hover:to-teal-800 transition flex flex-col items-center gap-2 text-lg border-2 border-green-200"
+          >
+            <img src={assets.tick_icon} alt="Settings" className="w-10 h-10 mb-2" />
+            Settings
+          </button>
+        </div>
+      </div>
+      {/* Dashboard stats and latest enrollments */}
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded shadow">

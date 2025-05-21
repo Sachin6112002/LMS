@@ -1,35 +1,20 @@
-import axios from 'axios'
-import React, { useContext, useState } from 'react'
-import { AppContext } from '../context/AppContext'
-import { toast } from 'react-toastify'
+import React from 'react';
 
 const Login = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
-  const { setAToken } = useContext(AppContext)
-
-  const onSubmitHandler = async (event) => {
-    event.preventDefault();
-    const { data } = await axios.post(backendUrl + '/api/admin/login', { email, password })
-    if (data.success) {
-      setAToken(data.token)
-      localStorage.setItem('aToken', data.token)
-    } else {
-      toast.error(data.message)
-    }
-  }
-
   return (
-    <div className='flex justify-center items-center min-h-screen bg-gray-100'>
-      <form onSubmit={onSubmitHandler} className='bg-white p-8 rounded shadow-md w-80'>
-        <h2 className='text-2xl font-bold mb-6 text-center'>Admin Login</h2>
-        <input type='email' value={email} onChange={e => setEmail(e.target.value)} placeholder='Email' className='w-full mb-4 p-2 border rounded' required />
-        <input type='password' value={password} onChange={e => setPassword(e.target.value)} placeholder='Password' className='w-full mb-6 p-2 border rounded' required />
-        <button type='submit' className='w-full bg-primary text-white py-2 rounded'>Login</button>
-      </form>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FD]">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center">
+        <img src="/vite.svg" alt="LMS Logo" className="h-14 w-14 mb-4" />
+        <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
+        <p className="text-gray-600 mb-6 text-center">Sign in as an admin to access the dashboard.</p>
+        {/* Clerk login button placeholder */}
+        <div className="w-full flex flex-col items-center">
+          {/* Replace with <SignIn /> from Clerk if Clerk is set up */}
+          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all">Sign in with Clerk</button>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

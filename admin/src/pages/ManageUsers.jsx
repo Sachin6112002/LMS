@@ -27,29 +27,30 @@ const ManageUsers = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Manage Users</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded shadow">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Enrolled Courses</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, idx) => (
-              <tr key={user._id}>
-                <td className="px-4 py-2">{idx + 1}</td>
-                <td className="px-4 py-2">{user.name}</td>
-                <td className="px-4 py-2">{user.email}</td>
-                <td className="px-4 py-2">{user.enrolledCourses?.length || 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 p-8">
+      <div className="flex flex-col items-center mb-6">
+        <span className="mb-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-blue-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 010 7.75"
+            />
+          </svg>
+        </span>
+        <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
+      </div>
+      <div className="bg-white rounded-lg shadow p-8 w-full max-w-2xl">
+        <p className="text-gray-600 text-center">
+          User management features coming soon.
+        </p>
       </div>
     </div>
   );
