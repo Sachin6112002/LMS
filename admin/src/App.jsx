@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import ManageUsers from "./pages/ManageUsers";
 import ManageCourses from "./pages/ManageCourses";
 import Settings from "./pages/Settings";
+import Register from './pages/Register';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ const App = () => {
           <Route path='/manage-courses' element={<ManageCourses />} />
           <Route path='/settings' element={<Settings />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
         </Routes>
       </main>
     </div>
