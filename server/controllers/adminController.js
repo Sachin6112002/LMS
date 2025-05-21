@@ -44,3 +44,40 @@ export const getAllPurchases = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Check if any admin exists
+export const checkAdminExists = async (req, res) => {
+  try {
+    const admin = await User.findOne({ 'publicMetadata.role': 'admin' });
+    res.json({ exists: !!admin });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Register the first admin
+export const registerAdmin = async (req, res) => {
+  try {
+    // Only allow if no admin exists
+    const admin = await User.findOne({ 'publicMetadata.role': 'admin' });
+    if (admin) return res.status(403).json({ success: false, message: 'Admin already exists' });
+
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ success: false, message: 'All fields required' });
+
+    // Check if user with email already exists
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(409).json({ success: false, message: 'User already exists' });
+
+    const newAdmin = new User({
+      name,
+      email,
+      password, // In production, hash the password!
+      publicMetadata: { role: 'admin' },
+    });
+    await newAdmin.save();
+    res.json({ success: true, message: 'Admin registered successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
