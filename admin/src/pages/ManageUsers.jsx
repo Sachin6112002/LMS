@@ -19,9 +19,12 @@ const ManageUsers = () => {
         const data = await res.json();
         if (data.success && Array.isArray(data.users)) {
           setUsers(data.users);
-          // Find current user by token (assuming token is userId or you have userId in context)
-          // For demo, use the first user as current user
-          const currentUser = data.users[0];
+          // Find current user by their ID (from token or context)
+          const tokenPayload = aToken
+            ? JSON.parse(atob(aToken.split('.')[1]))
+            : null;
+          const userId = tokenPayload ? tokenPayload.sub : null;
+          const currentUser = data.users.find((u) => u._id === userId);
           setIsAdmin(
             currentUser && currentUser.publicMetadata?.role === 'admin'
           );
