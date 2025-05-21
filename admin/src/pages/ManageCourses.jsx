@@ -67,11 +67,6 @@ const ManageCourses = () => {
             )}
           </tbody>
         </table>
-        {courses.length === 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-gray-600">Course management features coming soon.</p>
-          </div>
-        )}
       </div>
     </div>
   );

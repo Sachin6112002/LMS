@@ -14,7 +14,7 @@ const ManageUsers = () => {
           headers: { Authorization: `Bearer ${aToken}` },
         });
         const data = await res.json();
-        if (Array.isArray(data)) setUsers(data);
+        if (data.success && Array.isArray(data.users)) setUsers(data.users);
       } catch (err) {
         setUsers([]);
       } finally {
@@ -47,10 +47,40 @@ const ManageUsers = () => {
         </span>
         <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
       </div>
-      <div className="bg-white rounded-lg shadow p-8 w-full max-w-2xl">
-        <p className="text-gray-600 text-center">
-          User management features coming soon.
-        </p>
+      <div className="overflow-x-auto bg-white rounded-lg shadow p-8 w-full max-w-2xl">
+        <table className="min-w-full">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">#</th>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user, idx) => (
+                <tr key={user._id}>
+                  <td className="px-4 py-2">{idx + 1}</td>
+                  <td className="px-4 py-2">{user.name}</td>
+                  <td className="px-4 py-2">{user.email}</td>
+                  <td className="px-4 py-2">
+                    {user.publicMetadata?.role || 'student'}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  className="px-4 py-2 text-center text-gray-500"
+                >
+                  No users found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
