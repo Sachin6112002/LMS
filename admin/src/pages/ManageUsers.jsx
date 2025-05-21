@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const ManageUsers = () => {
   const { backendUrl, aToken } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -14,9 +17,18 @@ const ManageUsers = () => {
           headers: { Authorization: `Bearer ${aToken}` },
         });
         const data = await res.json();
-        if (data.success && Array.isArray(data.users)) setUsers(data.users);
+        if (data.success && Array.isArray(data.users)) {
+          setUsers(data.users);
+          // Find current user by token (assuming token is userId or you have userId in context)
+          // For demo, use the first user as current user
+          const currentUser = data.users[0];
+          setIsAdmin(
+            currentUser && currentUser.publicMetadata?.role === 'admin'
+          );
+        }
       } catch (err) {
         setUsers([]);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
@@ -25,6 +37,12 @@ const ManageUsers = () => {
   }, [backendUrl, aToken]);
 
   if (loading) return <div>Loading...</div>;
+  if (isAdmin === false)
+    return (
+      <div className="p-8 text-red-600 font-semibold">
+        Unauthorized: Admin access only.
+      </div>
+    );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 p-8">

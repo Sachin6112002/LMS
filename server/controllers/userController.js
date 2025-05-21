@@ -3,7 +3,6 @@ import { CourseProgress } from "../models/CourseProgress.js"
 import { Purchase } from "../models/Purchase.js"
 import User from "../models/User.js"
 import stripe from "stripe"
-import { assignAdminToFirstUser } from './adminController.js';
 
 
 
@@ -218,7 +217,7 @@ export const registerUser = async (req, res) => {
             // ...other fields...
         });
         // Assign admin to first user
-        await assignAdminToFirstUser(newUser._id);
+        // await assignAdminToFirstUser(newUser._id);
         // Re-fetch user to get updated role
         const updatedUser = await User.findById(newUser._id);
         res.status(201).json({ success: true, user: updatedUser });
