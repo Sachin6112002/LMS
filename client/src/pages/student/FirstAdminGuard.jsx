@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../../components/student/Loading';
 
-// This component checks if an admin exists. If not, renders children (registration form). If admin exists, redirects to login/home.
 const FirstAdminGuard = ({ children }) => {
   const [checking, setChecking] = useState(true);
   const [adminExists, setAdminExists] = useState(false);
@@ -16,7 +15,6 @@ const FirstAdminGuard = ({ children }) => {
         setAdminExists(data.exists);
         setChecking(false);
         if (data.exists) {
-          // If admin exists, redirect to login or home
           navigate('/login', { replace: true });
         }
       } catch (err) {

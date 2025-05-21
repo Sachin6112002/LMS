@@ -26,6 +26,7 @@ const AddCourse = () => {
     lectureUrl: '',
     isPreviewFree: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChapter = (action, chapterId) => {
     if (action === 'add') {
@@ -92,11 +93,13 @@ const AddCourse = () => {
 
   const handleSubmit = async (e) => {
     try {
-
       e.preventDefault();
-
+      if (isSubmitting) return;
+      setIsSubmitting(true);
       if (!image) {
         toast.error('Thumbnail Not Selected')
+        setIsSubmitting(false);
+        return;
       }
 
       const courseData = {
@@ -125,12 +128,13 @@ const AddCourse = () => {
         setImage(null)
         setChapters([])
         quillRef.current.root.innerHTML = ""
-      } else (
+      } else {
         toast.error(data.message)
-      )
-
+      }
+      setIsSubmitting(false);
     } catch (error) {
       toast.error(error.message)
+      setIsSubmitting(false);
     }
 
   };
@@ -259,8 +263,8 @@ const AddCourse = () => {
           )}
         </div>
 
-        <button type="submit" className='bg-black text-white w-max py-2.5 px-8 rounded my-4'>
-          ADD
+        <button type="submit" className='bg-black text-white w-max py-2.5 px-8 rounded my-4' disabled={isSubmitting}>
+          {isSubmitting ? 'ADDING...' : 'ADD'}
         </button>
       </form>
     </div>

@@ -13,6 +13,10 @@ import MyEnrollments from "./pages/student/MyEnrollments";
 import Loading from "./components/student/Loading";
 import { AppContextProvider } from "./context/AppContext";
 import Register from "./pages/student/Register";
+import Dashboard from "./pages/educator/Dashboard";
+import AddCourse from "./pages/educator/AddCourse";
+import MyCourses from "./pages/educator/MyCourses";
+import StudentsEnrolled from "./pages/educator/StudentsEnrolled";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -108,7 +112,12 @@ const App = () => {
               <Route path="/register" element={<Register />} />
 
               {/* Educator Routes */}
-              <Route path="/educator/*" element={<Educator />} />
+              <Route path="/educator/*" element={<Educator />}>
+                <Route index element={<Dashboard />} />
+                <Route path="add-course" element={<AddCourse />} />
+                <Route path="my-courses" element={<MyCourses />} />
+                <Route path="student-enrolled" element={<StudentsEnrolled />} />
+              </Route>
 
               {/* Admin Routes */}
               {/* <Route path="/admin/*" element={<Admin />}>
