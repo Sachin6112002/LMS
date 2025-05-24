@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { AppContext, isAdminAuthenticated } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { FaUsers, FaSort, FaLock, FaTrashAlt } from 'react-icons/fa';
 
@@ -13,6 +13,12 @@ const ManageUsers = () => {
   const [sortOrder, setSortOrder] = useState('asc');
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {

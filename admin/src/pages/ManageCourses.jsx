@@ -1,12 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { AppContext, isAdminAuthenticated } from '../context/AppContext';
 import { FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const ManageCourses = () => {
   const { backendUrl, aToken } = useContext(AppContext);
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCourses = async () => {

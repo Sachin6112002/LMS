@@ -64,13 +64,25 @@ const Login = () => {
       setLoading(false);
       return;
     }
-    // TODO: Implement real login logic (JWT, session, etc.)
-    // For now, just show a success message
-    setTimeout(() => {
-      setSuccess('Login successful!');
+    try {
+      const { data } = await axios.post('/api/admin/login', {
+        email: form.email,
+        password: form.password,
+      });
+      if (data.success && data.token) {
+        setSuccess('Login successful! Redirecting...');
+        localStorage.setItem('adminToken', data.token);
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true });
+        }, 1000);
+      } else {
+        setError(data.message || 'Login failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
       setLoading(false);
-      // navigate('/'); // Uncomment to redirect after login
-    }, 1000);
+    }
   };
 
   if (showRegister) {

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { isAdminAuthenticated } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
+  const navigate = useNavigate();
+
   // State for form inputs
   const [profile, setProfile] = useState({
     name: '',
@@ -16,6 +20,19 @@ const Settings = () => {
   const [theme, setTheme] = useState('light');
   const [loading, setLoading] = useState(true);
   const [activity, setActivity] = useState([]);
+
+  // Add Admin State
+  const [addAdminForm, setAddAdminForm] = useState({ name: '', email: '', password: '' });
+  const [addAdminLoading, setAddAdminLoading] = useState(false);
+  const [addAdminError, setAddAdminError] = useState('');
+  const [addAdminSuccess, setAddAdminSuccess] = useState('');
+
+  // Protect Settings page: redirect to /login if not authenticated as admin
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   // Fetch admin profile and settings
   useEffect(() => {
@@ -83,6 +100,33 @@ const Settings = () => {
 
   const handleThemeChange = (e) => {
     setTheme(e.target.value);
+  };
+
+  const handleAddAdminChange = (e) => {
+    setAddAdminForm({ ...addAdminForm, [e.target.name]: e.target.value });
+  };
+
+  const handleAddAdmin = async (e) => {
+    e.preventDefault();
+    setAddAdminLoading(true);
+    setAddAdminError('');
+    setAddAdminSuccess('');
+    try {
+      const token = localStorage.getItem('adminToken');
+      const { data } = await axios.post('/api/admin/add', addAdminForm, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (data.success) {
+        setAddAdminSuccess('Admin added successfully!');
+        setAddAdminForm({ name: '', email: '', password: '' });
+      } else {
+        setAddAdminError(data.message || 'Failed to add admin.');
+      }
+    } catch (err) {
+      setAddAdminError(err.response?.data?.message || 'Failed to add admin.');
+    } finally {
+      setAddAdminLoading(false);
+    }
   };
 
   return (
@@ -212,6 +256,22 @@ const Settings = () => {
                 <label htmlFor="emailNotify" className="ml-2 text-gray-700 font-medium">Receive Email Notifications</label>
               </div>
               <button className="w-full py-2 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-lg font-semibold shadow hover:from-blue-700 hover:to-blue-500 transition">Preview Dark Mode</button>
+            </section>
+            {/* Add Another Admin */}
+            <section className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow p-6 flex flex-col justify-between mt-8">
+              <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
+                <span className="inline-block w-2 h-6 bg-blue-500 rounded-full mr-2"></span>Add Another Admin
+              </h3>
+              <form className="space-y-4" onSubmit={handleAddAdmin}>
+                <input name="name" type="text" placeholder="Name" value={addAdminForm.name} onChange={handleAddAdminChange} className="border rounded px-3 py-2 w-full" required />
+                <input name="email" type="email" placeholder="Email" value={addAdminForm.email} onChange={handleAddAdminChange} className="border rounded px-3 py-2 w-full" required />
+                <input name="password" type="password" placeholder="Password" value={addAdminForm.password} onChange={handleAddAdminChange} className="border rounded px-3 py-2 w-full" required />
+                <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={addAdminLoading}>
+                  {addAdminLoading ? 'Adding...' : 'Add Admin'}
+                </button>
+                {addAdminError && <p className="text-red-500 mt-2">{addAdminError}</p>}
+                {addAdminSuccess && <p className="text-green-600 mt-2">{addAdminSuccess}</p>}
+              </form>
             </section>
             {/* Account & Security */}
             <section className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow p-6 flex flex-col justify-between">

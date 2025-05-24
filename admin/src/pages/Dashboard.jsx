@@ -2,12 +2,19 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
+import { isAdminAuthenticated } from '../context/AppContext';
 
 const Dashboard = () => {
   const { backendUrl, aToken } = useContext(AppContext);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchStats = async () => {

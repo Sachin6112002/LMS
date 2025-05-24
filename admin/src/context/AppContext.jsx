@@ -25,3 +25,8 @@ const AppContextProvider = (props) => {
 }
 
 export default AppContextProvider
+
+// Admin Auth Context
+export const isAdminAuthenticated = () => {
+  return !!localStorage.getItem('adminToken');
+};
