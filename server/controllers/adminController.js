@@ -81,3 +81,20 @@ export const registerAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Publish/Unpublish a course by admin
+export const toggleCoursePublish = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isPublished } = req.body;
+    const course = await Course.findById(id);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+    course.isPublished = isPublished;
+    await course.save();
+    res.json({ success: true, isPublished: course.isPublished });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

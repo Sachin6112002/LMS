@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 
 const ManageCourses = () => {
   const { backendUrl, aToken } = useContext(AppContext);
@@ -15,7 +16,7 @@ const ManageCourses = () => {
           headers: { Authorization: `Bearer ${aToken}` },
         });
         const data = await res.json();
-        if (Array.isArray(data)) setCourses(data);
+        if (Array.isArray(data.courses)) setCourses(data.courses);
       } catch (err) {
         setCourses([]);
       } finally {
@@ -27,7 +28,7 @@ const ManageCourses = () => {
 
   const togglePublish = async (courseId, isPublished) => {
     try {
-      const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}/toggle`, {
+      const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}/publish`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -41,6 +42,26 @@ const ManageCourses = () => {
       );
     } catch (error) {
       console.error('Failed to toggle publish state', error);
+    }
+  };
+
+  // Delete a course
+  const deleteCourse = async (courseId) => {
+    if (!window.confirm('Are you sure you want to delete this course?')) return;
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${aToken}`,
+        },
+      });
+      if (res.ok) {
+        setCourses(prev => prev.filter(c => c._id !== courseId));
+      } else {
+        alert('Failed to delete course.');
+      }
+    } catch (error) {
+      alert('Error deleting course.');
     }
   };
 
@@ -89,7 +110,7 @@ const ManageCourses = () => {
         Export CSV
       </button>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow p-8 w-full max-w-2xl">
+      <div className="overflow-x-auto bg-white rounded-lg shadow p-8 w-full max-w-5xl">
         <table className="min-w-full">
           <thead>
             <tr>
@@ -98,6 +119,7 @@ const ManageCourses = () => {
               <th className="px-4 py-2">Description</th>
               <th className="px-4 py-2">Price</th>
               <th className="px-4 py-2">Published</th>
+              <th className="px-4 py-2">Educator</th>
             </tr>
           </thead>
           <tbody>
@@ -111,23 +133,37 @@ const ManageCourses = () => {
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
                     <td className="px-4 py-2">{course.courseTitle}</td>
-                    <td className="px-4 py-2">{course.courseDescription}</td>
+                    <td className="px-4 py-2">{course.courseDescription.replace(/<[^>]+>/g, '')}</td>
                     <td className="px-4 py-2">{course.coursePrice}</td>
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 flex items-center gap-2">
                       <button
                         onClick={() => togglePublish(course._id, course.isPublished)}
-                        className={`px-2 py-1 rounded text-white text-xs ${
+                        className={`px-2 py-1 rounded text-white text-xs flex items-center gap-1 ${
                           course.isPublished ? 'bg-red-500' : 'bg-green-500'
                         }`}
+                        title={course.isPublished ? 'Unpublish' : 'Publish'}
                       >
+                        {course.isPublished ? <FaTimes /> : <FaCheck />}
                         {course.isPublished ? 'Unpublish' : 'Publish'}
                       </button>
+                      <button
+                        onClick={() => deleteCourse(course._id)}
+                        className="ml-2 px-2 py-1 rounded text-white text-xs bg-gray-700 hover:bg-gray-900 flex items-center gap-1"
+                        title="Delete Course"
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </td>
+                    <td className="px-4 py-2">
+                      {course.educator && typeof course.educator === 'object'
+                        ? course.educator.name || 'N/A'
+                        : 'N/A'}
                     </td>
                   </tr>
                 ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
+                <td colSpan="6" className="px-4 py-2 text-center text-gray-500">
                   No courses found.
                 </td>
               </tr>
