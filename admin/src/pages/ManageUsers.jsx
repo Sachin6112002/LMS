@@ -1,12 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { FaUsers, FaSort, FaLock, FaTrashAlt } from 'react-icons/fa';
 
 const ManageUsers = () => {
   const { backendUrl, aToken } = useContext(AppContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(null);
+  const [search, setSearch] = useState('');
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +24,7 @@ const ManageUsers = () => {
         const data = await res.json();
         if (data.success && Array.isArray(data.users)) {
           setUsers(data.users);
-          // Find current user by their ID (from token or context)
+
           const tokenPayload = aToken
             ? JSON.parse(atob(aToken.split('.')[1]))
             : null;
@@ -30,6 +35,7 @@ const ManageUsers = () => {
           );
         }
       } catch (err) {
+        console.error(err);
         setUsers([]);
         setIsAdmin(false);
       } finally {
@@ -38,6 +44,89 @@ const ManageUsers = () => {
     };
     fetchUsers();
   }, [backendUrl, aToken]);
+
+  const handleDeleteUser = async (userId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${aToken}`,
+        },
+      });
+
+      const text = await res.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('Expected JSON but got:', text);
+        alert('Server error: invalid response.');
+        return;
+      }
+
+      if (data.success) {
+        setUsers(users.filter((user) => user._id !== userId));
+      } else {
+        alert('Failed to delete user');
+      }
+    } catch (err) {
+      alert('Error deleting user');
+    }
+  };
+
+  const handleChangeRole = async (userId, newRole) => {
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${aToken}`,
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUsers(
+          users.map((u) =>
+            u._id === userId
+              ? { ...u, publicMetadata: { ...u.publicMetadata, role: newRole } }
+              : u
+          )
+        );
+      } else {
+        alert('Failed to update role.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating role.');
+    }
+  };
+
+  const sortUsers = (field) => {
+    const order = field === sortField && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortOrder(order);
+
+    setUsers((prevUsers) =>
+      [...prevUsers].sort((a, b) => {
+        const valA = (a[field] || '').toLowerCase();
+        const valB = (b[field] || '').toLowerCase();
+        if (valA < valB) return order === 'asc' ? -1 : 1;
+        if (valA > valB) return order === 'asc' ? 1 : -1;
+        return 0;
+      })
+    );
+  };
+
+  const filteredUsers = users.filter(
+    (u) =>
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase())
+  );
 
   if (loading) return <div>Loading...</div>;
   if (isAdmin === false)
@@ -50,52 +139,96 @@ const ManageUsers = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 p-8">
       <div className="flex flex-col items-center mb-6">
-        <span className="mb-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 text-blue-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 010 7.75"
-            />
-          </svg>
-        </span>
+        <FaUsers className="h-12 w-12 text-blue-600 mb-2" />
         <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
+        <p className="text-sm text-gray-600 mt-1">
+          Total Users: {users.length} | Showing: {filteredUsers.length}
+        </p>
       </div>
-      <div className="overflow-x-auto bg-white rounded-lg shadow p-8 w-full max-w-2xl">
-        <table className="min-w-full">
+
+      <div className="flex gap-4 mb-4 w-full max-w-xl">
+        <input
+          type="text"
+          placeholder="Search by name or email"
+          className="border px-3 py-2 rounded w-full"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <button
+          className="bg-gray-200 px-4 rounded"
+          onClick={() => setSearch('')}
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="overflow-x-auto bg-white rounded-lg shadow p-6 w-full max-w-4xl">
+        <table className="min-w-full text-sm">
           <thead>
             <tr>
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Role</th>
+              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('name')}>
+                Name <FaSort className="inline ml-1" />
+              </th>
+              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('email')}>
+                Email <FaSort className="inline ml-1" />
+              </th>
+              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('role')}>
+                Role <FaSort className="inline ml-1" />
+              </th>
+              <th className="px-4 py-2">Change Role</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {users.length > 0 ? (
-              users.map((user, idx) => (
-                <tr key={user._id}>
-                  <td className="px-4 py-2">{idx + 1}</td>
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <tr key={user._id} className="border-t">
                   <td className="px-4 py-2">{user.name}</td>
                   <td className="px-4 py-2">{user.email}</td>
                   <td className="px-4 py-2">
-                    {user.publicMetadata?.role || 'student'}
+                    <span
+                      className={`px-2 py-1 rounded-full text-white text-xs ${
+                        user.publicMetadata?.role === 'admin'
+                          ? 'bg-green-600'
+                          : 'bg-blue-500'
+                      }`}
+                    >
+                      {user.publicMetadata?.role || 'student'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2">
+                    <select
+                      value={user.publicMetadata?.role || 'student'}
+                      onChange={(e) =>
+                        handleChangeRole(user._id, e.target.value)
+                      }
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="student">Student</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                  <td className="px-4 py-2 flex gap-3">
+                    <button
+                      onClick={() => handleDeleteUser(user._id)}
+                      className="text-red-600 hover:text-red-800"
+                      title="Delete User"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                    <button
+                      onClick={() => alert('Lock functionality not implemented')}
+                      className="text-gray-600 hover:text-black"
+                      title="Lock User (UI only)"
+                    >
+                      <FaLock />
+                    </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="4"
-                  className="px-4 py-2 text-center text-gray-500"
-                >
+                <td colSpan="5" className="text-center px-4 py-2 text-gray-500">
                   No users found.
                 </td>
               </tr>

@@ -1,8 +1,10 @@
-import React from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from './components/Navbar'
+import { FaUsers, FaBookOpen, FaCog } from 'react-icons/fa';
+
+import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import ManageUsers from "./pages/ManageUsers";
 import ManageCourses from "./pages/ManageCourses";
@@ -11,63 +13,72 @@ import Register from './pages/Register';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+
+  const actionButtons = [
+    {
+      title: 'Manage Users',
+      color: 'bg-blue-600 hover:bg-blue-700',
+      path: '/manage-users',
+      icon: <FaUsers size={24} className="mb-1" />,
+    },
+    {
+      title: 'Manage Courses',
+      color: 'bg-green-600 hover:bg-green-700',
+      path: '/manage-courses',
+      icon: <FaBookOpen size={24} className="mb-1" />,
+    },
+    {
+      title: 'Settings',
+      color: 'bg-gray-700 hover:bg-gray-800',
+      path: '/settings',
+      icon: <FaCog size={24} className="mb-1" />,
+    },
+  ];
+
   return (
-    <section className="flex flex-col items-center justify-center py-16 bg-white rounded-lg shadow-md mt-8 mx-4">
-      <h1 className="text-3xl font-bold mb-2 text-gray-800">Welcome, Admin!</h1>
-      <p className="text-gray-600 mb-8 text-center max-w-xl">
-        This is your Learning Management System admin dashboard. Here you can manage users, courses, and platform settings. Use the buttons below to get started.
+    <section className="max-w-5xl w-full px-4 py-12 mx-auto bg-white rounded-lg shadow mt-10 text-center">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Welcome, Admin!</h1>
+      <p className="text-gray-600 mt-2 mb-8">
+        Use the dashboard below to manage users, courses, and system settings.
       </p>
-      <div className="flex flex-col md:flex-row gap-6 mb-8">
-        <button
-          onClick={() => navigate('/manage-users')}
-          className="flex flex-col items-center px-8 py-6 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-all w-56"
-        >
-          <span className="mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 010 7.75" /></svg>
-          </span>
-          <span className="font-semibold">Manage Users</span>
-        </button>
-        <button
-          onClick={() => navigate('/manage-courses')}
-          className="flex flex-col items-center px-8 py-6 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-all w-56"
-        >
-          <span className="mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m0 0l-9-5m9 5l9-5" /></svg>
-          </span>
-          <span className="font-semibold">Manage Courses</span>
-        </button>
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex flex-col items-center px-8 py-6 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-800 transition-all w-56"
-        >
-          <span className="mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          </span>
-          <span className="font-semibold">Settings</span>
-        </button>
+
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 place-items-center">
+        {actionButtons.map((btn, index) => (
+          <button
+            key={index}
+            onClick={() => navigate(btn.path)}
+            className={`w-full px-4 py-5 text-white rounded-md shadow-md ${btn.color} transition duration-200 text-center flex flex-col items-center`}
+          >
+            {btn.icon}
+            <span className="font-medium mt-1">{btn.title}</span>
+          </button>
+        ))}
       </div>
-      <footer className="text-gray-400 text-sm mt-8">&copy; {new Date().getFullYear()} LMS Admin Panel. All rights reserved.</footer>
+
+      <p className="text-gray-400 text-sm mt-10">
+        &copy; {new Date().getFullYear()} LMS Admin Panel. All rights reserved.
+      </p>
     </section>
   );
 };
 
 const App = () => {
   return (
-    <div className='bg-[#F8F9FD] min-h-screen flex flex-col'>
+    <div className="bg-gray-100 min-h-screen flex flex-col">
       <ToastContainer />
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-center">
+      <main className="flex-1 flex items-center justify-center">
         <Routes>
-          <Route path='/' element={<HeroSection />} />
-          <Route path='/manage-users' element={<ManageUsers />} />
-          <Route path='/manage-courses' element={<ManageCourses />} />
-          <Route path='/settings' element={<Settings />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
+          <Route path="/" element={<HeroSection />} />
+          <Route path="/manage-users" element={<ManageUsers />} />
+          <Route path="/manage-courses" element={<ManageCourses />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
