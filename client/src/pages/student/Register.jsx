@@ -5,7 +5,7 @@ import FirstAdminGuard from './FirstAdminGuard';
 import { AppContext } from '../../context/AppContext';
 
 const Register = () => {
-  const [form, setForm] = useState({ name: '', email: '', imageUrl: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', imageFile: null, password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -16,6 +16,10 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setForm({ ...form, imageFile: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23,7 +27,16 @@ const Register = () => {
     setSuccess('');
     try {
       // Use admin registration endpoint for first admin
-      const { data } = await axios.post('/api/admin/register', form);
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      formData.append('password', form.password);
+      if (form.imageFile) {
+        formData.append('imageFile', form.imageFile);
+      }
+      const { data } = await axios.post('/api/admin/register', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       if (data.success) {
         setSuccess('Registration successful! You are now the admin.');
         await reloadUserData(); // <-- reload userData after registration
@@ -54,8 +67,8 @@ const Register = () => {
             <input type="email" name="email" value={form.email} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
           </div>
           <div className="mb-4">
-            <label className="block mb-1 font-medium">Profile Image URL</label>
-            <input type="text" name="imageUrl" value={form.imageUrl} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
+            <label className="block mb-1 font-medium">Profile Image (optional)</label>
+            <input type="file" name="imageFile" accept="image/*" onChange={handleFileChange} className="w-full border px-3 py-2 rounded" />
           </div>
           <div className="mb-4">
             <label className="block mb-1 font-medium">Password</label>

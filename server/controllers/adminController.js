@@ -3,6 +3,7 @@ import Course from '../models/Course.js';
 import { Purchase } from '../models/Purchase.js';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import upload from '../configs/multer.js';
 
 // Assign admin role to the very first user
 export const assignAdminToFirstUser = async () => {
@@ -64,8 +65,13 @@ export const registerAdmin = async (req, res) => {
     const admin = await User.findOne({ 'publicMetadata.role': 'admin' });
     if (admin) return res.status(403).json({ success: false, message: 'Admin already exists' });
 
-    const { name, email, password, imageUrl } = req.body;
-    if (!name || !email || !password || !imageUrl) return res.status(400).json({ success: false, message: 'All fields required' });
+    let imageUrl = req.body.imageUrl;
+    if (req.file) {
+      // If an image file is uploaded, use its path as the imageUrl
+      imageUrl = `/uploads/${req.file.filename}`;
+    }
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
 
     // Check if user with email already exists
     const existing = await User.findOne({ email });
@@ -76,7 +82,7 @@ export const registerAdmin = async (req, res) => {
       name,
       email,
       password, // In production, hash the password!
-      imageUrl,
+      imageUrl: imageUrl || '',
       publicMetadata: { role: 'admin' },
     });
     await newAdmin.save();
