@@ -6,7 +6,7 @@ import { backendUrl } from '../context/AppContext';
 const Login = () => {
   const navigate = useNavigate();
   const [showRegister, setShowRegister] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', name: '' });
+  const [form, setForm] = useState({ email: '', password: '', name: '', imageUrl: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -28,7 +28,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-    if (!form.name || !form.email || !form.password) {
+    if (!form.name || !form.email || !form.password || !form.imageUrl) {
       setError('All fields are required.');
       setLoading(false);
       return;
@@ -38,12 +38,13 @@ const Login = () => {
         name: form.name,
         email: form.email,
         password: form.password,
+        imageUrl: form.imageUrl,
       });
       if (data.success) {
         setSuccess('Registration successful! You can now log in.');
         setTimeout(() => {
           setShowRegister(false);
-          setForm({ email: '', password: '', name: '' });
+          setForm({ email: '', password: '', name: '', imageUrl: '' });
         }, 1500);
       } else {
         setError(data.message || 'Registration failed.');
@@ -97,6 +98,7 @@ const Login = () => {
             <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
             <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
             <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+            <input name="imageUrl" type="text" placeholder="Profile Image URL" value={form.imageUrl} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
             <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
               {loading ? 'Registering...' : 'Register as Admin'}
             </button>

@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import Course from '../models/Course.js';
 import { Purchase } from '../models/Purchase.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 // Assign admin role to the very first user
 export const assignAdminToFirstUser = async () => {
@@ -63,23 +64,25 @@ export const registerAdmin = async (req, res) => {
     const admin = await User.findOne({ 'publicMetadata.role': 'admin' });
     if (admin) return res.status(403).json({ success: false, message: 'Admin already exists' });
 
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ success: false, message: 'All fields required' });
+    const { name, email, password, imageUrl } = req.body;
+    if (!name || !email || !password || !imageUrl) return res.status(400).json({ success: false, message: 'All fields required' });
 
     // Check if user with email already exists
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ success: false, message: 'User already exists' });
 
     const newAdmin = new User({
+      _id: new mongoose.Types.ObjectId().toString(),
       name,
       email,
       password, // In production, hash the password!
+      imageUrl,
       publicMetadata: { role: 'admin' },
     });
     await newAdmin.save();
     // Generate JWT and return admin info for auto-login
     const token = jwt.sign({ id: newAdmin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
-    res.json({ success: true, token, admin: { name: newAdmin.name, email: newAdmin.email } });
+    res.json({ success: true, token, admin: { name: newAdmin.name, email: newAdmin.email, imageUrl: newAdmin.imageUrl } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
