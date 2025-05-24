@@ -77,7 +77,9 @@ export const registerAdmin = async (req, res) => {
       publicMetadata: { role: 'admin' },
     });
     await newAdmin.save();
-    res.json({ success: true, message: 'Admin registered successfully' });
+    // Generate JWT and return admin info for auto-login
+    const token = jwt.sign({ id: newAdmin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
+    res.json({ success: true, token, admin: { name: newAdmin.name, email: newAdmin.email } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

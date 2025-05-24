@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { backendUrl } from '../context/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const Login = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    fetch('/api/admin/check-admin-exists')
+    fetch(`${backendUrl}/api/admin/check-admin-exists`)
       .then(res => res.json())
       .then(data => {
         setShowRegister(!data.exists);
@@ -33,7 +34,7 @@ const Login = () => {
       return;
     }
     try {
-      const { data } = await axios.post('/api/admin/register', {
+      const { data } = await axios.post(`${backendUrl}/api/admin/register`, {
         name: form.name,
         email: form.email,
         password: form.password,
@@ -65,7 +66,7 @@ const Login = () => {
       return;
     }
     try {
-      const { data } = await axios.post('/api/admin/login', {
+      const { data } = await axios.post(`${backendUrl}/api/admin/login`, {
         email: form.email,
         password: form.password,
       });

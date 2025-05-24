@@ -1,11 +1,12 @@
 import axios from "axios";
-import { createContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
 
-export const AppContext = createContext()
+export const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+
+export const AppContext = createContext({ backendUrl })
 
 const AppContextProvider = (props) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
     const currency = import.meta.env.VITE_CURRENCY
     const [aToken, setAToken] = useState(localStorage.getItem('aToken') || '')
 
