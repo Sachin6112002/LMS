@@ -48,10 +48,10 @@ const ManageCourses = () => {
   // Delete a course
   const deleteCourse = async (courseId) => {
     if (!window.confirm('Are you sure you want to delete this course?')) return;
-    try {
-      const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}`, {
+    try {      const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}`, {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${aToken}`,
         },
       });
