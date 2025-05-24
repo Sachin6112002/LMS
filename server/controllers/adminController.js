@@ -196,3 +196,24 @@ export const deleteAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Get all students
+export const getAllStudents = async (req, res) => {
+  try {
+    const students = await User.find({ 'publicMetadata.role': 'student' }).select('-password -__v');
+    res.json({ success: true, students });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get all educators
+export const getAllEducators = async (req, res) => {
+  try {
+    const educators = await User.find({ 'publicMetadata.role': 'educator' }).select('-password -__v');
+    // Optionally, populate courses if needed
+    res.json({ success: true, educators });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

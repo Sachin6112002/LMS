@@ -20,6 +20,7 @@ const Settings = () => {
   const [theme, setTheme] = useState('light');
   const [loading, setLoading] = useState(true);
   const [activity, setActivity] = useState([]);
+  const [activities, setActivities] = useState([]);
 
   // Add Admin State
   const [addAdminForm, setAddAdminForm] = useState({ name: '', email: '', password: '' });
@@ -65,6 +66,23 @@ const Settings = () => {
       }
     };
     fetchAdminData();
+  }, []);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const token = localStorage.getItem('adminToken');
+        const { data } = await axios.get('/api/admin/activities', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.success) {
+          setActivities(data.activities);
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchActivities();
   }, []);
 
   // Handlers for profile change
@@ -298,6 +316,19 @@ const Settings = () => {
                 </ul>
               </div>
             </section>
+          </div>
+          {/* Activity Section */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold mb-2">Recent Admin Activities</h3>
+            <ul className="bg-gray-50 rounded p-4 max-h-60 overflow-y-auto">
+              {activities.length === 0 ? (
+                <li className="text-gray-400">No recent activities.</li>
+              ) : (
+                activities.map((activity, idx) => (
+                  <li key={idx} className="py-1 border-b last:border-b-0 text-sm text-gray-700">{activity}</li>
+                ))
+              )}
+            </ul>
           </div>
         </>
       )}

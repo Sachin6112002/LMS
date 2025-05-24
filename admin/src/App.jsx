@@ -10,6 +10,8 @@ import ManageUsers from "./pages/ManageUsers";
 import ManageCourses from "./pages/ManageCourses";
 import Settings from "./pages/Settings";
 import Register from './pages/Register';
+import StudentManager from './pages/StudentManager';
+import EducatorManager from './pages/EducatorManager';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -76,6 +78,8 @@ const App = () => {
           <Route path="/settings" element={<Settings />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/students" element={<StudentManager />} />
+          <Route path="/educators" element={<EducatorManager />} />
         </Routes>
       </main>
     </div>
