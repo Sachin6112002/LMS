@@ -70,6 +70,7 @@ const App = () => {
       <main className="flex-1 flex items-center justify-center">
         <Routes>
           <Route path="/" element={<HeroSection />} />
+          <Route path="/dashboard" element={<HeroSection />} />
           <Route path="/manage-users" element={<ManageUsers />} />
           <Route path="/manage-courses" element={<ManageCourses />} />
           <Route path="/settings" element={<Settings />} />

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, getAllCourses, getAllPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin } from '../controllers/adminController.js';
+import { getAllUsers, getAllCourses, getAllPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin, deleteAdmin } from '../controllers/adminController.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import upload from '../configs/multer.js';
 
@@ -14,5 +14,6 @@ adminRouter.patch('/courses/:id/publish', toggleCoursePublish);
 adminRouter.delete('/courses/:id', deleteCourseByAdmin);
 adminRouter.post('/login', loginAdmin);
 adminRouter.post('/add', adminAuth, addAdmin);
+adminRouter.delete('/admin/:id', adminAuth, deleteAdmin);
 
 export default adminRouter;

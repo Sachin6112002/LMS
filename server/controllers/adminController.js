@@ -98,16 +98,21 @@ export const registerAdmin = async (req, res) => {
 export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
-    if (!admin) {
-      return res.status(401).json({ success: false, message: 'Admin not found' });
+    try {
+      const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
+      console.log('LOGIN DEBUG:', { email, password, found: admin ? { email: admin.email, password: admin.password } : null });
+      if (!admin) {
+        return res.status(401).json({ success: false, message: 'Admin not found' });
+      }
+      // In production, use hashed passwords!
+      if (admin.password !== password) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
+      const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
+      res.json({ success: true, token, admin: { name: admin.name, email: admin.email } });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
     }
-    // In production, use hashed passwords!
-    if (admin.password !== password) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
-    res.json({ success: true, token, admin: { name: admin.name, email: admin.email } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -163,6 +168,30 @@ export const addAdmin = async (req, res) => {
     });
     await newAdmin.save();
     res.json({ success: true, message: 'Admin added successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Delete an admin (must be authenticated as admin)
+export const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Only allow if requester is admin
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+    // Count number of admins
+    const adminCount = await User.countDocuments({ 'publicMetadata.role': 'admin' });
+    if (adminCount <= 1) {
+      return res.status(400).json({ success: false, message: 'Cannot delete the only admin. Add another admin first.' });
+    }
+    const admin = await User.findById(id);
+    if (!admin || admin.publicMetadata.role !== 'admin') {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+    await User.findByIdAndDelete(id);
+    res.json({ success: true, message: 'Admin deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
