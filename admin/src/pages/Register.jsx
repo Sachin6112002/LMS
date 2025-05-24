@@ -62,3 +62,5 @@ const Register = () => {
 };
 
 export default Register;
+
+// REMOVE THIS FILE: Registration is handled in Login.jsx as a conditional popup if no admin exists.
