@@ -22,7 +22,8 @@ const Register = () => {
     setError('');
     setSuccess('');
     try {
-      const { data } = await axios.post('/api/user/register', form);
+      // Use admin registration endpoint for first admin
+      const { data } = await axios.post('/api/admin/register', form);
       if (data.success) {
         setSuccess('Registration successful! You are now the admin.');
         await reloadUserData(); // <-- reload userData after registration
