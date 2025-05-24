@@ -5,7 +5,7 @@ import FirstAdminGuard from './FirstAdminGuard';
 import { AppContext } from '../../context/AppContext';
 
 const Register = () => {
-  const [form, setForm] = useState({ name: '', email: '', imageUrl: '' });
+  const [form, setForm] = useState({ name: '', email: '', imageUrl: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -56,6 +56,10 @@ const Register = () => {
           <div className="mb-4">
             <label className="block mb-1 font-medium">Profile Image URL</label>
             <input type="text" name="imageUrl" value={form.imageUrl} onChange={handleChange} className="w-full border px-3 py-2 rounded" />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-1 font-medium">Password</label>
+            <input type="password" name="password" value={form.password} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
           </div>
           <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">
             {loading ? 'Registering...' : 'Register as Admin'}
