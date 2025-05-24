@@ -98,3 +98,17 @@ export const toggleCoursePublish = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Delete a course by admin
+export const deleteCourseByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await Course.findByIdAndDelete(id);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+    res.json({ success: true, message: 'Course deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
