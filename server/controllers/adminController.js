@@ -82,7 +82,7 @@ export const registerAdmin = async (req, res) => {
       name,
       email,
       password, // In production, hash the password!
-      imageUrl: imageUrl || '',
+      imageUrl: imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name),
       publicMetadata: { role: 'admin' },
     });
     await newAdmin.save();
