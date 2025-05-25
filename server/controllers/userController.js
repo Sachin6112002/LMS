@@ -8,6 +8,9 @@ import stripe from "stripe"
 
 // Get User Data
 export const getUserData = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const userId = req.auth.userId
@@ -27,7 +30,9 @@ export const getUserData = async (req, res) => {
 
 // Purchase Course 
 export const purchaseCourse = async (req, res) => {
-
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const { courseId } = req.body
@@ -88,7 +93,9 @@ export const purchaseCourse = async (req, res) => {
 
 // Users Enrolled Courses With Lecture Links
 export const userEnrolledCourses = async (req, res) => {
-
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const userId = req.auth.userId
@@ -106,7 +113,9 @@ export const userEnrolledCourses = async (req, res) => {
 
 // Update User Course Progress
 export const updateUserCourseProgress = async (req, res) => {
-
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const userId = req.auth.userId
@@ -144,7 +153,9 @@ export const updateUserCourseProgress = async (req, res) => {
 
 // get User Course Progress
 export const getUserCourseProgress = async (req, res) => {
-
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const userId = req.auth.userId
@@ -163,7 +174,9 @@ export const getUserCourseProgress = async (req, res) => {
 
 // Add User Ratings to Course
 export const addUserRating = async (req, res) => {
-
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     const userId = req.auth.userId;
     const { courseId, rating } = req.body;
 

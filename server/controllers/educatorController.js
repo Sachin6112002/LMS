@@ -5,10 +5,10 @@ import User from '../models/User.js';
 
 // update role to educator
 export const updateRoleToEducator = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
-        if (!req.auth || !req.auth.userId) {
-            return res.status(401).json({ success: false, message: 'Unauthorized' });
-        }
         const userId = req.auth.userId;
         const user = await User.findById(userId);
         if (!user) {
@@ -24,11 +24,10 @@ export const updateRoleToEducator = async (req, res) => {
 
 // Add New Course
 export const addCourse = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
-        if (!req.auth || !req.auth.userId) {
-            return res.status(401).json({ success: false, message: 'Unauthorized' });
-        }
-
         const { courseData } = req.body
 
         const imageFile = req.file
@@ -62,6 +61,9 @@ export const addCourse = async (req, res) => {
 
 // Get Educator Courses
 export const getEducatorCourses = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
 
         const educator = req.auth.userId
@@ -77,6 +79,9 @@ export const getEducatorCourses = async (req, res) => {
 
 // Get Educator Dashboard Data ( Total Earning, Enrolled Students, No. of Courses)
 export const educatorDashboardData = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
         const educator = req.auth.userId;
 
@@ -124,6 +129,9 @@ export const educatorDashboardData = async (req, res) => {
 
 // Get Enrolled Students Data with Purchase Data
 export const getEnrolledStudentsData = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
     try {
         const educator = req.auth.userId;
 
