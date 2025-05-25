@@ -17,6 +17,7 @@ import Dashboard from "./pages/educator/Dashboard";
 import AddCourse from "./pages/educator/AddCourse";
 import MyCourses from "./pages/educator/MyCourses";
 import StudentsEnrolled from "./pages/educator/StudentsEnrolled";
+import Login from "./pages/student/Login";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -110,6 +111,7 @@ const App = () => {
               <Route path="/player/:courseId" element={<Player />} />
               <Route path="/loading/:path" element={<Loading />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
 
               {/* Educator Routes */}
               <Route path="/educator/*" element={<Educator />}>

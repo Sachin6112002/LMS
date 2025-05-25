@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
 // User Registration Controller
 export const registerUser = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
+    const { email, password, name, imageUrl } = req.body;
+    if (!email || !password || !name || !imageUrl) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
     const existingUser = await User.findOne({ email });
@@ -16,10 +16,11 @@ export const registerUser = async (req, res) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
+      _id: new mongoose.Types.ObjectId().toString(),
       email,
       password: hashedPassword,
       name,
-      resume: '',
+      imageUrl,
       enrolledCourses: [],
       publicMetadata: { role: 'student' }
     });
