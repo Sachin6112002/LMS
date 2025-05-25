@@ -6,7 +6,6 @@ import { FaUsers, FaBookOpen, FaCog } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import ManageUsers from "./pages/ManageUsers";
 import ManageCourses from "./pages/ManageCourses";
 import Settings from "./pages/Settings";
 import Register from './pages/Register';
@@ -18,12 +17,6 @@ const HeroSection = () => {
 
   const actionButtons = [
     {
-      title: 'Manage Users',
-      color: 'bg-blue-600 hover:bg-blue-700',
-      path: '/manage-users',
-      icon: <FaUsers size={24} className="mb-1" />,
-    },
-    {
       title: 'Manage Courses',
       color: 'bg-green-600 hover:bg-green-700',
       path: '/manage-courses',
@@ -34,6 +27,18 @@ const HeroSection = () => {
       color: 'bg-gray-700 hover:bg-gray-800',
       path: '/settings',
       icon: <FaCog size={24} className="mb-1" />,
+    },
+    {
+      title: 'Student Manager',
+      color: 'bg-purple-600 hover:bg-purple-700',
+      path: '/students',
+      icon: <FaUsers size={24} className="mb-1" />,
+    },
+    {
+      title: 'Educator Manager',
+      color: 'bg-yellow-600 hover:bg-yellow-700',
+      path: '/educators',
+      icon: <FaBookOpen size={24} className="mb-1" />,
     },
   ];
 
@@ -73,7 +78,6 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/dashboard" element={<HeroSection />} />
-          <Route path="/manage-users" element={<ManageUsers />} />
           <Route path="/manage-courses" element={<ManageCourses />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/login" element={<Login />} />

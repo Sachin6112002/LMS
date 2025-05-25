@@ -27,7 +27,7 @@ const StudentManager = () => {
 
   return (
     <div className="p-8">
-      <h2 className="text-2xl font-bold mb-6">Student Manager</h2>
+      <h2 className="text-2xl font-bold mb-6">Student Data</h2>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (

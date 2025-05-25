@@ -3,39 +3,61 @@ import User from "../models/User.js";
 import stripe from "stripe";
 import { Purchase } from "../models/Purchase.js";
 import Course from "../models/Course.js";
-
-
+import mongoose from "mongoose";
 
 // API Controller Function to Manage Clerk User with database
 export const clerkWebhooks = async (req, res) => {
   try {
-
     // Create a Svix instance with clerk webhook secret.
-    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
+    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     // Verifying Headers
     await whook.verify(JSON.stringify(req.body), {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
-      "svix-signature": req.headers["svix-signature"]
-    })
+      "svix-signature": req.headers["svix-signature"],
+    });
 
     // Getting Data from request body
-    const { data, type } = req.body
+    const { data, type } = req.body;
+
+    console.log("Webhook event type:", type);
+    console.log("Webhook data:", data);
+
+    console.log("Svix Headers:", {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+      "svix-signature": req.headers["svix-signature"],
+    });
+
+    // Log database connection status
+    console.log("Database connection status:", mongoose.connection.readyState);
+
+    // Ensure required fields are present
+    if (!data.id || !data.email_addresses || !data.first_name || !data.last_name) {
+      console.error("Missing required user data in webhook payload:", data);
+      return res.status(400).json({ success: false, message: "Invalid user data" });
+    }
 
     // Switch Cases for differernt Events
     switch (type) {
       case 'user.created': {
-
         const userData = {
           _id: data.id,
-          email: data.email_addresses[0].email_address,
-          name: data.first_name + " " + data.last_name,
-          imageUrl: data.image_url,
+          email: data.email_addresses[0]?.email_address || "",
+          name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+          imageUrl: data.image_url || "",
           resume: ''
+        };
+
+        try {
+          await User.create(userData);
+          console.log("User created successfully:", userData);
+          res.json({});
+        } catch (err) {
+          console.error("Error creating user:", err);
+          res.status(500).json({ success: false, message: "Failed to create user" });
         }
-        await User.create(userData)
-        res.json({})
         break;
       }
 
@@ -60,7 +82,8 @@ export const clerkWebhooks = async (req, res) => {
     }
 
   } catch (error) {
-    res.json({ success: false, message: error.message })
+    console.error("Clerk Webhook Error:", error); // Log the full error stack
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 

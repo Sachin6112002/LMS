@@ -17,11 +17,6 @@ import Dashboard from "./pages/educator/Dashboard";
 import AddCourse from "./pages/educator/AddCourse";
 import MyCourses from "./pages/educator/MyCourses";
 import StudentsEnrolled from "./pages/educator/StudentsEnrolled";
-import Admin from "./pages/admin/Admin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import ManageUsers from "./pages/admin/ManageUsers";
-import ManageCourses from "./pages/admin/ManageCourses";
-import AdminSettings from "./pages/admin/AdminSettings";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -125,13 +120,13 @@ const App = () => {
               </Route>
 
               {/* Admin Routes */}
-              <Route path="/admin/*" element={<Admin />}>
+              {/* <Route path="/admin/*" element={<Admin />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="manage-users" element={<ManageUsers />} />
                 <Route path="manage-courses" element={<ManageCourses />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route index element={<AdminDashboard />} />
-              </Route>
+              </Route> */}
             </Routes>
           </div>
         </AppContextProvider>

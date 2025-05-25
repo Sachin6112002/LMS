@@ -217,3 +217,13 @@ export const getAllEducators = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Get all admins (for Settings page)
+export const getAllAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ 'publicMetadata.role': 'admin' }).select('-password -__v');
+    res.json({ success: true, admins });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

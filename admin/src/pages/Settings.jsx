@@ -147,6 +147,31 @@ const Settings = () => {
     }
   };
 
+  // --- Button Handlers ---
+  const handleDeactivateAccount = () => {
+    if (window.confirm('Are you sure you want to deactivate your account?')) {
+      // TODO: Implement backend call for deactivation
+      alert('Account deactivation is not implemented yet.');
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
+      // TODO: Implement backend call for deletion
+      alert('Account deletion is not implemented yet.');
+    }
+  };
+
+  const handleLogoutAll = () => {
+    // TODO: Implement backend call for logging out from all devices
+    alert('Logout from all devices is not implemented yet.');
+  };
+
+  const handlePreviewDarkMode = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+    alert(`Theme switched to ${theme === 'dark' ? 'light' : 'dark'}`);
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white rounded-xl shadow-lg">
       {loading ? (
@@ -273,7 +298,7 @@ const Settings = () => {
                 <input type="checkbox" className="form-checkbox h-5 w-5 text-purple-600 accent-purple-500" id="emailNotify" />
                 <label htmlFor="emailNotify" className="ml-2 text-gray-700 font-medium">Receive Email Notifications</label>
               </div>
-              <button className="w-full py-2 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-lg font-semibold shadow hover:from-blue-700 hover:to-blue-500 transition">Preview Dark Mode</button>
+              <button className="w-full py-2 bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-lg font-semibold shadow hover:from-blue-700 hover:to-blue-500 transition" onClick={handlePreviewDarkMode}>Preview Dark Mode</button>
             </section>
             {/* Add Another Admin */}
             <section className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow p-6 flex flex-col justify-between mt-8">
@@ -297,11 +322,11 @@ const Settings = () => {
                 <span className="inline-block w-2 h-6 bg-gray-500 rounded-full mr-2"></span>Account & Security
               </h3>
               <div className="flex gap-4 mb-6">
-                <button className="flex-1 py-2 bg-yellow-400 text-white rounded-lg font-semibold shadow hover:bg-yellow-500 transition">Deactivate Account</button>
-                <button className="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold shadow hover:bg-red-700 transition">Delete Account</button>
+                <button className="flex-1 py-2 bg-yellow-400 text-white rounded-lg font-semibold shadow hover:bg-yellow-500 transition" onClick={handleDeactivateAccount}>Deactivate Account</button>
+                <button className="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold shadow hover:bg-red-700 transition" onClick={handleDeleteAccount}>Delete Account</button>
               </div>
               <div className="mb-6">
-                <button className="w-full py-2 bg-blue-500 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition">Log out from all devices</button>
+                <button className="w-full py-2 bg-blue-500 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition" onClick={handleLogoutAll}>Log out from all devices</button>
               </div>
               <div className="bg-gray-100 rounded-lg p-4 shadow-inner">
                 <h4 className="font-semibold mb-2 text-gray-700">Recent Activity</h4>
@@ -320,8 +345,7 @@ const Settings = () => {
           {/* Activity Section */}
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-2">Recent Admin Activities</h3>
-            <ul className="bg-gray-50 rounded p-4 max-h-60 overflow-y-auto">
-              {activities.length === 0 ? (
+            <ul className="bg-gray-50 rounded p-4 max-h-60 overflow-y-auto">              {activities.length === 0 ? (
                 <li className="text-gray-400">No recent activities.</li>
               ) : (
                 activities.map((activity, idx) => (
