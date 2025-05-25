@@ -42,9 +42,10 @@ export const AppContextProvider = (props) => {
         navigate('/')
     }
     // Registration
-    const register = async (form) => {
+    const register = async (form, isFormData = false) => {
         try {
-            const { data } = await axios.post(`${backendUrl}/api/user/register`, form)
+            const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+            const { data } = await axios.post(`${backendUrl}/api/user/register`, form, config);
             if (data.success) {
                 toast.success('Registration successful! Please login.')
                 navigate('/login')

@@ -1,9 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
+import fileUploadIcon from '../../assets/file_upload_icon.svg';
 
 const Register = () => {
-  const [form, setForm] = useState({ name: '', email: '', password: '', imageUrl: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -14,18 +16,27 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
+    if (!image) {
+      setError('Profile image is required.');
+      setLoading(false);
+      return;
+    }
     try {
-      if (!form.imageUrl) {
-        setError('Profile image URL is required.');
-        setLoading(false);
-        return;
-      }
-      await register(form);
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      formData.append('password', form.password);
+      formData.append('image', image);
+      await register(formData, true); // true = isFormData
       setSuccess('Registration successful! Please login.');
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
@@ -37,7 +48,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md" encType="multipart/form-data">
         <h2 className="text-2xl font-bold mb-6 text-center">Student Registration</h2>
         {error && <div className="mb-4 text-red-500">{error}</div>}
         {success && <div className="mb-4 text-green-600">{success}</div>}
@@ -54,8 +65,13 @@ const Register = () => {
           <input type="password" name="password" value={form.password} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
         </div>
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Profile Image URL</label>
-          <input type="text" name="imageUrl" value={form.imageUrl} onChange={handleChange} required className="w-full border px-3 py-2 rounded" />
+          <label className="block mb-1 font-medium">Profile Image</label>
+          <label className="flex items-center gap-2 cursor-pointer bg-blue-50 border border-blue-200 px-3 py-2 rounded hover:bg-blue-100 transition">
+            <img src={fileUploadIcon} alt="Upload" className="w-5 h-5" />
+            <span className="text-blue-700 font-medium">Upload Image</span>
+            <input type="file" name="image" accept="image/*" onChange={handleImageChange} required className="hidden" />
+            {image && <span className="ml-2 text-xs text-gray-600">{image.name}</span>}
+          </label>
         </div>
         <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">
           {loading ? 'Registering...' : 'Register'}
