@@ -2,33 +2,32 @@ import { v2 as cloudinary } from 'cloudinary'
 import Course from '../models/Course.js';
 import { Purchase } from '../models/Purchase.js';
 import User from '../models/User.js';
-import { clerkClient } from '@clerk/express'
 
 // update role to educator
 export const updateRoleToEducator = async (req, res) => {
-
     try {
-
-        const userId = req.auth.userId
-
-        await clerkClient.users.updateUserMetadata(userId, {
-            publicMetadata: {
-                role: 'educator',
-            },
-        })
-
-        res.json({ success: true, message: 'You can publish a course now' })
-
+        if (!req.auth || !req.auth.userId) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const userId = req.auth.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        user.publicMetadata.role = 'educator';
+        await user.save();
+        res.json({ success: true, message: 'You can publish a course now' });
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-
 }
 
 // Add New Course
 export const addCourse = async (req, res) => {
-
     try {
+        if (!req.auth || !req.auth.userId) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
 
         const { courseData } = req.body
 
