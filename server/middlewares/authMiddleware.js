@@ -4,15 +4,23 @@ import User from '../models/User.js'
 export const protectEducator = async (req,res,next) => {
     try {
         if (!req.auth || !req.auth.userId) {
+            console.log('protectEducator: No userId in req.auth');
             return res.status(401).json({ success: false, message: 'Unauthorized' });
         }
         const userId = req.auth.userId;
         const user = await User.findById(userId);
-        if (!user || user.publicMetadata.role !== 'educator') {
-            return res.json({success:false, message: 'Unauthorized Access'})
+        console.log('protectEducator: userId', userId, 'user', user);
+        if (!user) {
+            console.log('protectEducator: User not found');
+            return res.json({success:false, message: 'Unauthorized Access: User not found'})
+        }
+        if (user.publicMetadata.role !== 'educator') {
+            console.log('protectEducator: User role is', user.publicMetadata.role);
+            return res.json({success:false, message: 'Unauthorized Access: Not an educator'})
         }
         next()
     } catch (error) {
+        console.log('protectEducator: Error', error);
         res.json({success:false, message: error.message})
     }
 }
