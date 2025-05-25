@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { assets } from '../../assets/assets';
 import { Link, useLocation } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
-import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
@@ -12,10 +11,7 @@ const Navbar = () => {
 
   const isCoursesListPage = location.pathname.includes('/course-list');
 
-  const { backendUrl, isEducator, setIsEducator, navigate, getToken } = useContext(AppContext)
-
-  const { openSignIn } = useClerk()
-  const { user } = useUser()
+  const { backendUrl, isEducator, setIsEducator, navigate, getToken, userData, logout } = useContext(AppContext)
 
   const becomeEducator = async () => {
 
@@ -26,7 +22,7 @@ const Navbar = () => {
         return;
       }
 
-      const token = await getToken()
+      const token = getToken()
       const { data } = await axios.get(backendUrl + '/api/educator/update-role', { headers: { Authorization: `Bearer ${token}` } })
       if (data.success) {
         toast.success(data.message)
@@ -46,15 +42,17 @@ const Navbar = () => {
       <div className="md:flex hidden items-center gap-5 text-gray-500">
         <div className="flex items-center gap-5">
           {
-            user && <>
+            userData && <>
               <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
               | <Link to='/my-enrollments' >My Enrollments</Link>
             </>
           }
         </div>
-        {user
-          ? <UserButton />
-          : <button onClick={() => openSignIn()} className="bg-blue-600 text-white px-5 py-2 rounded-full">
+        {userData
+          ? <button onClick={logout} className="bg-blue-600 text-white px-5 py-2 rounded-full">
+            Logout
+          </button>
+          : <button onClick={() => navigate('/login')} className="bg-blue-600 text-white px-5 py-2 rounded-full">
             Create Account
           </button>}
       </div>
@@ -63,12 +61,14 @@ const Navbar = () => {
         <div className="flex items-center gap-1 sm:gap-2 max-sm:text-xs">
           <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
           | {
-            user && <Link to='/my-enrollments' >My Enrollments</Link>
+            userData && <Link to='/my-enrollments' >My Enrollments</Link>
           }
         </div>
-        {user
-          ? <UserButton />
-          : <button onClick={() => openSignIn()}>
+        {userData
+          ? <button onClick={logout}>
+            <img src={assets.user_icon} alt="" />
+          </button>
+          : <button onClick={() => navigate('/login')}>
             <img src={assets.user_icon} alt="" />
           </button>}
       </div>

@@ -7,7 +7,6 @@ import { AppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
 import humanizeDuration from 'humanize-duration'
 import YouTube from 'react-youtube';
-import { useAuth } from '@clerk/clerk-react';
 import Loading from '../../components/student/Loading';
 
 const CourseDetails = () => {
@@ -18,8 +17,7 @@ const CourseDetails = () => {
   const [playerData, setPlayerData] = useState(null)
   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false)
 
-  const { backendUrl, currency, userData, calculateChapterTime, calculateCourseDuration, calculateRating, calculateNoOfLectures } = useContext(AppContext)
-  const { getToken } = useAuth()
+  const { backendUrl, currency, userData, calculateChapterTime, calculateCourseDuration, calculateRating, calculateNoOfLectures, getToken } = useContext(AppContext)
 
 
   const fetchCourseData = async () => {
