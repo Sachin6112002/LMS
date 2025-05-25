@@ -80,7 +80,7 @@ export const getEducatorCourses = async (req, res) => {
 // Get Educator Dashboard Data ( Total Earning, Enrolled Students, No. of Courses)
 export const educatorDashboardData = async (req, res) => {
     if (!req.auth || !req.auth.userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing or invalid token' });
     }
     try {
         const educator = req.auth.userId;
