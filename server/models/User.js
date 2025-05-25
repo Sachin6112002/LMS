@@ -7,15 +7,16 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true },
     imageUrl: { type: String, required: true },
     password: { type: String, required: false },
-    enrolledCourses: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Course'
-        }
-    ],
+    enrolledCourses: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+        default: []
+    },
     publicMetadata: {
-        role: { type: String, default: 'student' },
-        // ...other metadata fields...
+        type: {
+            role: { type: String, default: 'student' },
+            // ...other metadata fields...
+        },
+        default: () => ({ role: 'student' })
     },
 }, { timestamps: true });
 

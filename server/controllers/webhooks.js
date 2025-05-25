@@ -47,7 +47,9 @@ export const clerkWebhooks = async (req, res) => {
           email: data.email_addresses[0]?.email_address || "",
           name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
           imageUrl: data.image_url || "",
-          resume: ''
+          resume: '',
+          enrolledCourses: [],
+          publicMetadata: { role: 'student' }
         };
 
         try {
