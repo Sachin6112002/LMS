@@ -11,14 +11,21 @@ const Register = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkAdminExists = async () => {
+      try {
+        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/admin/check-admin-exists`);
+        if (data.exists) {
+          navigate('/login', { replace: true });
+        }
+      } catch {}
+    };
+    checkAdminExists();
     if (isAdminAuthenticated()) {
       navigate('/dashboard', { replace: true });
     }
   }, [navigate]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,5 +72,3 @@ const Register = () => {
 };
 
 export default Register;
-
-// REMOVE THIS FILE: Registration is handled in Login.jsx as a conditional popup if no admin exists.

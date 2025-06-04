@@ -1,11 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isAdminAuthenticated, backendUrl } from '../context/AppContext';
 import { assets } from '../assets/assets';
-import { isAdminAuthenticated } from '../context/AppContext';
 
 const Dashboard = () => {
-  const { backendUrl, aToken } = useContext(AppContext);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -20,8 +18,9 @@ const Dashboard = () => {
     const fetchStats = async () => {
       setLoading(true);
       try {
+        const token = localStorage.getItem('adminToken');
         const res = await fetch(`${backendUrl}/api/admin/dashboard`, {
-          headers: { Authorization: `Bearer ${aToken}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         if (data.success) setStats(data.dashboardData);
@@ -32,7 +31,7 @@ const Dashboard = () => {
       }
     };
     fetchStats();
-  }, [backendUrl, aToken]);
+  }, []);
 
   if (loading) return <div>Loading...</div>;
   if (!stats) return <div>Failed to load dashboard data.</div>;
