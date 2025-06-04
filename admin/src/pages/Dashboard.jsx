@@ -49,25 +49,18 @@ const Dashboard = () => {
         </p>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center mt-4">
           <button
-            onClick={() => navigate('/manage-users')}
+            onClick={() => navigate('/students')}
             className="bg-gradient-to-r from-blue-500 to-blue-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-blue-600 hover:to-blue-800 transition flex flex-col items-center gap-2 text-lg border-2 border-blue-200"
           >
-            <img src={assets.list_icon} alt="Users" className="w-10 h-10 mb-2" />
-            Manage Users
+            <img src={assets.list_icon} alt="Students" className="w-10 h-10 mb-2" />
+            Student Manager
           </button>
           <button
-            onClick={() => navigate('/manage-courses')}
+            onClick={() => navigate('/educators')}
             className="bg-gradient-to-r from-purple-500 to-indigo-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-purple-600 hover:to-indigo-800 transition flex flex-col items-center gap-2 text-lg border-2 border-purple-200"
           >
-            <img src={assets.add_icon} alt="Courses" className="w-10 h-10 mb-2" />
-            Manage Courses
-          </button>
-          <button
-            onClick={() => navigate('/settings')}
-            className="bg-gradient-to-r from-green-500 to-teal-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-green-600 hover:to-teal-800 transition flex flex-col items-center gap-2 text-lg border-2 border-green-200"
-          >
-            <img src={assets.tick_icon} alt="Settings" className="w-10 h-10 mb-2" />
-            Settings
+            <img src={assets.add_icon} alt="Educators" className="w-10 h-10 mb-2" />
+            Educator Manager
           </button>
         </div>
       </div>

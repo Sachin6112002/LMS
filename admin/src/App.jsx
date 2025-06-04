@@ -2,12 +2,10 @@ import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaUsers, FaBookOpen, FaCog } from 'react-icons/fa';
+import { FaUsers, FaBookOpen } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import ManageCourses from "./pages/ManageCourses";
-import Settings from "./pages/Settings";
 import Register from './pages/Register';
 import StudentManager from './pages/StudentManager';
 import EducatorManager from './pages/EducatorManager';
@@ -16,18 +14,6 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const actionButtons = [
-    {
-      title: 'Manage Courses',
-      color: 'bg-green-600 hover:bg-green-700',
-      path: '/manage-courses',
-      icon: <FaBookOpen size={24} className="mb-1" />,
-    },
-    {
-      title: 'Settings',
-      color: 'bg-gray-700 hover:bg-gray-800',
-      path: '/settings',
-      icon: <FaCog size={24} className="mb-1" />,
-    },
     {
       title: 'Student Manager',
       color: 'bg-purple-600 hover:bg-purple-700',
@@ -78,8 +64,6 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/dashboard" element={<HeroSection />} />
-          <Route path="/manage-courses" element={<ManageCourses />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/students" element={<StudentManager />} />
