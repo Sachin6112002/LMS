@@ -5,18 +5,22 @@ import { backendUrl } from '../context/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [showRegister, setShowRegister] = useState(false);
+  const [adminExists, setAdminExists] = useState(true);
   const [form, setForm] = useState({ email: '', password: '', name: '', imageUrl: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    fetch(`${backendUrl}/api/admin/check-admin-exists`)
-      .then(res => res.json())
-      .then(data => {
-        setShowRegister(!data.exists);
-      });
+    const checkAdminExists = async () => {
+      try {
+        const { data } = await axios.get(`${backendUrl}/api/admin/check-admin-exists`);
+        setAdminExists(data.exists);
+      } catch {
+        setAdminExists(true);
+      }
+    };
+    checkAdminExists();
   }, []);
 
   const handleChange = (e) => {
@@ -43,7 +47,7 @@ const Login = () => {
       if (data.success) {
         setSuccess('Registration successful! You can now log in.');
         setTimeout(() => {
-          setShowRegister(false);
+          setAdminExists(true);
           setForm({ email: '', password: '', name: '', imageUrl: '' });
         }, 1500);
       } else {
@@ -87,42 +91,36 @@ const Login = () => {
     }
   };
 
-  if (showRegister) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FD]">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center">
-          <img src="/vite.svg" alt="LMS Logo" className="h-14 w-14 mb-4" />
-          <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Registration</h2>
-          <p className="text-gray-600 mb-6 text-center">Register as the first admin user.</p>
-          <form className="w-full flex flex-col gap-4" onSubmit={handleRegister}>
-            <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-            <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-            <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-            <input name="imageUrl" type="text" placeholder="Profile Image URL" value={form.imageUrl} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-            <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
-              {loading ? 'Registering...' : 'Register as Admin'}
-            </button>
-          </form>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
-          {success && <p className="text-green-600 mt-4">{success}</p>}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FD]">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center">
         <img src="/vite.svg" alt="LMS Logo" className="h-14 w-14 mb-4" />
-        <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
-        <p className="text-gray-600 mb-6 text-center">Sign in as an admin to access the dashboard.</p>
-        <form className="w-full flex flex-col gap-4" onSubmit={handleLogin}>
-          <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-          <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in as Admin'}
-          </button>
-        </form>
+        {adminExists ? (
+          <>
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
+            <p className="text-gray-600 mb-6 text-center">Login to your admin account.</p>
+            <form className="w-full flex flex-col gap-4" onSubmit={handleLogin}>
+              <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+              <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+              <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Registration</h2>
+            <p className="text-gray-600 mb-6 text-center">Register as the first admin user.</p>
+            <form className="w-full flex flex-col gap-4" onSubmit={handleRegister}>
+              <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+              <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+              <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+              <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
+                {loading ? 'Registering...' : 'Register'}
+              </button>
+            </form>
+          </>
+        )}
         {error && <p className="text-red-500 mt-4">{error}</p>}
         {success && <p className="text-green-600 mt-4">{success}</p>}
       </div>
