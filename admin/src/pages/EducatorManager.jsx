@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { backendUrl } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const EducatorManager = () => {
   const [educators, setEducators] = useState([]);
@@ -9,24 +10,39 @@ const EducatorManager = () => {
   const [roleChangeLoading, setRoleChangeLoading] = useState('');
   const [roleChangeError, setRoleChangeError] = useState('');
   const [roleChangeSuccess, setRoleChangeSuccess] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEducators = async () => {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       try {
-        const token = localStorage.getItem('adminToken');
         const { data } = await axios.get(`${backendUrl}/api/admin/educators`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (data.success) setEducators(data.educators);
         else setError(data.message || 'Failed to fetch educators');
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch educators');
+        if (
+          err.response?.data?.message === 'Invalid token' ||
+          err.response?.data?.message === 'No token provided' ||
+          err.response?.data?.message === 'Not authorized as admin'
+        ) {
+          setError('Session expired or unauthorized. Please log in again.');
+          localStorage.removeItem('adminToken');
+          setTimeout(() => navigate('/login'), 1500);
+        } else {
+          setError(err.response?.data?.message || 'Failed to fetch educators');
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchEducators();
-  }, []);
+  }, [navigate]);
 
   const handleRoleChange = async (id, newRole) => {
     setRoleChangeLoading(id);

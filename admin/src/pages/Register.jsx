@@ -54,6 +54,9 @@ const Register = () => {
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
+        <div className="mt-4 text-center">
+          Already have an account? <a href="/login" className="text-blue-600 underline">Login</a>
+        </div>
         {error && <p className="text-red-500 mt-4">{error}</p>}
         {success && <p className="text-green-600 mt-4">{success}</p>}
       </div>
