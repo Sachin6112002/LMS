@@ -6,7 +6,7 @@ import { backendUrl } from '../context/AppContext';
 const Login = () => {
   const navigate = useNavigate();
   const [adminExists, setAdminExists] = useState(true);
-  const [form, setForm] = useState({ email: '', password: '', name: '', imageUrl: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -32,7 +32,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-    if (!form.name || !form.email || !form.password || !form.imageUrl) {
+    if (!form.name || !form.email || !form.password) {
       setError('All fields are required.');
       setLoading(false);
       return;
@@ -42,13 +42,12 @@ const Login = () => {
         name: form.name,
         email: form.email,
         password: form.password,
-        imageUrl: form.imageUrl,
       });
       if (data.success) {
         setSuccess('Registration successful! You can now log in.');
         setTimeout(() => {
           setAdminExists(true);
-          setForm({ email: '', password: '', name: '', imageUrl: '' });
+          setForm({ name: '', email: '', password: '' });
         }, 1500);
       } else {
         setError(data.message || 'Registration failed.');
