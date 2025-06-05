@@ -13,11 +13,13 @@ export const stripeWebhook = express.raw({ type: 'application/json' }, async (re
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  console.log('Stripe webhook event received:', event.type);
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
+    console.log('Stripe session object:', session);
     const purchaseId = session.metadata?.purchaseId;
     if (purchaseId) {
-      // Update the purchase status to completed
       const result = await Purchase.findByIdAndUpdate(
         purchaseId,
         { status: 'completed' },
