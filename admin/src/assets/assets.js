@@ -1,10 +1,9 @@
+import add_icon from './add_icon.svg';
+import home_icon from './home_icon.svg';
+import tick_icon from './tick_icon.svg';
+
 export const assets = {
-  add_icon: require('./add_icon.svg'),
-  appointment_icon: require('./appointment_icon.svg'),
-  cancel_icon: require('./cancel_icon.svg'),
-  doctor_icon: require('./doctor_icon.svg'),
-  home_icon: require('./home_icon.svg'),
-  list_icon: require('./list_icon.svg'),
-  tick_icon: require('./tick_icon.svg'),
-  upload_area: require('./upload_area.svg'),
+  add_icon,
+  home_icon,
+  tick_icon,
 };

@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import StudentManager from './pages/StudentManager';
 import EducatorManager from './pages/EducatorManager';
+import Dashboard from './pages/Dashboard';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -79,8 +80,8 @@ const App = () => {
       <main className="flex-1 flex items-center justify-center">
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<PrivateRoute><HeroSection /></PrivateRoute>} />
-          <Route path="/dashboard" element={<PrivateRoute><HeroSection /></PrivateRoute>} />
+          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
           <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
           {/* Add more admin-only routes here */}

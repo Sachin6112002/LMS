@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { backendUrl } from '../context/AppContext';
+import { backendUrl, isAdminAuthenticated } from '../context/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,6 +13,11 @@ const Login = () => {
 
   // Check if admin exists on mount
   useEffect(() => {
+    // If already logged in, go to dashboard
+    if (isAdminAuthenticated()) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
     const checkAdminExists = async () => {
       try {
         const { data } = await axios.get(`${backendUrl}/api/admin/check-admin-exists`);
@@ -22,7 +27,7 @@ const Login = () => {
       }
     };
     checkAdminExists();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -53,6 +58,11 @@ const Login = () => {
         setError(data.message || 'Registration failed.');
       }
     } catch (err) {
+      if (err.response && err.response.status === 409) {
+        // Admin already exists, force reload to show login
+        window.location.reload();
+        return;
+      }
       setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
