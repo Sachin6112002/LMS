@@ -20,43 +20,32 @@ export const stripeWebhook = async (request, response) => {
 
   // Handle the event
   switch (event.type) {
-    case 'payment_intent.succeeded': {
-      console.log('Processing payment_intent.succeeded');
-      const paymentIntent = event.data.object;
-      const paymentIntentId = paymentIntent.id;
-      try {
-        // Getting Session Metadata
-        const session = await stripeInstance.checkout.sessions.list({
-          payment_intent: paymentIntentId,
-        });
-        console.log('Checkout session(s) found:', session.data.length);
-        if (!session.data.length) {
-          console.error('No checkout session found for payment_intent:', paymentIntentId);
-          break;
-        }
-        const { purchaseId } = session.data[0].metadata;
-        console.log('purchaseId from session metadata:', purchaseId);
-        const purchaseData = await Purchase.findById(purchaseId);
-        if (!purchaseData) {
-          console.error('No purchase found for purchaseId:', purchaseId);
-          break;
-        }
-        const userData = await User.findById(purchaseData.userId);
-        const courseData = await Course.findById(purchaseData.courseId.toString());
-        if (!userData || !courseData) {
-          console.error('User or Course not found for purchase:', purchaseId);
-          break;
-        }
-        courseData.enrolledStudents.push(userData);
-        await courseData.save();
-        userData.enrolledCourses.push(courseData._id);
-        await userData.save();
-        purchaseData.status = 'completed';
-        await purchaseData.save();
-        console.log('Purchase marked as completed:', purchaseId);
-      } catch (err) {
-        console.error('Error processing payment_intent.succeeded:', err);
+    case 'checkout.session.completed': {
+      console.log('Processing checkout.session.completed');
+      const session = event.data.object;
+      const { purchaseId } = session.metadata;
+      if (!purchaseId) {
+        console.error('No purchaseId in session metadata');
+        break;
       }
+      const purchaseData = await Purchase.findById(purchaseId);
+      if (!purchaseData) {
+        console.error('No purchase found for purchaseId:', purchaseId);
+        break;
+      }
+      const userData = await User.findById(purchaseData.userId);
+      const courseData = await Course.findById(purchaseData.courseId.toString());
+      if (!userData || !courseData) {
+        console.error('User or Course not found for purchase:', purchaseId);
+        break;
+      }
+      courseData.enrolledStudents.push(userData);
+      await courseData.save();
+      userData.enrolledCourses.push(courseData._id);
+      await userData.save();
+      purchaseData.status = 'completed';
+      await purchaseData.save();
+      console.log('Purchase marked as completed:', purchaseId);
       break;
     }
     case 'payment_intent.payment_failed': {
