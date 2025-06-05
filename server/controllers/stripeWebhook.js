@@ -39,10 +39,15 @@ export const stripeWebhook = async (request, response) => {
         console.error('User or Course not found for purchase:', purchaseId);
         break;
       }
-      courseData.enrolledStudents.push(userData);
-      await courseData.save();
-      userData.enrolledCourses.push(courseData._id);
-      await userData.save();
+      // Prevent duplicate enrollments
+      if (!courseData.enrolledStudents.includes(userData._id)) {
+        courseData.enrolledStudents.push(userData._id);
+        await courseData.save();
+      }
+      if (!userData.enrolledCourses.includes(courseData._id)) {
+        userData.enrolledCourses.push(courseData._id);
+        await userData.save();
+      }
       purchaseData.status = 'completed';
       await purchaseData.save();
       console.log('Purchase marked as completed:', purchaseId);
