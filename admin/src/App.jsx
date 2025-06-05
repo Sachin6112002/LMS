@@ -1,14 +1,14 @@
 import React from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaUsers, FaBookOpen } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import StudentManager from './pages/StudentManager';
 import EducatorManager from './pages/EducatorManager';
+import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -55,6 +55,11 @@ const HeroSection = () => {
   );
 };
 
+// PrivateRoute wrapper for admin-only pages
+const PrivateRoute = ({ children }) => {
+  return isAdminAuthenticated() ? children : <Navigate to="/login" replace />;
+};
+
 const App = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -62,12 +67,12 @@ const App = () => {
       <Navbar />
       <main className="flex-1 flex items-center justify-center">
         <Routes>
-          <Route path="/" element={<HeroSection />} />
-          <Route path="/dashboard" element={<HeroSection />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/students" element={<StudentManager />} />
-          <Route path="/educators" element={<EducatorManager />} />
+          <Route path="/" element={<PrivateRoute><HeroSection /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><HeroSection /></PrivateRoute>} />
+          <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
+          <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
     </div>

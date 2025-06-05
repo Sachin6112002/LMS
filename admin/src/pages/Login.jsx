@@ -5,12 +5,13 @@ import { backendUrl } from '../context/AppContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [adminExists, setAdminExists] = useState(true);
+  const [adminExists, setAdminExists] = useState(undefined); // undefined = loading
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Check if admin exists on mount
   useEffect(() => {
     const checkAdminExists = async () => {
       try {
@@ -46,9 +47,8 @@ const Login = () => {
       if (data.success) {
         setSuccess('Registration successful! You can now log in.');
         setTimeout(() => {
-          setAdminExists(true);
-          setForm({ name: '', email: '', password: '' });
-        }, 1500);
+          window.location.reload(); // force re-check from backend
+        }, 1200);
       } else {
         setError(data.message || 'Registration failed.');
       }
@@ -78,8 +78,10 @@ const Login = () => {
         setSuccess('Login successful! Redirecting...');
         localStorage.setItem('adminToken', data.token);
         setTimeout(() => {
+          setForm({ name: '', email: '', password: '' });
+          setSuccess('');
           navigate('/dashboard', { replace: true });
-        }, 1000);
+        }, 800);
       } else {
         setError(data.message || 'Login failed.');
       }
@@ -94,28 +96,30 @@ const Login = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FD]">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center">
         <img src="/vite.svg" alt="LMS Logo" className="h-14 w-14 mb-4" />
-        {adminExists ? (
+        {adminExists === undefined ? (
+          <div>Loading...</div>
+        ) : !adminExists ? (
           <>
-            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
-            <p className="text-gray-600 mb-6 text-center">Login to your admin account.</p>
-            <form className="w-full flex flex-col gap-4" onSubmit={handleLogin}>
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Registration</h2>
+            <p className="text-gray-600 mb-6 text-center">Register as the first admin user.</p>
+            <form className="w-full flex flex-col gap-4" onSubmit={handleRegister} autoComplete="on">
+              <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required autoFocus />
               <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
               <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
               <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Registering...' : 'Register'}
               </button>
             </form>
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Registration</h2>
-            <p className="text-gray-600 mb-6 text-center">Register as the first admin user.</p>
-            <form className="w-full flex flex-col gap-4" onSubmit={handleRegister}>
-              <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
-              <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
+            <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
+            <p className="text-gray-600 mb-6 text-center">Login to your admin account.</p>
+            <form className="w-full flex flex-col gap-4" onSubmit={handleLogin} autoComplete="on">
+              <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required autoFocus />
               <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
               <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all" disabled={loading}>
-                {loading ? 'Registering...' : 'Register'}
+                {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
           </>
