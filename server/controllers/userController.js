@@ -74,7 +74,7 @@ export const purchaseCourse = async (req, res) => {
         }]
 
         const session = await stripeInstance.checkout.sessions.create({
-            success_url: `${origin}/student/my-enrollments`, // <-- updated to correct route
+            success_url: `${origin}/my-enrollments`, // <-- updated to match frontend route
             cancel_url: `${origin}/`,
             line_items: line_items,
             mode: 'payment',
