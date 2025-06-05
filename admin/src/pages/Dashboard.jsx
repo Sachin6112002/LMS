@@ -62,6 +62,20 @@ const Dashboard = () => {
             <img src={assets.add_icon} alt="Educators" className="w-10 h-10 mb-2" />
             Educator Manager
           </button>
+          <button
+            onClick={() => navigate('/add-feature')}
+            className="bg-gradient-to-r from-green-500 to-green-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-green-600 hover:to-green-800 transition flex flex-col items-center gap-2 text-lg border-2 border-green-200"
+          >
+            <img src={assets.add_icon} alt="Add" className="w-10 h-10 mb-2" />
+            Add Feature
+          </button>
+          <button
+            onClick={() => navigate('/settings')}
+            className="bg-gradient-to-r from-gray-500 to-gray-700 text-white font-bold px-10 py-6 rounded-xl shadow-xl hover:scale-105 hover:from-gray-600 hover:to-gray-800 transition flex flex-col items-center gap-2 text-lg border-2 border-gray-200"
+          >
+            <img src={assets.tick_icon} alt="Settings" className="w-10 h-10 mb-2" />
+            Settings
+          </button>
         </div>
       </div>
       {/* Dashboard stats and latest enrollments */}

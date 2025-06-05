@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaUsers, FaBookOpen } from 'react-icons/fa';
+import { FaUsers, FaBookOpen, FaPlus, FaCog } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
@@ -12,7 +12,6 @@ import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
   const navigate = useNavigate();
-
   const actionButtons = [
     {
       title: 'Student Manager',
@@ -25,6 +24,18 @@ const HeroSection = () => {
       color: 'bg-yellow-600 hover:bg-yellow-700',
       path: '/educators',
       icon: <FaBookOpen size={24} className="mb-1" />,
+    },
+    {
+      title: 'Add Something',
+      color: 'bg-green-600 hover:bg-green-700',
+      path: '/add-feature',
+      icon: <FaPlus size={24} className="mb-1" />,
+    },
+    {
+      title: 'Settings',
+      color: 'bg-gray-700 hover:bg-gray-800',
+      path: '/settings',
+      icon: <FaCog size={24} className="mb-1" />,
     },
   ];
 
@@ -72,6 +83,7 @@ const App = () => {
           <Route path="/dashboard" element={<PrivateRoute><HeroSection /></PrivateRoute>} />
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
           <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
+          {/* Add more admin-only routes here */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
