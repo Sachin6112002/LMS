@@ -11,7 +11,7 @@ const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
 
 
 // Stripe Webhooks to Manage Payments Action
-export const stripeWebhooks = async (request, response) => {
+export const stripeWebhook = async (request, response) => {
   const sig = request.headers['stripe-signature'];
 
   let event;
