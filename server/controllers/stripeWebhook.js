@@ -17,7 +17,15 @@ export const stripeWebhook = express.raw({ type: 'application/json' }, async (re
     const session = event.data.object;
     const purchaseId = session.metadata?.purchaseId;
     if (purchaseId) {
-      await Purchase.findByIdAndUpdate(purchaseId, { status: 'completed' });
+      // Update the purchase status to completed
+      const result = await Purchase.findByIdAndUpdate(
+        purchaseId,
+        { status: 'completed' },
+        { new: true }
+      );
+      console.log('Stripe webhook: purchase updated:', result);
+    } else {
+      console.warn('Stripe webhook: No purchaseId found in session metadata');
     }
   }
   res.status(200).json({ received: true });

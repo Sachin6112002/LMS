@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import StudentManager from './pages/StudentManager';
 import EducatorManager from './pages/EducatorManager';
 import Dashboard from './pages/Dashboard';
+import Settings from './pages/Settings';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -84,6 +85,7 @@ const App = () => {
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
           <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           {/* Add more admin-only routes here */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
