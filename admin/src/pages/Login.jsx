@@ -11,28 +11,33 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Check if admin exists on mount
+  // Helper to check admin existence
+  const checkAdminExists = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/check-admin-exists`);
+      setAdminExists(data.exists);
+    } catch {
+      setAdminExists(true);
+    }
+  };
+
+  // On mount: if already logged in, go to dashboard. Otherwise, check if admin exists.
   useEffect(() => {
-    // If already logged in, go to dashboard
     if (isAdminAuthenticated()) {
       navigate('/dashboard', { replace: true });
       return;
     }
-    const checkAdminExists = async () => {
-      try {
-        const { data } = await axios.get(`${backendUrl}/api/admin/check-admin-exists`);
-        setAdminExists(data.exists);
-      } catch {
-        setAdminExists(true);
-      }
-    };
     checkAdminExists();
   }, [navigate]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    setError('');
+    setSuccess('');
+  }, [adminExists]);
 
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  // Registration logic: only allowed if NO admin exists
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -50,25 +55,42 @@ const Login = () => {
         password: form.password,
       });
       if (data.success) {
-        setSuccess('Registration successful! You can now log in.');
-        setTimeout(() => {
-          window.location.reload(); // force re-check from backend
-        }, 1200);
+        setSuccess('Registration successful! Redirecting to dashboard...');
+        // Immediately log in the new admin
+        const loginRes = await axios.post(`${backendUrl}/api/admin/login`, {
+          email: form.email,
+          password: form.password,
+        });
+        if (loginRes.data.success && loginRes.data.token) {
+          localStorage.setItem('adminToken', loginRes.data.token);
+          setTimeout(() => {
+            setForm({ name: '', email: '', password: '' });
+            setSuccess('');
+            navigate('/dashboard', { replace: true });
+            checkAdminExists(); // force re-check after registration/login
+          }, 800);
+        } else {
+          setError('Registration succeeded but automatic login failed. Please log in manually.');
+          checkAdminExists();
+        }
       } else {
         setError(data.message || 'Registration failed.');
+        checkAdminExists();
       }
     } catch (err) {
       if (err.response && err.response.status === 409) {
-        // Admin already exists, force reload to show login
-        window.location.reload();
+        setAdminExists(true); // Show login form immediately
+        setError('Admin already exists. Please log in.');
         return;
       }
       setError(err.response?.data?.message || err.message);
+      checkAdminExists();
     } finally {
       setLoading(false);
     }
   };
 
+  // Login logic: only allowed if admin exists
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -109,9 +131,9 @@ const Login = () => {
         {adminExists === undefined ? (
           <div>Loading...</div>
         ) : !adminExists ? (
+          // Registration form (only if NO admin exists)
           <>
             <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Registration</h2>
-            <p className="text-gray-600 mb-6 text-center">Register as the first admin user.</p>
             <form className="w-full flex flex-col gap-4" onSubmit={handleRegister} autoComplete="on">
               <input name="name" type="text" placeholder="Name" value={form.name} onChange={handleChange} className="border rounded px-3 py-2 w-full" required autoFocus />
               <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />
@@ -122,9 +144,9 @@ const Login = () => {
             </form>
           </>
         ) : (
+          // Login form (only if admin exists)
           <>
             <h2 className="text-2xl font-bold mb-2 text-gray-800">Admin Login</h2>
-            <p className="text-gray-600 mb-6 text-center">Login to your admin account.</p>
             <form className="w-full flex flex-col gap-4" onSubmit={handleLogin} autoComplete="on">
               <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required autoFocus />
               <input name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" required />

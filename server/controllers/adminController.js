@@ -227,3 +227,39 @@ export const getAllAdmins = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Admin dashboard summary route
+export const getAdminDashboard = async (req, res) => {
+  try {
+    // Summary stats
+    const totalUsers = await User.countDocuments();
+    const totalCourses = await Course.countDocuments();
+    const totalEarnings = await Purchase.aggregate([
+      { $match: { status: 'completed' } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+    // Latest enrollments (last 10 purchases)
+    const latestPurchases = await Purchase.find({ status: 'completed' })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('userId', 'name')
+      .populate('courseId', 'courseTitle');
+    const enrolledStudentsData = latestPurchases.map(p => ({
+      student: { name: p.userId?.name || 'Unknown' },
+      courseTitle: p.courseId?.courseTitle || 'Unknown',
+      enrollmentDate: p.createdAt.toISOString().split('T')[0],
+      status: p.status
+    }));
+    res.json({
+      success: true,
+      dashboardData: {
+        totalUsers,
+        totalCourses,
+        totalEarnings: totalEarnings[0]?.total || 0,
+        enrolledStudentsData
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
