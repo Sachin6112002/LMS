@@ -1,5 +1,9 @@
-// Stripe Gateway Initialize
-const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
+import { Purchase } from '../models/Purchase.js';
+import User from '../models/User.js';
+import Course from '../models/Course.js';
+import stripe from 'stripe';
+
+const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
 
 // Stripe Webhooks to Manage Payments Action
