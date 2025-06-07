@@ -34,34 +34,24 @@ export const purchaseCourse = async (req, res) => {
         return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
     }
     try {
-
-        const { courseId } = req.body
-        const { origin } = req.headers
-
-
-        const userId = req.auth.userId
-
-        const courseData = await Course.findById(courseId)
-        const userData = await User.findById(userId)
-
+        const { courseId } = req.body;
+        const { origin } = req.headers;
+        const userId = req.auth.userId;
+        const courseData = await Course.findById(courseId);
+        const userData = await User.findById(userId);
         if (!userData || !courseData) {
-            return res.json({ success: false, message: 'Data Not Found' })
+            return res.json({ success: false, message: 'Data Not Found' });
         }
-
         const purchaseData = {
             courseId: courseData._id,
             userId,
             amount: (courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2),
-        }
-
-        const newPurchase = await Purchase.create(purchaseData)
-
+        };
+        const newPurchase = await Purchase.create(purchaseData);
         // Stripe Gateway Initialize
-        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
-
-        const currency = process.env.CURRENCY.toLocaleLowerCase()
-
-        // Creating line items to for Stripe
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+        const currency = process.env.CURRENCY.toLocaleLowerCase();
+        // Creating line items for Stripe
         const line_items = [{
             price_data: {
                 currency,
@@ -71,21 +61,17 @@ export const purchaseCourse = async (req, res) => {
                 unit_amount: Math.floor(newPurchase.amount) * 100
             },
             quantity: 1
-        }]
-
+        }];
         const session = await stripeInstance.checkout.sessions.create({
-            success_url: `${origin}/my-enrollments`, // <-- updated to match frontend route
+            success_url: `${origin}/my-enrollments`,
             cancel_url: `${origin}/`,
             line_items: line_items,
             mode: 'payment',
             metadata: {
                 purchaseId: newPurchase._id.toString()
             }
-        })
-
+        });
         res.json({ success: true, session_url: session.url });
-
-
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
