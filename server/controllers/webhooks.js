@@ -77,7 +77,7 @@ export const stripeWebhooks = async (request, response) => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object;
-      const { purchaseId } = session.metadata || {};
+      const purchaseId = session.metadata && session.metadata.purchaseId;
       if (!purchaseId) {
         console.error('No purchaseId in session metadata');
         break;
