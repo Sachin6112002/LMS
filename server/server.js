@@ -22,7 +22,7 @@ app.use(cors())
 app.use(express.json())
 
 // Stripe webhook must use raw body
-app.post('/api/webhook/stripe', stripeWebhook);
+app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhook);
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
