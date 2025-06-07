@@ -7,7 +7,7 @@ import userRouter from './routes/userRoutes.js'
 import educatorRouter from './routes/educatorRoutes.js'
 import courseRouter from './routes/courseRoute.js'
 import adminRouter from './routes/adminRoutes.js'
-import { stripeWebhook } from './controllers/stripeWebhook.js';
+import { stripeWebhooks } from './controllers/webhooks.js';
 import bodyParser from 'body-parser';
 
 // Initialize Express
@@ -22,7 +22,7 @@ app.use(cors())
 app.use(express.json())
 
 // Stripe webhook must use raw body
-app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhook);
+app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhooks);
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
