@@ -17,12 +17,12 @@ const app = express()
 await connectDB()
 await connectCloudinary()
 
-// Middlewares
-app.use(cors())
-app.use(express.json())
-
-// Stripe webhook must use raw body
+// Stripe webhook must use raw body - register BEFORE express.json()
 app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhooks);
+
+// Middlewares
+app.use(cors());
+app.use(express.json())
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))

@@ -133,6 +133,11 @@ export const stripeWebhooks = async (request, response) => {
       }
       break;
     }
+    case 'payment_intent.succeeded': {
+      // Acknowledge payment_intent.succeeded for Stripe, but do not process (handled by checkout.session.completed)
+      console.log('Received payment_intent.succeeded event, no action taken.');
+      break;
+    }
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
