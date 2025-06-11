@@ -90,7 +90,6 @@ export const purchaseCourse = async (req, res) => {
     }
 }
 
-
 // Users Enrolled Courses With Lecture Links
 export const userEnrolledCourses = async (req, res) => {
     if (!req.auth || !req.auth.userId) {
