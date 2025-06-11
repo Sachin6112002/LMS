@@ -86,6 +86,7 @@ const App = () => {
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
           <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+          <Route path="/manage-purchases" element={<PrivateRoute>{React.createElement(require('./pages/ManagePurchases.jsx').default)}</PrivateRoute>} />
           {/* Add more admin-only routes here */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
