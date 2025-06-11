@@ -7,6 +7,7 @@ const ManagePurchases = () => {
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,22 +41,36 @@ const ManagePurchases = () => {
   const filteredPurchases = purchases.filter(p => {
     const user = p.userId?.name || p.userId?.email || '';
     const course = p.courseId?.courseTitle || '';
-    return (
+    const matchesSearch =
       user.toLowerCase().includes(search.toLowerCase()) ||
-      course.toLowerCase().includes(search.toLowerCase())
-    );
+      course.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' ? true : p.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Manage Purchases</h2>
-      <input
-        type="text"
-        placeholder="Search by user or course..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="mb-4 px-3 py-2 border rounded w-full max-w-md"
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by user or course..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="px-3 py-2 border rounded w-full max-w-md"
+        />
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="px-3 py-2 border rounded w-full max-w-xs"
+        >
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
       {loading ? (
         <div>Loading...</div>
       ) : (
