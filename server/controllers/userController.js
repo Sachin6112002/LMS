@@ -47,6 +47,11 @@ export const purchaseCourse = async (req, res) => {
             return res.json({ success: false, message: 'Data Not Found' })
         }
 
+        // Prevent educator from enrolling in their own course
+        if (courseData.educator && userData._id.toString() === courseData.educator.toString()) {
+            return res.json({ success: false, message: 'Educators cannot enroll in their own course.' });
+        }
+
         const purchaseData = {
             courseId: courseData._id,
             userId,
