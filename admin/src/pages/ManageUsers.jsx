@@ -143,7 +143,16 @@ const ManageUsers = () => {
     );
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 p-8">
+    <div className="p-4 md:p-8 bg-white min-h-screen">
+      <div className="flex flex-wrap gap-4 mb-8">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+
       <div className="flex flex-col items-center mb-6">
         <FaUsers className="h-12 w-12 text-blue-600 mb-2" />
         <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>

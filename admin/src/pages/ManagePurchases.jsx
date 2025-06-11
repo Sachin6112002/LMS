@@ -50,8 +50,16 @@ const ManagePurchases = () => {
   });
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Purchases</h2>
+    <div className="p-4 md:p-8 bg-white min-h-screen">
+      <div className="flex flex-wrap gap-4 mb-8">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+      <h2 className="text-xl font-bold mb-4 text-blue-800">Manage Purchases</h2>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
         <input
           type="text"
@@ -74,16 +82,16 @@ const ManagePurchases = () => {
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
+        <div className="overflow-x-auto rounded-xl border border-gray-100">
+          <table className="min-w-full bg-white rounded-xl text-sm">
+            <thead className="bg-cyan-50">
               <tr>
-                <th className="px-4 py-2 border">User</th>
-                <th className="px-4 py-2 border">Email</th>
-                <th className="px-4 py-2 border">Course</th>
-                <th className="px-4 py-2 border">Amount</th>
-                <th className="px-4 py-2 border">Status</th>
-                <th className="px-4 py-2 border">Date</th>
+                <th className="px-4 py-2 text-left">User</th>
+                <th className="px-4 py-2 text-left">Email</th>
+                <th className="px-4 py-2 text-left">Course</th>
+                <th className="px-4 py-2 text-left">Amount</th>
+                <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -93,13 +101,15 @@ const ManagePurchases = () => {
                 </tr>
               ) : (
                 filteredPurchases.map((p, idx) => (
-                  <tr key={p._id || idx} className="border-t">
-                    <td className="px-4 py-2 border">{p.userId?.name || 'N/A'}</td>
-                    <td className="px-4 py-2 border">{p.userId?.email || 'N/A'}</td>
-                    <td className="px-4 py-2 border">{p.courseId?.courseTitle || 'N/A'}</td>
-                    <td className="px-4 py-2 border">${p.amount?.toFixed(2) || 'N/A'}</td>
-                    <td className="px-4 py-2 border capitalize">{p.status}</td>
-                    <td className="px-4 py-2 border">{new Date(p.createdAt).toLocaleString()}</td>
+                  <tr key={p._id || idx} className="border-t hover:bg-cyan-50 transition">
+                    <td className="px-4 py-2">{p.userId?.name || 'N/A'}</td>
+                    <td className="px-4 py-2">{p.userId?.email || 'N/A'}</td>
+                    <td className="px-4 py-2">{p.courseId?.courseTitle || 'N/A'}</td>
+                    <td className="px-4 py-2">${p.amount?.toFixed(2) || 'N/A'}</td>
+                    <td className="px-4 py-2 capitalize">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' ? 'bg-green-100 text-green-700' : p.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{p.status}</span>
+                    </td>
+                    <td className="px-4 py-2">{new Date(p.createdAt).toLocaleString()}</td>
                   </tr>
                 ))
               )}

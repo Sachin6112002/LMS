@@ -106,6 +106,15 @@ const ManageCourses = () => {
         <h2 className="text-2xl font-bold text-gray-800">Manage Courses</h2>
       </div>
 
+      <div className="flex flex-wrap gap-4 mb-8">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+
       <input
         type="text"
         placeholder="Search courses..."
