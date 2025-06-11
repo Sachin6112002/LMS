@@ -10,6 +10,15 @@ const Navbar = () => {
         <img onClick={() => navigate('/')} src="/vite.svg" alt="LMS Logo" className="h-10 w-10 mr-3 cursor-pointer" />
         <span className="text-2xl font-bold text-gray-800">LMS Admin</span>
       </div>
+      <button
+        onClick={() => {
+          localStorage.removeItem('adminToken');
+          navigate('/login', { replace: true });
+        }}
+        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow ml-4"
+      >
+        Logout
+      </button>
     </nav>
   )
 }

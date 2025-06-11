@@ -10,6 +10,7 @@ import StudentManager from './pages/StudentManager';
 import EducatorManager from './pages/EducatorManager';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+import ManagePurchases from './pages/ManagePurchases';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -86,7 +87,7 @@ const App = () => {
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
           <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-          <Route path="/manage-purchases" element={<PrivateRoute>{React.createElement(require('./pages/ManagePurchases.jsx').default)}</PrivateRoute>} />
+          <Route path="/manage-purchases" element={<PrivateRoute><ManagePurchases /></PrivateRoute>} />
           {/* Add more admin-only routes here */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
