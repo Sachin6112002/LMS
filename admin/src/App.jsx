@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaUsers, FaBookOpen, FaPlus, FaCog } from 'react-icons/fa';
+import { FaUsers, FaBookOpen, FaCog } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
@@ -27,12 +27,6 @@ const HeroSection = () => {
       color: 'bg-yellow-600 hover:bg-yellow-700',
       path: '/educators',
       icon: <FaBookOpen size={24} className="mb-1" />,
-    },
-    {
-      title: 'Add Something',
-      color: 'bg-green-600 hover:bg-green-700',
-      path: '/add-feature',
-      icon: <FaPlus size={24} className="mb-1" />,
     },
     {
       title: 'Settings',

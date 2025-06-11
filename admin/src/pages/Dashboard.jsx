@@ -6,6 +6,7 @@ import { FaUserGraduate, FaChalkboardTeacher, FaCogs } from 'react-icons/fa';
 import personTickIcon from '../assets/person_tick_icon.svg';
 import myCourseIcon from '../assets/my_course_icon.svg';
 import addIcon from '../assets/add_icon.svg';
+import { FaUsers } from 'react-icons/fa';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -64,6 +65,27 @@ const Dashboard = () => {
         >
           <img src={addIcon} alt="Purchases" className="w-5 h-5" />
           Manage Purchases
+        </button>
+        <button
+          onClick={() => navigate('/students')}
+          className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          <FaUsers className="w-5 h-5" />
+          Student Manager
+        </button>
+        <button
+          onClick={() => navigate('/educators')}
+          className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          <img src={personTickIcon} alt="Educators" className="w-5 h-5" />
+          Educator Manager
+        </button>
+        <button
+          onClick={() => navigate('/settings')}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+        >
+          <FaUsers className="w-5 h-5" />
+          Settings
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
