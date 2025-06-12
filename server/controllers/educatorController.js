@@ -166,3 +166,30 @@ export const getEnrolledStudentsData = async (req, res) => {
         });
     }
 };
+
+// Upload Lecture Video (Educator only)
+export const uploadLectureVideo = async (req, res) => {
+    try {
+        const { courseId, chapterId, lectureId } = req.body;
+        if (!req.file) return res.status(400).json({ message: 'No video file uploaded' });
+        const course = await Course.findById(courseId);
+        if (!course) return res.status(404).json({ message: 'Course not found' });
+        let updated = false;
+        for (const chapter of course.courseContent) {
+            if (chapter.chapterId === chapterId) {
+                for (const lecture of chapter.chapterContent) {
+                    if (lecture.lectureId === lectureId) {
+                        lecture.videoFile = req.file.filename;
+                        lecture.lectureUrl = '';
+                        updated = true;
+                    }
+                }
+            }
+        }
+        if (!updated) return res.status(404).json({ message: 'Lecture not found' });
+        await course.save();
+        res.json({ success: true, filename: req.file.filename });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};

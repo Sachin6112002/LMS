@@ -23,9 +23,9 @@ const AddCourse = () => {
   const [lectureDetails, setLectureDetails] = useState({
     lectureTitle: '',
     lectureDuration: '',
-    lectureUrl: '',
     isPreviewFree: false,
   });
+  const [lectureVideo, setLectureVideo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChapter = (action, chapterId) => {
@@ -68,14 +68,38 @@ const AddCourse = () => {
     }
   };
 
-  const addLecture = () => {
+  const addLecture = async () => {
+    let videoFileName = '';
+    if (lectureVideo) {
+      // Upload video to backend
+      const formData = new FormData();
+      formData.append('video', lectureVideo);
+      formData.append('courseId', 'TEMP'); // Replace with actual courseId after course creation
+      formData.append('chapterId', currentChapterId);
+      formData.append('lectureId', uniqid());
+      try {
+        const token = await getToken();
+        const res = await axios.post(`${backendUrl}/api/educator/upload-video`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.data.success) {
+          videoFileName = res.data.filename;
+        } else {
+          toast.error('Video upload failed');
+        }
+      } catch (err) {
+        toast.error('Video upload error');
+      }
+    }
     setChapters(
       chapters.map((chapter) => {
         if (chapter.chapterId === currentChapterId) {
           const newLecture = {
             ...lectureDetails,
             lectureOrder: chapter.chapterContent.length > 0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1 : 1,
-            lectureId: uniqid()
+            lectureId: uniqid(),
+            videoFile: videoFileName,
+            lectureUrl: '',
           };
           chapter.chapterContent.push(newLecture);
         }
@@ -86,9 +110,9 @@ const AddCourse = () => {
     setLectureDetails({
       lectureTitle: '',
       lectureDuration: '',
-      lectureUrl: '',
       isPreviewFree: false,
     });
+    setLectureVideo(null);
   };
 
   const handleSubmit = async (e) => {
@@ -202,7 +226,7 @@ const AddCourse = () => {
                 <div className="p-4">
                   {chapter.chapterContent.map((lecture, lectureIndex) => (
                     <div key={lectureIndex} className="flex justify-between items-center mb-2">
-                      <span>{lectureIndex + 1} {lecture.lectureTitle} - {lecture.lectureDuration} mins - <a href={lecture.lectureUrl} target="_blank" className="text-blue-500">Link</a> - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                      <span>{lectureIndex + 1} {lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
                       <img onClick={() => handleLecture('remove', chapter.chapterId, lectureIndex)} src={assets.cross_icon} alt="" className='cursor-pointer' />
                     </div>
                   ))}
@@ -240,12 +264,12 @@ const AddCourse = () => {
                   />
                 </div>
                 <div className="mb-2">
-                  <p>Lecture URL</p>
+                  <p>Lecture Video</p>
                   <input
-                    type="text"
+                    type="file"
+                    accept="video/*"
                     className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureUrl}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, lectureUrl: e.target.value })}
+                    onChange={e => setLectureVideo(e.target.files[0])}
                   />
                 </div>
                 <div className="flex gap-2 my-4">

@@ -4,7 +4,8 @@ const lectureSchema = new mongoose.Schema({
     lectureId: { type: String, required: true },
     lectureTitle: { type: String, required: true },
     lectureDuration: { type: Number, required: true },
-    lectureUrl: { type: String, required: true },
+    lectureUrl: { type: String }, // Now optional for migration
+    videoFile: { type: String }, // New: uploaded video filename
     isPreviewFree: { type: Boolean, required: true },
     lectureOrder: { type: Number, required: true }
 }, { _id: false }); 
