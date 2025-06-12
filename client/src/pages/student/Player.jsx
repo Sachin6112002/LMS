@@ -180,7 +180,13 @@ const Player = ({ }) => {
           playerData
             ? (
               <div>
-                <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
+                {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
+                  <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
+                ) : playerData.lectureUrl ? (
+                  <video className='w-full aspect-video' src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl}/videos/${playerData.lectureUrl}`} controls />
+                ) : (
+                  <div className='w-full aspect-video bg-gray-200 flex items-center justify-center'>No video available</div>
+                )}
                 <div className='flex justify-between items-center mt-1'>
                   <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
                   <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}</button>
