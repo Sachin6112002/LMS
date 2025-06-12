@@ -6,7 +6,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   return (
     <div className="flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-200 py-4 bg-cyan-50">
-      <img onClick={() => navigate('/')} src={logo} alt="Logo" className="w-28 lg:w-32 cursor-pointer" />
+      <img onClick={() => navigate('/')} src={logo} alt="eSiksha Logo" className="w-28 lg:w-32 cursor-pointer" />
       <button
         onClick={() => {
           localStorage.removeItem('adminToken');

@@ -74,13 +74,6 @@ const Dashboard = () => {
           Student Manager
         </button>
         <button
-          onClick={() => navigate('/educators')}
-          className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
-        >
-          <img src={personTickIcon} alt="Educators" className="w-5 h-5" />
-          Educator Manager
-        </button>
-        <button
           onClick={() => navigate('/settings')}
           className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
         >

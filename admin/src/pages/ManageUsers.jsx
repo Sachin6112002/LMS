@@ -205,6 +205,8 @@ const ManageUsers = () => {
                       className={`px-2 py-1 rounded-full text-white text-xs ${
                         user.publicMetadata?.role === 'admin'
                           ? 'bg-green-600'
+                          : user.publicMetadata?.role === 'educator'
+                          ? 'bg-yellow-600'
                           : 'bg-blue-500'
                       }`}
                     >
@@ -212,16 +214,21 @@ const ManageUsers = () => {
                     </span>
                   </td>
                   <td className="px-4 py-2">
-                    <select
-                      value={user.publicMetadata?.role || 'student'}
-                      onChange={(e) =>
-                        handleChangeRole(user._id, e.target.value)
-                      }
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="student">Student</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    {/* Only allow role change for educators, not students or admins */}
+                    {user.publicMetadata?.role === 'educator' ? (
+                      <select
+                        value={user.publicMetadata?.role}
+                        onChange={e => handleChangeRole(user._id, e.target.value)}
+                        className="border rounded px-2 py-1"
+                      >
+                        <option value="educator">Educator</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    ) : user.publicMetadata?.role === 'admin' ? (
+                      <span className="text-gray-500">Admin</span>
+                    ) : (
+                      <span className="text-gray-500">Student</span>
+                    )}
                   </td>
                   <td className="px-4 py-2 flex gap-3">
                     <button

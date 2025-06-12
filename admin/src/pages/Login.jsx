@@ -127,7 +127,7 @@ const Login = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FD]">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center">
-        <img src="/vite.svg" alt="LMS Logo" className="h-14 w-14 mb-4" />
+        <img src="/vite.svg" alt="eSiksha Logo" className="h-14 w-14 mb-4" />
         {adminExists === undefined ? (
           <div>Loading...</div>
         ) : !adminExists ? (

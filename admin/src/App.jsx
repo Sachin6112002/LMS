@@ -2,15 +2,16 @@ import React from 'react';
 import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaUsers, FaBookOpen, FaCog } from 'react-icons/fa';
+import { FaUsers, FaCog } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import StudentManager from './pages/StudentManager';
-import EducatorManager from './pages/EducatorManager';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import ManagePurchases from './pages/ManagePurchases';
+import ManageUsers from './pages/ManageUsers';
+import ManageCourses from './pages/ManageCourses';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -21,12 +22,6 @@ const HeroSection = () => {
       color: 'bg-purple-600 hover:bg-purple-700',
       path: '/students',
       icon: <FaUsers size={24} className="mb-1" />,
-    },
-    {
-      title: 'Educator Manager',
-      color: 'bg-yellow-600 hover:bg-yellow-700',
-      path: '/educators',
-      icon: <FaBookOpen size={24} className="mb-1" />,
     },
     {
       title: 'Settings',
@@ -57,7 +52,7 @@ const HeroSection = () => {
       </div>
 
       <p className="text-gray-400 text-sm mt-10">
-        &copy; {new Date().getFullYear()} LMS Admin Panel. All rights reserved.
+        &copy; {new Date().getFullYear()} eSiksha Admin Panel. All rights reserved.
       </p>
     </section>
   );
@@ -79,9 +74,10 @@ const App = () => {
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
-          <Route path="/educators" element={<PrivateRoute><EducatorManager /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           <Route path="/manage-purchases" element={<PrivateRoute><ManagePurchases /></PrivateRoute>} />
+          <Route path="/manage-users" element={<PrivateRoute><ManageUsers /></PrivateRoute>} />
+          <Route path="/manage-courses" element={<PrivateRoute><ManageCourses /></PrivateRoute>} />
           {/* Add more admin-only routes here */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
