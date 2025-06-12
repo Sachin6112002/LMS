@@ -263,13 +263,13 @@ const AddCourse = () => {
       ) : (
         <div className='w-full max-w-2xl'>
           <h2 className='text-xl font-bold mb-4'>Upload Videos for Lectures</h2>
-          {createdCourse.courseContent.map((chapter, chapterIdx) => (
+          {createdCourse.courseContent.map((chapter) => (
             <div key={chapter._id} className='mb-6'>
-              <h3 className='font-semibold mb-2'>Chapter {chapterIdx + 1}: {chapter.chapterTitle}</h3>
-              {chapter.chapterContent.map((lecture, lectureIdx) => (
+              <h3 className='font-semibold mb-2'>Chapter: {chapter.chapterTitle}</h3>
+              {chapter.chapterContent.map((lecture) => (
                 <div key={lecture._id} className='mb-4 p-3 border rounded'>
                   <div className='mb-2'>
-                    <span className='font-medium'>Lecture {lectureIdx + 1}: {lecture.lectureTitle}</span>
+                    <span className='font-medium'>Lecture: {lecture.lectureTitle}</span>
                     <span className='ml-2 text-sm text-gray-500'>({lecture.lectureDuration} mins)</span>
                   </div>
                   <VideoUploadComponent
