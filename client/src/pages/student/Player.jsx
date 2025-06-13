@@ -193,6 +193,7 @@ const Player = ({ }) => {
                     className='w-full aspect-video'
                     src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
                     controls
+                    crossOrigin="anonymous"
                     onError={e => { e.target.onerror = null; e.target.poster = ''; toast.error('Video failed to load. Please refresh or contact support.'); }}
                   />
                 ) : (
