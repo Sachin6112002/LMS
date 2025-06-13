@@ -249,15 +249,6 @@ const AddCourse = () => {
                       onChange={(e) => setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
                     />
                   </div>
-                  <div className="mb-2">
-                    <p>Duration (minutes)</p>
-                    <input
-                      type="number"
-                      className="mt-1 block w-full border rounded py-1 px-2"
-                      value={lectureDetails.lectureDuration}
-                      onChange={(e) => setLectureDetails({ ...lectureDetails, lectureDuration: e.target.value })}
-                    />
-                  </div>
                   <div className="flex gap-2 my-4">
                     <p>Is Preview Free?</p>
                     <input

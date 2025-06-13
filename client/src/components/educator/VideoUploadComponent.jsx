@@ -26,11 +26,37 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
       };
-      xhr.onload = () => {
+      xhr.onload = async () => {
         setUploading(false);
         if (xhr.status === 200) {
           setUploaded(true);
-          onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
+          // Extract video duration and update backend
+          if (videoFile) {
+            const videoUrl = URL.createObjectURL(videoFile);
+            const tempVideo = document.createElement('video');
+            tempVideo.preload = 'metadata';
+            tempVideo.src = videoUrl;
+            tempVideo.onloadedmetadata = async () => {
+              URL.revokeObjectURL(videoUrl);
+              const duration = Math.round(tempVideo.duration / 60); // in minutes
+              try {
+                await fetch(`${backendUrl}/api/educator/update-lecture-duration`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({ courseId, chapterId, lectureId, duration })
+                });
+              } catch (err) {
+                // ignore error, just log
+                console.error('Failed to update duration', err);
+              }
+              onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
+            };
+          } else {
+            onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
+          }
         } else {
           alert('Upload failed: ' + xhr.status + ' ' + xhr.responseText);
         }
