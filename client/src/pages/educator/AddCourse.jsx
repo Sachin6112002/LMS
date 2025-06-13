@@ -190,22 +190,22 @@ const AddCourse = () => {
 
           {/* Adding Chapters & Lectures */}
           <div>
-            {chapters.map((chapter, chapterIndex) => (
-              <div key={chapterIndex} className="bg-white border rounded-lg mb-4">
+            {chapters.map((chapter) => (
+              <div key={chapter.chapterId || chapter.chapterOrder} className="bg-white border rounded-lg mb-4">
                 <div className="flex justify-between items-center p-4 border-b">
                   <div className="flex items-center">
                     <img className={`mr-2 cursor-pointer transition-all ${chapter.collapsed && "-rotate-90"} `} onClick={() => handleChapter('toggle', chapter.chapterId)} src={assets.dropdown_icon} width={14} alt="" />
-                    <span className="font-semibold">{chapterIndex + 1} {chapter.chapterTitle}</span>
+                    <span className="font-semibold">{chapter.chapterTitle}</span>
                   </div>
                   <span className="text-gray-500">{chapter.chapterContent.length} Lectures</span>
                   <img onClick={() => handleChapter('remove', chapter.chapterId)} src={assets.cross_icon} alt="" className='cursor-pointer' />
                 </div>
                 {!chapter.collapsed && (
                   <div className="p-4">
-                    {chapter.chapterContent.map((lecture, lectureIndex) => (
-                      <div key={lectureIndex} className="flex justify-between items-center mb-2">
-                        <span>{lectureIndex + 1} {lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
-                        <img onClick={() => handleLecture('remove', chapter.chapterId, lectureIndex)} src={assets.cross_icon} alt="" className='cursor-pointer' />
+                    {chapter.chapterContent.map((lecture) => (
+                      <div key={lecture.lectureId || lecture.lectureTitle} className="flex justify-between items-center mb-2">
+                        <span>{lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                        <img onClick={() => handleLecture('remove', chapter.chapterId, chapter.chapterContent.indexOf(lecture))} src={assets.cross_icon} alt="" className='cursor-pointer' />
                       </div>
                     ))}
                     <div className="inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2" onClick={() => handleLecture('add', chapter.chapterId)}>

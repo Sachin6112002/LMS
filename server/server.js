@@ -9,6 +9,8 @@ import courseRouter from './routes/courseRoute.js'
 import adminRouter from './routes/adminRoutes.js'
 import { stripeWebhooks } from './controllers/webhooks.js';
 import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Initialize Express
 const app = express()
@@ -23,6 +25,11 @@ app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), st
 // Middlewares
 app.use(cors());
 app.use(express.json())
+
+// Serve uploaded videos statically
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))

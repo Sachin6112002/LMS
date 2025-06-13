@@ -180,7 +180,7 @@ export const uploadLectureVideo = async (req, res) => {
                 for (const lecture of chapter.chapterContent) {
                     if (lecture.lectureId === lectureId) {
                         lecture.videoFile = req.file.filename;
-                        lecture.lectureUrl = '';
+                        lecture.lectureUrl = req.file.filename; // <-- Fix: set lectureUrl to filename
                         updated = true;
                     }
                 }
