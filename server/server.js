@@ -11,6 +11,7 @@ import { stripeWebhooks } from './controllers/webhooks.js';
 import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import testimonialRoutes from './routes/testimonialRoutes.js';
 
 // Initialize Express
 const app = express()
@@ -37,6 +38,7 @@ app.use('/api/educator', educatorRouter)
 app.use('/api/course', courseRouter)
 app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/testimonials', testimonialRoutes)
 
 // Port
 const PORT = process.env.PORT || 3000

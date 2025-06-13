@@ -239,7 +239,7 @@ const ManageUsers = () => {
                       <FaTrashAlt />
                     </button>
                     <button
-                      onClick={() => alert('Lock functionality not implemented')}
+                      onClick={() => alert('Lock functionality coming soon!')}
                       className="text-gray-600 hover:text-black"
                       title="Lock User (UI only)"
                     >

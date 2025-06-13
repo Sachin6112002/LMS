@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import Rating from '../../components/student/Rating';
 import Footer from '../../components/student/Footer';
 import Loading from '../../components/student/Loading';
+import TestimonialForm from '../../components/student/TestimonialForm';
 
 const Player = ({ }) => {
 
@@ -20,6 +21,8 @@ const Player = ({ }) => {
   const [openSections, setOpenSections] = useState({});
   const [playerData, setPlayerData] = useState(null);
   const [initialRating, setInitialRating] = useState(0);
+  const [showTestimonialForm, setShowTestimonialForm] = useState(false);
+  const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
 
   const getCourseData = () => {
     enrolledCourses.map((course) => {
@@ -134,6 +137,10 @@ const Player = ({ }) => {
     setTimeout(() => getCourseData(), 500); // Give time for backend to update
   };
 
+  // After course completion UI (e.g., after all lectures completed)
+  const allLectures = courseData && courseData.courseContent ? courseData.courseContent.flatMap(ch => ch.chapterContent) : [];
+  const allCompleted = progressData && allLectures.length > 0 && progressData.lectureCompleted && progressData.lectureCompleted.length === allLectures.length;
+
   return (
     <>
     <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36' >
@@ -178,6 +185,19 @@ const Player = ({ }) => {
           <h1 className="text-xl font-bold">Rate this Course:</h1>
           <Rating initialRating={initialRating} onRate={handleRate} />
         </div>
+
+        {allCompleted && !testimonialSubmitted && (
+          <div className="my-8">
+            {!showTestimonialForm ? (
+              <button className="bg-blue-600 text-white px-6 py-3 rounded font-semibold" onClick={() => setShowTestimonialForm(true)}>
+                Share Your Testimonial
+              </button>
+            ) : (
+              <TestimonialForm onSubmit={() => { setTestimonialSubmitted(true); setShowTestimonialForm(false); toast.success('Thank you for your feedback!'); }} />
+            )}
+          </div>
+        )}
+        {testimonialSubmitted && <div className="text-green-600 text-center my-8 font-semibold">Thank you for submitting your testimonial!</div>}
 
       </div>
 
