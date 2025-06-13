@@ -143,7 +143,10 @@ const AddCourse = () => {
   // Fetch latest course data after video upload
   const fetchLatestCourse = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/educator/courses`);
+      const token = await getToken();
+      const { data } = await axios.get(`${backendUrl}/api/educator/courses`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (data.success && data.courses) {
         // Find the current course by ID
         const updated = data.courses.find(c => c._id === createdCourse._id);
