@@ -140,6 +140,20 @@ const AddCourse = () => {
 
   };
 
+  // Fetch latest course data after video upload
+  const fetchLatestCourse = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/educator/courses`);
+      if (data.success && data.courses) {
+        // Find the current course by ID
+        const updated = data.courses.find(c => c._id === createdCourse._id);
+        if (updated) setCreatedCourse(updated);
+      }
+    } catch (err) {
+      toast.error('Failed to refresh course data after upload');
+    }
+  };
+
   useEffect(() => {
     // Initiate Quill only once
     if (!quillRef.current && editorRef.current) {
@@ -283,7 +297,10 @@ const AddCourse = () => {
                     courseId={createdCourse._id}
                     chapterId={chapter._id || chapter.chapterId}
                     lectureId={lecture._id || lecture.lectureId}
-                    onUploadSuccess={(filename) => toast.success('Video uploaded!')}
+                    onUploadSuccess={() => {
+                      toast.success('Video uploaded!');
+                      fetchLatestCourse();
+                    }}
                   />
                 </div>
               ))}

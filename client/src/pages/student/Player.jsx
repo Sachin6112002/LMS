@@ -128,12 +128,18 @@ const Player = ({ }) => {
   if (!courseData) return <Loading />;
   if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
 
+  // Helper: force refresh course data (for educator after upload)
+  const handleRefresh = () => {
+    fetchUserEnrolledCourses();
+    setTimeout(() => getCourseData(), 500); // Give time for backend to update
+  };
+
   return (
     <>
-    
     <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36' >
       <div className=" text-gray-800" >
         <h2 className="text-xl font-semibold">Course Structure</h2>
+        <button onClick={handleRefresh} className="mb-4 px-3 py-1 bg-blue-500 text-white rounded text-sm">Refresh</button>
         <div className="pt-5">
           {courseData && courseData.courseContent.map((chapter, index) => (
             <div key={index} className="border border-gray-300 bg-white mb-2 rounded">
@@ -183,7 +189,12 @@ const Player = ({ }) => {
                 {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
                   <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
                 ) : playerData.lectureUrl ? (
-                  <video className='w-full aspect-video' src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`} controls />
+                  <video
+                    className='w-full aspect-video'
+                    src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
+                    controls
+                    onError={e => { e.target.onerror = null; e.target.poster = ''; toast.error('Video failed to load. Please refresh or contact support.'); }}
+                  />
                 ) : (
                   <div className='w-full aspect-video bg-gray-200 flex items-center justify-center'>No video available</div>
                 )}
