@@ -18,8 +18,10 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
     formData.append('lectureId', lectureId);
 
     try {
+      const url = `${backendUrl}/api/educator/upload-video`;
+      console.log('Uploading to:', url);
       const xhr = new window.XMLHttpRequest();
-      xhr.open('POST', `${backendUrl}/api/educator/upload-video`);
+      xhr.open('POST', url);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
@@ -30,17 +32,17 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
           setUploaded(true);
           onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
         } else {
-          alert('Upload failed');
+          alert('Upload failed: ' + xhr.status + ' ' + xhr.responseText);
         }
       };
       xhr.onerror = () => {
         setUploading(false);
-        alert('Upload error');
+        alert('Upload error: ' + xhr.status + ' ' + xhr.responseText);
       };
       xhr.send(formData);
     } catch (err) {
       setUploading(false);
-      alert('Upload error');
+      alert('Upload error: ' + err.message);
     }
   };
 

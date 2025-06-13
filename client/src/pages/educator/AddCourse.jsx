@@ -281,8 +281,8 @@ const AddCourse = () => {
                     backendUrl={backendUrl}
                     token={uploadToken}
                     courseId={createdCourse._id}
-                    chapterId={chapter._id}
-                    lectureId={lecture._id}
+                    chapterId={chapter._id || chapter.chapterId}
+                    lectureId={lecture._id || lecture.lectureId}
                     onUploadSuccess={(filename) => toast.success('Video uploaded!')}
                   />
                 </div>
