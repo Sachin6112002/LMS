@@ -183,7 +183,7 @@ const Player = ({ }) => {
                 {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
                   <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
                 ) : playerData.lectureUrl ? (
-                  <video className='w-full aspect-video' src={`${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`} controls />
+                  <video className='w-full aspect-video' src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`} controls />
                 ) : (
                   <div className='w-full aspect-video bg-gray-200 flex items-center justify-center'>No video available</div>
                 )}

@@ -267,12 +267,12 @@ const AddCourse = () => {
             <div className="text-red-600 font-semibold mb-6">No lectures found. Please add at least one lecture to each chapter to enable video uploads.</div>
           ) : null}
           {createdCourse.courseContent.map((chapter) => (
-            <div key={chapter._id} className='mb-6'>
+            <div key={chapter._id || chapter.chapterId} className='mb-6'>
               <h3 className='font-semibold mb-2'>Chapter: {chapter.chapterTitle}</h3>
               {chapter.chapterContent.length === 0 ? (
                 <div className="text-yellow-600 mb-4">No lectures in this chapter.</div>
               ) : chapter.chapterContent.map((lecture) => (
-                <div key={lecture._id} className='mb-4 p-3 border rounded'>
+                <div key={lecture._id || lecture.lectureId} className='mb-4 p-3 border rounded'>
                   <div className='mb-2'>
                     <span className='font-medium'>Lecture: {lecture.lectureTitle}</span>
                     <span className='ml-2 text-sm text-gray-500'>({lecture.lectureDuration} mins)</span>
