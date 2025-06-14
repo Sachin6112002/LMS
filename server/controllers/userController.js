@@ -3,8 +3,8 @@ import { CourseProgress } from "../models/CourseProgress.js"
 import { Purchase } from "../models/Purchase.js"
 import User from "../models/User.js"
 import stripe from "stripe"
-
-
+import { v2 as cloudinary } from 'cloudinary';
+import connectCloudinary from '../configs/cloudinary.js';
 
 // Get User Data
 export const getUserData = async (req, res) => {
@@ -231,11 +231,17 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Name and email are required.' });
         }
 
-        // Handle image upload
+        // Connect to Cloudinary
+        await connectCloudinary();
+
         let imageUrl = req.body.imageUrl;
         if (req.file) {
-            // Assuming you store uploads in /uploads and serve statically
-            imageUrl = `/uploads/${req.file.filename}`;
+            // Upload image to Cloudinary
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'lms_users',
+                resource_type: 'image',
+            });
+            imageUrl = result.secure_url;
         }
         if (!imageUrl) {
             return res.status(400).json({ success: false, message: 'Image is required.' });
