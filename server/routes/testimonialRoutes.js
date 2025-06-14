@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
+import testimonialController from '../controllers/testimonialController.js';
+
 const router = express.Router();
-const testimonialController = require('../controllers/testimonialController');
 
 // Create testimonial
 router.post('/', testimonialController.createTestimonial);
 // Get all published testimonials
 router.get('/', testimonialController.getTestimonials);
 
-module.exports = router;
+export default router;
