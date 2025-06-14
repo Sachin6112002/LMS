@@ -225,16 +225,33 @@ export const addUserRating = async (req, res) => {
 // Example registration logic (add this after creating a new user):
 export const registerUser = async (req, res) => {
     try {
-        // ...existing registration logic...
+        // Check required fields
+        const { name, email } = req.body;
+        if (!name || !email) {
+            return res.status(400).json({ success: false, message: 'Name and email are required.' });
+        }
+
+        // Handle image upload
+        let imageUrl = req.body.imageUrl;
+        if (req.file) {
+            // Assuming you store uploads in /uploads and serve statically
+            imageUrl = `/uploads/${req.file.filename}`;
+        }
+        if (!imageUrl) {
+            return res.status(400).json({ success: false, message: 'Image is required.' });
+        }
+
+        // Create user (let MongoDB generate _id)
         const newUser = await User.create({
-            _id: req.auth.userId, // Use auth provider user ID
-            name: req.body.name,
-            email: req.body.email,
-            imageUrl: req.body.imageUrl,
-            // ...other fields...
+            name,
+            email,
+            imageUrl,
+            // ...other fields as needed...
         });
-        // Assign admin to first user
+
+        // Optionally assign admin to first user (uncomment if needed)
         // await assignAdminToFirstUser(newUser._id);
+
         // Re-fetch user to get updated role
         const updatedUser = await User.findById(newUser._id);
         res.status(201).json({ success: true, user: updatedUser });
