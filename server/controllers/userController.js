@@ -5,6 +5,7 @@ import User from "../models/User.js"
 import stripe from "stripe"
 import { v2 as cloudinary } from 'cloudinary';
 import connectCloudinary from '../configs/cloudinary.js';
+import streamifier from 'streamifier';
 
 // Get User Data
 export const getUserData = async (req, res) => {
@@ -236,11 +237,23 @@ export const registerUser = async (req, res) => {
 
         let imageUrl = req.body.imageUrl;
         if (req.file) {
-            // Upload image to Cloudinary
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'lms_users',
-                resource_type: 'image',
-            });
+            // Upload image buffer to Cloudinary using stream
+            const streamUpload = (buffer) => {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        { folder: 'lms_users', resource_type: 'image' },
+                        (error, result) => {
+                            if (result) {
+                                resolve(result);
+                            } else {
+                                reject(error);
+                            }
+                        }
+                    );
+                    streamifier.createReadStream(buffer).pipe(stream);
+                });
+            };
+            const result = await streamUpload(req.file.buffer);
             imageUrl = result.secure_url;
         }
         if (!imageUrl) {

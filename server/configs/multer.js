@@ -2,15 +2,7 @@ import multer from "multer";
 
 // Multer config for image uploads (for thumbnails)
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/'); // Store in /uploads (make sure this folder exists)
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, uniqueSuffix + '-' + file.originalname);
-    }
-  }),
+  storage: multer.memoryStorage(), // Use memory storage for serverless compatibility
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
