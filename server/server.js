@@ -40,6 +40,9 @@ app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
 
+// Handle favicon.ico requests gracefully to avoid 500 errors
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Port
 const PORT = process.env.PORT || 3000
 
