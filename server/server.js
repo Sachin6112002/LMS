@@ -32,6 +32,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
+// Serve favicon.ico statically if present
+app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
+
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
 app.use('/api/educator', educatorRouter)
