@@ -227,7 +227,7 @@ export const registerUser = async (req, res) => {
     try {
         // ...existing registration logic...
         const newUser = await User.create({
-            _id: req.auth.userId, // Use Clerk or auth provider user ID
+            _id: req.auth.userId, // Use auth provider user ID
             name: req.body.name,
             email: req.body.email,
             imageUrl: req.body.imageUrl,
