@@ -24,7 +24,13 @@ await connectCloudinary()
 app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhooks);
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://lms-client-one-lemon.vercel.app',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json())
 
 // Serve uploaded videos statically
