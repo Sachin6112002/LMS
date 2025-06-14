@@ -55,14 +55,17 @@ const Navbar = () => {
           : <button onClick={() => navigate('/login')} className="bg-blue-600 text-white px-5 py-2 rounded-full">
             Create Account
           </button>}
-        <a
-          href="/admin"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-red-600 text-white px-5 py-2 rounded-full ml-2 font-semibold hover:bg-red-700 transition"
-        >
-          Admin Panel
-        </a>
+        {/* Only show Admin Panel button if not logged in or not a student */}
+        {(!userData || userData?.publicMetadata?.role !== 'student') && (
+          <a
+            href="https://lms-admin-blond.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-red-600 text-white px-5 py-2 rounded-full ml-2 font-semibold hover:bg-red-700 transition"
+          >
+            Admin Panel
+          </a>
+        )}
       </div>
       {/* For Phone Screens */}
       <div className='md:hidden flex items-center gap-2 sm:gap-5 text-gray-500'>
@@ -79,6 +82,17 @@ const Navbar = () => {
           : <button onClick={() => navigate('/login')}>
             <img src={assets.user_icon} alt="" />
           </button>}
+        {/* Only show Admin Panel button if not logged in or not a student */}
+        {(!userData || userData?.publicMetadata?.role !== 'student') && (
+          <a
+            href="https://lms-admin-blond.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-red-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-red-700 transition"
+          >
+            Admin Panel
+          </a>
+        )}
       </div>
     </div>
   );
