@@ -53,6 +53,16 @@ export const purchaseCourse = async (req, res) => {
             return res.json({ success: false, message: 'Educators cannot enroll in their own course.' });
         }
 
+        // Prevent duplicate pending purchases
+        const existingPending = await Purchase.findOne({
+            courseId: courseData._id,
+            userId,
+            status: 'pending'
+        });
+        if (existingPending) {
+            return res.json({ success: false, message: 'A pending purchase already exists for this course. Please complete the payment or wait for it to finish processing.' });
+        }
+
         const purchaseData = {
             courseId: courseData._id,
             userId,
