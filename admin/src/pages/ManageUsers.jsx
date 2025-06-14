@@ -239,9 +239,13 @@ const ManageUsers = () => {
                       <FaTrashAlt />
                     </button>
                     <button
-                      onClick={() => alert('Lock functionality coming soon!')}
-                      className="text-gray-600 hover:text-black"
-                      title="Lock User (UI only)"
+                      onClick={() => {
+                        // UI-only lock toggle
+                        setUsers(users.map(u => u._id === user._id ? { ...u, locked: !u.locked } : u));
+                      }}
+                      className={`text-gray-600 hover:text-black ${user.locked ? 'opacity-50' : ''}`}
+                      title={user.locked ? 'User is locked (UI only)' : 'Lock User (UI only)'}
+                      disabled={user.locked}
                     >
                       <FaLock />
                     </button>
