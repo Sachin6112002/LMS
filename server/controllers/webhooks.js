@@ -7,6 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import stripe from 'stripe';
 import { Purchase } from '../models/Purchase.js';
 import Course from '../models/Course.js';
+import streamifier from 'streamifier';
 
 // Stripe Gateway Initialize
 const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
@@ -22,8 +23,23 @@ export const registerUser = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ success: false, message: "User already exists" });
     }
-    // Upload image to Cloudinary
-    const imageUpload = await cloudinary.uploader.upload(req.file.path);
+    // Upload image to Cloudinary using buffer
+    const streamUpload = (buffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'lms_users', resource_type: 'image' },
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
+    const imageUpload = await streamUpload(req.file.buffer);
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       _id: new mongoose.Types.ObjectId().toString(),
