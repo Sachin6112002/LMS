@@ -1,7 +1,7 @@
-const Testimonial = require('../models/Testimonial');
+import Testimonial from '../models/Testimonial.js';
 
 // POST /api/testimonials
-exports.createTestimonial = async (req, res) => {
+export const createTestimonial = async (req, res) => {
   try {
     const testimonial = new Testimonial(req.body);
     await testimonial.save();
@@ -12,7 +12,7 @@ exports.createTestimonial = async (req, res) => {
 };
 
 // GET /api/testimonials
-exports.getTestimonials = async (req, res) => {
+export const getTestimonials = async (req, res) => {
   try {
     const testimonials = await Testimonial.find({ permission: true }).sort({ createdAt: -1 });
     res.json({ success: true, testimonials });
