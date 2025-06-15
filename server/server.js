@@ -28,6 +28,9 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+// Register webhook route BEFORE express.json()
+app.use('/api/webhook', webhookRoutes);
 app.use(express.json())
 
 // Serve uploaded videos statically
@@ -45,7 +48,6 @@ app.use('/api/course', courseRouter)
 app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
-app.use('/api/webhook', webhookRoutes)
 
 // Handle favicon.ico requests gracefully to avoid 500 errors
 app.get('/favicon.ico', (req, res) => res.status(204).end());
