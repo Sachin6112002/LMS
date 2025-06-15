@@ -94,6 +94,9 @@ export const stripeWebhooks = async (request, response) => {
     case 'checkout.session.completed': {
       const session = event.data.object;
       const purchaseId = session.metadata ? session.metadata.purchaseId : undefined;
+      console.log('Webhook DEBUG: checkout.session.completed received');
+      console.log('Session:', JSON.stringify(session));
+      console.log('purchaseId:', purchaseId);
       if (!purchaseId) {
         console.error('No purchaseId in session metadata');
         break;
@@ -107,13 +110,10 @@ export const stripeWebhooks = async (request, response) => {
       const courseData = await Course.findById(purchaseData.courseId?.toString());
       if (!userData || !courseData) {
         console.error('User or Course not found for purchase:', purchaseId);
+        console.error('userData:', userData);
+        console.error('courseData:', courseData);
         break;
       }
-      console.log('--- Stripe Webhook Debug ---');
-      console.log('Session:', session);
-      console.log('PurchaseId:', purchaseId);
-      console.log('User:', userData ? userData._id : 'not found');
-      console.log('Course:', courseData ? courseData._id : 'not found');
       // Prevent duplicate enrollments
       if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
         courseData.enrolledStudents.push(userData._id);
