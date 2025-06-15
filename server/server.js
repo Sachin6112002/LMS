@@ -29,9 +29,12 @@ app.use(cors({
   credentials: true
 }));
 
-// Register webhook route BEFORE express.json()
+// Register webhook route FIRST, before any body parser
 app.use('/api/webhook', webhookRoutes);
-app.use(express.json())
+
+// Now add body parsers for the rest of the app
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded videos statically
 const __filename = fileURLToPath(import.meta.url);
