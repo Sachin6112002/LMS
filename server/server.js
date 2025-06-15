@@ -7,7 +7,6 @@ import userRouter from './routes/userRoutes.js'
 import educatorRouter from './routes/educatorRoutes.js'
 import courseRouter from './routes/courseRoute.js'
 import adminRouter from './routes/adminRoutes.js'
-import { stripeWebhooks } from './controllers/webhooks.js';
 import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,9 +18,6 @@ const app = express()
 // Connect to database
 await connectDB()
 await connectCloudinary()
-
-// Stripe webhook must use raw body - register BEFORE express.json()
-app.post('/api/webhook/stripe', bodyParser.raw({ type: 'application/json' }), stripeWebhooks);
 
 // Middlewares
 app.use(cors({
