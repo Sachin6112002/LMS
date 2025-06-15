@@ -24,7 +24,8 @@ await connectCloudinary()
 app.use(cors({
   origin: [
     'https://lms-client-one-lemon.vercel.app',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://lms-admin-blond.vercel.app' // Added admin frontend origin
   ],
   credentials: true
 }));
