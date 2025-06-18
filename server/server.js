@@ -7,7 +7,6 @@ import userRouter from './routes/userRoutes.js'
 import educatorRouter from './routes/educatorRoutes.js'
 import courseRouter from './routes/courseRoute.js'
 import adminRouter from './routes/adminRoutes.js'
-import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import testimonialRoutes from './routes/testimonialRoutes.js';

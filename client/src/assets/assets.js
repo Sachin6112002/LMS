@@ -1,5 +1,4 @@
-import logo from './logo.svg'
-import logo_dark from './logo_dark.svg'
+import logo from './logo.png'
 import search_icon from './search_icon.svg'
 import cross_icon from './cross_icon.svg'
 import upload_area from './upload_area.svg'
@@ -42,9 +41,12 @@ import profile_img from './profile_img.png'
 import profile_img2 from './profile_img2.png'
 import profile_img3 from './profile_img3.png'
 import lesson_icon from './lesson_icon.svg'
+import hero from './hero.png'
+
 
 
 export const assets = {
+    hero,
     logo,
     search_icon,
     sketch,
@@ -66,7 +68,6 @@ export const assets = {
     dropdown_icon,
     cross_icon,
     upload_area,
-    logo_dark,
     down_arrow_icon,
     time_left_clock_icon,
     time_clock_icon,
