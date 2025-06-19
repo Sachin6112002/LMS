@@ -202,19 +202,6 @@ const Player = ({ }) => {
       </div>
 
       <div className='md:mt-10'>
-        {/* Main Watch Button */}
-        <button
-          className={`w-full py-3 rounded mb-4 font-semibold transition text-white ${courseData && courseData.courseContent?.length && courseData.courseContent[0].chapterContent?.length ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-gray-300 cursor-not-allowed'}`}
-          disabled={!courseData || !courseData.courseContent?.length || !courseData.courseContent[0].chapterContent?.length}
-          onClick={() => {
-            if (courseData && courseData.courseContent?.length && courseData.courseContent[0].chapterContent?.length) {
-              const firstLecture = courseData.courseContent[0].chapterContent[0];
-              setPlayerData({ ...firstLecture, chapter: 1, lecture: 1 });
-            }
-          }}
-        >
-          Watch
-        </button>
         {
           playerData
             ? (
@@ -235,6 +222,7 @@ const Player = ({ }) => {
                 <div className='flex justify-between items-center mt-1'>
                   <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
                   <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}</button>
+   
                 </div>
               </div>
             )
