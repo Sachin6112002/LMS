@@ -9,7 +9,7 @@ import TestimonialsSection from '../../components/student/TestimonialSection';
 const Home = () => {
 
   return (
-    <div className="flex flex-col items-center space-y-7 text-center">
+    <div className="min-h-screen flex flex-col items-center space-y-7 text-center bg-green-50">
       <Hero />
       <Companies />
       <CoursesSection />

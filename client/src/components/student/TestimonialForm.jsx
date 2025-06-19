@@ -50,7 +50,7 @@ const TestimonialForm = ({ onSubmit }) => {
   };
 
   return (
-    <form className="max-w-xl mx-auto bg-white p-6 rounded shadow flex flex-col gap-4" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="bg-white border border-green-200 rounded p-6 max-w-xl mx-auto">
       <h2 className="text-2xl font-bold mb-2">Share Your Experience</h2>
       <input name="name" value={form.name} onChange={handleChange} placeholder="Your Name" className="border px-3 py-2 rounded" required />
       <input name="course" value={form.course} onChange={handleChange} placeholder="Course Enrolled" className="border px-3 py-2 rounded" required />
@@ -74,7 +74,7 @@ const TestimonialForm = ({ onSubmit }) => {
         <input name="permission" type="checkbox" checked={form.permission} onChange={handleChange} />
         I give permission to publish my testimonial
       </label>
-      <button type="submit" className="bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">Submit Testimonial</button>
+      <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-4">Submit</button>
     </form>
   );
 };
