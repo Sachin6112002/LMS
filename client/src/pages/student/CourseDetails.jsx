@@ -172,6 +172,20 @@ const CourseDetails = () => {
               ? <YouTube videoId={playerData.videoId} opts={{ playerVars: { autoplay: 1 } }} iframeClassName='w-full aspect-video' />
               : <img src={courseData.courseThumbnail} alt="" />
           }
+          {/* Watch Button */}
+          <button
+            className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-gray-300 cursor-not-allowed'}`}
+            disabled={!isAlreadyEnrolled || !courseData.courseContent?.length || !courseData.courseContent[0].chapterContent?.length}
+            onClick={() => {
+              if (isAlreadyEnrolled && courseData.courseContent?.length && courseData.courseContent[0].chapterContent?.length) {
+                setPlayerData({
+                  videoId: courseData.courseContent[0].chapterContent[0].lectureUrl.split('/').pop()
+                });
+              }
+            }}
+          >
+            Watch
+          </button>
           <div className="p-5">
             <div className="flex items-center gap-2">
               <img className="w-3.5" src={assets.time_left_clock_icon} alt="time left clock icon" />
