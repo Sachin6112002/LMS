@@ -34,15 +34,15 @@ const CoursesList = () => {
 
     return (
         <>
-            <div className="relative md:px-36 px-8 pt-20 text-left">
+            <div className="relative md:px-36 px-8 pt-20 text-left bg-green-50 min-h-screen">
                 <div className='flex md:flex-row flex-col gap-6 items-start justify-between w-full'>
                     <div>
-                        <h1 className='text-4xl font-semibold text-gray-800'>Course List</h1>
-                        <p className='text-gray-500'><span onClick={() => navigate('/')} className='text-blue-600 cursor-pointer'>Home</span> / <span>Course List</span></p>
+                        <h1 className='text-4xl font-semibold text-green-900'>Course List</h1>
+                        <p className='text-green-700'><span onClick={() => navigate('/')} className='text-green-600 hover:underline cursor-pointer'>Home</span> / <span>Course List</span></p>
                     </div>
                     <SearchBar data={input} />
                 </div>
-                {input && <div className='inline-flex items-center gap-4 px-4 py-2 border mt-8 -mb-8 text-gray-600'>
+                {input && <div className='inline-flex items-center gap-4 px-4 py-2 border border-green-200 mt-8 -mb-8 text-green-700 bg-white rounded'>
                     <p>{input}</p>
                     <img onClick={() => navigate('/course-list')} className='cursor-pointer' src={assets.cross_icon} alt="" />
                 </div>}
@@ -55,4 +55,4 @@ const CoursesList = () => {
     )
 }
 
-export default CoursesList 
+export default CoursesList
