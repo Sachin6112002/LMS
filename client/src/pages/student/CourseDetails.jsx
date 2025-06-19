@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Footer from '../../components/student/Footer';
 import { assets } from '../../assets/assets';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
@@ -11,6 +11,7 @@ import Loading from '../../components/student/Loading';
 const CourseDetails = () => {
 
   const { id } = useParams()
+  const navigate = useNavigate();
 
   const [courseData, setCourseData] = useState(null)
   const [playerData, setPlayerData] = useState(null)
@@ -177,9 +178,7 @@ const CourseDetails = () => {
             disabled={!isAlreadyEnrolled || !courseData.courseContent?.length || !courseData.courseContent[0].chapterContent?.length}
             onClick={() => {
               if (isAlreadyEnrolled && courseData.courseContent?.length && courseData.courseContent[0].chapterContent?.length) {
-                setPlayerData({
-                  videoUrl: courseData.courseContent[0].chapterContent[0].lectureUrl
-                });
+                navigate('/player/' + courseData._id);
               }
             }}
           >
