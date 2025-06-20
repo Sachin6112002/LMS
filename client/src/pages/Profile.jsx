@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 
 const Profile = () => {
-  const { userData } = useContext(AppContext);
+  const { userData, backendUrl } = useContext(AppContext);
   const [profile, setProfile] = useState(null);
   const [edit, setEdit] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', photo: '', password: '' });
@@ -22,7 +22,7 @@ const Profile = () => {
     setError('');
     try {
       const token = localStorage.getItem('jwtToken');
-      const res = await fetch(`/api/user/data`, {
+      const res = await fetch(`${backendUrl}/api/user/data`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
