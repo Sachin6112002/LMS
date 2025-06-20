@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
 
 const Profile = () => {
+  const { userData } = useContext(AppContext);
   const [profile, setProfile] = useState(null);
   const [edit, setEdit] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', photo: '', password: '' });
@@ -29,9 +31,19 @@ const Profile = () => {
         setForm({ name: data.user.name, email: data.user.email, photo: data.user.photo || '', password: '' });
       } else {
         setError(data.message || 'Failed to fetch profile');
+        // Fallback to userData from context if available
+        if (userData) {
+          setProfile(userData);
+          setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '', password: '' });
+        }
       }
     } catch {
       setError('Failed to fetch profile');
+      // Fallback to userData from context if available
+      if (userData) {
+        setProfile(userData);
+        setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '', password: '' });
+      }
     } finally {
       setLoading(false);
     }
