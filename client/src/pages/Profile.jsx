@@ -68,8 +68,14 @@ const Profile = () => {
     setSaving(false);
   };
 
+  if (error && !profile && userData) {
+    // If fetch failed but userData exists, use it
+    setProfile(userData);
+  }
+
   if (loading) return <div className="p-8">Loading...</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
+
+  if (error && !profile) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="p-4 md:p-8 bg-green-50 min-h-screen max-w-xl mx-auto">
@@ -77,15 +83,15 @@ const Profile = () => {
       {success && <div className="text-green-600 mb-4">{success}</div>}
       {!edit ? (
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-          <img src={profile.photo || '/default-avatar.png'} alt="Profile" className="w-24 h-24 rounded-full mb-4 object-cover border" />
-          <div className="mb-2"><span className="font-semibold">Name:</span> {profile.name}</div>
-          <div className="mb-2"><span className="font-semibold">Email:</span> {profile.email}</div>
+          <img src={profile?.photo || profile?.imageUrl || '/default-avatar.png'} alt="Profile" className="w-24 h-24 rounded-full mb-4 object-cover border" />
+          <div className="mb-2"><span className="font-semibold">Name:</span> {profile?.name}</div>
+          <div className="mb-2"><span className="font-semibold">Email:</span> {profile?.email}</div>
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
         </div>
       ) : (
         <form className="bg-white rounded-lg shadow p-6" onSubmit={handleSave}>
           <div className="mb-4 flex flex-col items-center">
-            <img src={form.photo && form.photo instanceof File ? URL.createObjectURL(form.photo) : (form.photo || '/default-avatar.png')} alt="Profile" className="w-24 h-24 rounded-full mb-2 object-cover border" />
+            <img src={form.photo && form.photo instanceof File ? URL.createObjectURL(form.photo) : (form.photo || profile?.imageUrl || '/default-avatar.png')} alt="Profile" className="w-24 h-24 rounded-full mb-2 object-cover border" />
             <input type="file" name="photo" accept="image/*" onChange={handleChange} className="mt-2" />
           </div>
           <div className="mb-4">
@@ -107,6 +113,15 @@ const Profile = () => {
           {error && <div className="text-red-500 mt-2">{error}</div>}
         </form>
       )}
+      {/* DEBUG PANEL: Remove in production */}
+      <div style={{position:'fixed',bottom:0,right:0,background:'#fff',color:'#222',zIndex:9999,padding:'8px',border:'1px solid #ccc',fontSize:'12px'}}>
+        <strong>profile:</strong>
+        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(profile,null,2)}</pre>
+        <strong>userData:</strong>
+        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(userData,null,2)}</pre>
+        <strong>error:</strong>
+        <pre style={{maxWidth:'300px',maxHeight:'100px',overflow:'auto'}}>{JSON.stringify(error,null,2)}</pre>
+      </div>
     </div>
   );
 };
