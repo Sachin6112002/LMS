@@ -55,6 +55,15 @@ const Navbar = () => {
           : <button onClick={() => navigate('/login')} className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full">
             Create Account
           </button>}
+        {userData && (
+          <Link
+            to="/profile"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full transition ml-2"
+            style={{ textDecoration: 'none' }}
+          >
+            Profile
+          </Link>
+        )}
         {(!userData || userData?.publicMetadata?.role !== 'student') && (
           <a
             href="https://lms-admin-blond.vercel.app"
