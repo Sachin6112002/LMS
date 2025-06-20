@@ -4,6 +4,8 @@ import { Purchase } from '../models/Purchase.js';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import upload from '../configs/multer.js';
+import crypto from 'crypto';
+import { sendMail } from '../utils/mailer.js';
 
 // Assign admin role to the very first user
 export const assignAdminToFirstUser = async () => {
@@ -285,13 +287,26 @@ export const updateStudentStatusByAdmin = async (req, res) => {
   }
 };
 
-// Reset student password by admin (dummy implementation)
+// Reset student password by admin (email token)
 export const resetStudentPasswordByAdmin = async (req, res) => {
   try {
-    // You can implement sending a reset email or setting a new password here
+    const user = await User.findById(req.params.id);
+    if (!user) return res.json({ success: false, message: 'User not found' });
+    // Generate token
+    const token = crypto.randomBytes(32).toString('hex');
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+    // Send email
+    const resetUrl = `https://yourdomain.com/reset-password?token=${token}`;
+    await sendMail({
+      to: user.email,
+      subject: 'Password Reset',
+      html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link is valid for 1 hour.</p>`
+    });
     res.json({ success: true });
   } catch (err) {
-    res.json({ success: false, message: 'Failed to reset password' });
+    res.json({ success: false, message: 'Failed to send reset email' });
   }
 };
 

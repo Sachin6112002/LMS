@@ -23,6 +23,7 @@ import Contact from "./pages/student/Contact";
 import Privacy from "./pages/student/Privacy";
 import Testimonials from "./pages/student/Testimonials";
 import Profile from "./pages/Profile";
+import ResetPassword from "./pages/ResetPassword";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -122,6 +123,7 @@ const App = () => {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Educator Routes */}
               <Route path="/educator/*" element={<Educator />}>
