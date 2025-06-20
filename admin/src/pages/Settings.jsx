@@ -90,8 +90,8 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-blue-800">Settings</h1>
+    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-green-900">Settings</h1>
       {loading ? (
         <div>Loading...</div>
       ) : error ? (

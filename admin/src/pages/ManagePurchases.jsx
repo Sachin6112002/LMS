@@ -50,7 +50,7 @@ const ManagePurchases = () => {
   });
 
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen">
+    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
       <div className="flex flex-wrap gap-4 mb-8">
         <button
           onClick={() => navigate('/dashboard')}
@@ -59,7 +59,7 @@ const ManagePurchases = () => {
           Back to Dashboard
         </button>
       </div>
-      <h2 className="text-xl font-bold mb-4 text-blue-800">Manage Purchases</h2>
+      <h1 className="text-2xl font-bold mb-6 text-green-900">Manage Purchases</h1>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
         <input
           type="text"

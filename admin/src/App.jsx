@@ -19,22 +19,22 @@ const HeroSection = () => {
   const actionButtons = [
     {
       title: 'Student Manager',
-      color: 'bg-purple-600 hover:bg-purple-700',
+      color: 'bg-green-600 hover:bg-green-700',
       path: '/students',
-      icon: <FaUsers size={24} className="mb-1" />,
+      icon: <FaUsers size={24} className="mb-1 text-green-500" />,
     },
     {
       title: 'Settings',
-      color: 'bg-gray-700 hover:bg-gray-800',
+      color: 'bg-green-500 hover:bg-green-600',
       path: '/settings',
-      icon: <FaCog size={24} className="mb-1" />,
+      icon: <FaCog size={24} className="mb-1 text-green-700" />,
     },
   ];
 
   return (
-    <section className="max-w-5xl w-full px-4 py-12 mx-auto bg-white rounded-lg shadow mt-10 text-center">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Welcome, Admin!</h1>
-      <p className="text-gray-600 mt-2 mb-8">
+    <section className="max-w-5xl w-full px-4 py-12 mx-auto bg-green-50 rounded-lg shadow mt-10 text-center">
+      <h1 className="text-2xl sm:text-3xl font-bold text-green-900">Welcome, Admin!</h1>
+      <p className="text-green-700 mt-2 mb-8">
         Use the dashboard below to manage users, courses, and system settings.
       </p>
 

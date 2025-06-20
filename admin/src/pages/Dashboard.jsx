@@ -42,14 +42,14 @@ const Dashboard = () => {
   if (!stats) return <div>Failed to load dashboard data.</div>;
 
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-blue-800">Admin Dashboard</h1>
+    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-green-900">Admin Dashboard</h1>
       <div className="flex flex-wrap gap-4 mb-8">
         <button
           onClick={() => navigate('/manage-users')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
         >
-          <img src={personTickIcon} alt="Users" className="w-5 h-5" />
+          <FaUsers />
           Manage Users
         </button>
         <button
@@ -61,21 +61,21 @@ const Dashboard = () => {
         </button>
         <button
           onClick={() => navigate('/manage-purchases')}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
         >
           <img src={addIcon} alt="Purchases" className="w-5 h-5" />
           Manage Purchases
         </button>
         <button
           onClick={() => navigate('/students')}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
         >
           <FaUsers className="w-5 h-5" />
           Student Manager
         </button>
         <button
           onClick={() => navigate('/settings')}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
         >
           <FaUsers className="w-5 h-5" />
           Settings

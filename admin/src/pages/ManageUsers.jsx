@@ -143,7 +143,9 @@ const ManageUsers = () => {
     );
 
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen">
+    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-green-900">Manage Users</h1>
+
       <div className="flex flex-wrap gap-4 mb-8">
         <button
           onClick={() => navigate('/dashboard')}
