@@ -86,11 +86,11 @@ const Navbar = () => {
           }
         </div>
         {userData
-          ? <button onClick={logout}>
-            <img src={assets.user_icon} alt="" />
+          ? <button onClick={logout} title="Logout" aria-label="Logout">
+            <img src={assets.user_icon} alt="Logout" />
           </button>
-          : <button onClick={() => navigate('/login')}>
-            <img src={assets.user_icon} alt="" />
+          : <button onClick={() => navigate('/login')} title="Login" aria-label="Login">
+            <img src={assets.user_icon} alt="Login" />
           </button>}
         {userData && (
           <Link
