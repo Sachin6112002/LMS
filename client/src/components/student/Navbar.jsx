@@ -86,7 +86,7 @@ const Navbar = () => {
             href="https://lms-admin-blond.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-red-600 transition"
+            className="bg-green-800 px-4 py-2 rounded-full font-semibold  hover:underline text-green-600"
           >
             Admin Panel
           </a>
