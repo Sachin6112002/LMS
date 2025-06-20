@@ -30,6 +30,30 @@ const HeroSection = () => {
       path: '/settings',
       icon: <FaCog size={24} className="mb-1 text-green-700" />,
     },
+    {
+      title: 'Manage Purchases',
+      color: 'bg-cyan-600 hover:bg-cyan-700',
+      path: '/manage-purchases',
+      icon: <span className="mb-1">💳</span>,
+    },
+    {
+      title: 'Manage Users',
+      color: 'bg-blue-600 hover:bg-blue-700',
+      path: '/manage-users',
+      icon: <span className="mb-1">👥</span>,
+    },
+    {
+      title: 'Manage Courses',
+      color: 'bg-purple-600 hover:bg-purple-700',
+      path: '/manage-courses',
+      icon: <span className="mb-1">📚</span>,
+    },
+    {
+      title: 'Profile',
+      color: 'bg-gray-600 hover:bg-gray-700',
+      path: '/profile',
+      icon: <span className="mb-1">👤</span>,
+    },
   ];
 
   return (
