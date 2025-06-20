@@ -36,6 +36,8 @@ const Navbar = () => {
     }
   }
 
+  console.log('Navbar userData:', userData);
+
   return (
     <div className={`flex items-center justify-between px-4 sm:px-10 h-20 md:px-14 lg:px-36 border-b border-green-200 py-4 ${isCoursesListPage ? 'bg-white' : 'bg-green-100'}`}>
       <img onClick={() => navigate('/')} src={assets.logo} alt="Logo" className="w-28 lg:w-32 cursor-pointer" />
