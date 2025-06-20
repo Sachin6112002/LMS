@@ -112,6 +112,11 @@ const Navbar = () => {
           </a>
         )}
       </div>
+      {/* DEBUG PANEL: Remove in production */}
+      <div style={{position:'fixed',bottom:0,right:0,background:'#fff',color:'#222',zIndex:9999,padding:'8px',border:'1px solid #ccc',fontSize:'12px'}}>
+        <strong>userData:</strong>
+        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(userData,null,2)}</pre>
+      </div>
     </div>
   );
 };
