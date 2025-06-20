@@ -342,3 +342,16 @@ export const getAuditLogs = async (req, res) => {
     res.json({ success: false, message: 'Failed to fetch logs' });
   }
 };
+
+// Get admin profile (for Profile page)
+export const getAdminProfile = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id).select('-password -__v');
+    if (!admin || admin.publicMetadata.role !== 'admin') {
+      return res.status(404).json({ success: false, message: 'Admin not found' });
+    }
+    res.json({ success: true, profile: admin });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to fetch profile' });
+  }
+};
