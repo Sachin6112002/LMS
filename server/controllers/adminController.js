@@ -263,3 +263,82 @@ export const getAdminDashboard = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Update student info by admin
+export const updateStudentByAdmin = async (req, res) => {
+  try {
+    const { name, email, active } = req.body;
+    await User.findByIdAndUpdate(req.params.id, { name, email, active });
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to update student' });
+  }
+};
+
+// Update student status (activate/deactivate) by admin
+export const updateStudentStatusByAdmin = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, { active: req.body.active });
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to update status' });
+  }
+};
+
+// Reset student password by admin (dummy implementation)
+export const resetStudentPasswordByAdmin = async (req, res) => {
+  try {
+    // You can implement sending a reset email or setting a new password here
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to reset password' });
+  }
+};
+
+// Delete student by admin
+export const deleteStudentByAdmin = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to delete student' });
+  }
+};
+
+// Update admin info (name, email, password)
+export const updateAdminProfile = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const update = { name, email };
+    if (password) update.password = password;
+    await User.findByIdAndUpdate(req.user.id, update);
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to update profile' });
+  }
+};
+
+// Update admin role (superadmin, editor, etc.)
+export const updateAdminRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    await User.findByIdAndUpdate(req.params.id, { 'publicMetadata.role': role });
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to update role' });
+  }
+};
+
+// Dummy audit logs endpoint
+export const getAuditLogs = async (req, res) => {
+  try {
+    // Replace with real logs if you have a logs collection
+    const logs = [
+      { timestamp: new Date(), adminName: req.user.name, action: 'Login', details: 'Logged in' },
+      { timestamp: new Date(), adminName: req.user.name, action: 'Edit Profile', details: 'Changed name' },
+    ];
+    res.json({ success: true, logs });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to fetch logs' });
+  }
+};

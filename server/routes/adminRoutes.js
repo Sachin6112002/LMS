@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, getAllCourses, getAllPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin, deleteAdmin, getAllStudents, getAllEducators, getAllAdmins, getAdminDashboard } from '../controllers/adminController.js';
+import { getAllUsers, getAllCourses, getAllPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin, deleteAdmin, getAllStudents, getAllEducators, getAllAdmins, getAdminDashboard, updateStudentByAdmin, updateStudentStatusByAdmin, resetStudentPasswordByAdmin, deleteStudentByAdmin, updateAdminProfile, updateAdminRole, getAuditLogs } from '../controllers/adminController.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import upload from '../configs/multer.js';
 
@@ -19,5 +19,12 @@ adminRouter.get('/students', adminAuth, getAllStudents);
 adminRouter.get('/educators', adminAuth, getAllEducators);
 adminRouter.get('/admins', adminAuth, getAllAdmins);
 adminRouter.get('/dashboard', adminAuth, getAdminDashboard);
+adminRouter.patch('/students/:id', adminAuth, updateStudentByAdmin);
+adminRouter.patch('/students/:id/status', adminAuth, updateStudentStatusByAdmin);
+adminRouter.post('/students/:id/reset-password', adminAuth, resetStudentPasswordByAdmin);
+adminRouter.delete('/students/:id', adminAuth, deleteStudentByAdmin);
+adminRouter.patch('/profile', adminAuth, updateAdminProfile);
+adminRouter.patch('/admin/:id/role', adminAuth, updateAdminRole);
+adminRouter.get('/audit-logs', adminAuth, getAuditLogs);
 
 export default adminRouter;
