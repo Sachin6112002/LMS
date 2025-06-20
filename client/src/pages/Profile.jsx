@@ -19,14 +19,14 @@ const Profile = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('userToken');
-      const res = await fetch(`/api/user/profile`, {
+      const token = localStorage.getItem('jwtToken');
+      const res = await fetch(`/api/user/data`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (data.success) {
-        setProfile(data.profile);
-        setForm({ name: data.profile.name, email: data.profile.email, photo: data.profile.photo || '', password: '' });
+        setProfile(data.user);
+        setForm({ name: data.user.name, email: data.user.email, photo: data.user.photo || '', password: '' });
       } else {
         setError(data.message || 'Failed to fetch profile');
       }
@@ -51,31 +51,9 @@ const Profile = () => {
     setSaving(true);
     setError('');
     setSuccess('');
-    try {
-      const token = localStorage.getItem('userToken');
-      const formData = new FormData();
-      formData.append('name', form.name);
-      formData.append('email', form.email);
-      if (form.password) formData.append('password', form.password);
-      if (form.photo && form.photo instanceof File) formData.append('photo', form.photo);
-      const res = await fetch(`/api/user/profile`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSuccess('Profile updated!');
-        setEdit(false);
-        fetchProfile();
-      } else {
-        setError(data.message || 'Failed to update profile');
-      }
-    } catch {
-      setError('Failed to update profile');
-    } finally {
-      setSaving(false);
-    }
+    // PATCH logic here (endpoint missing in backend, so just close edit mode for now)
+    setEdit(false);
+    setSaving(false);
   };
 
   if (loading) return <div className="p-8">Loading...</div>;
