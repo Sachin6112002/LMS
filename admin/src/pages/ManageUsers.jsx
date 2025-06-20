@@ -143,27 +143,24 @@ const ManageUsers = () => {
     );
 
   return (
-    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
+    <div className="p-2 sm:p-4 md:p-8 bg-green-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-green-900">Manage Users</h1>
-
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 mb-8">
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 w-full sm:w-auto"
         >
           Back to Dashboard
         </button>
       </div>
-
       <div className="flex flex-col items-center mb-6">
-        <FaUsers className="h-12 w-12 text-blue-600 mb-2" />
-        <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <FaUsers className="h-10 w-10 sm:h-12 sm:w-12 text-blue-600 mb-2" />
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Manage Users</h2>
+        <p className="text-xs sm:text-sm text-gray-600 mt-1">
           Total Users: {users.length} | Showing: {filteredUsers.length}
         </p>
       </div>
-
-      <div className="flex gap-4 mb-4 w-full max-w-xl">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4 w-full max-w-xl">
         <input
           type="text"
           placeholder="Search by name or email"
@@ -178,31 +175,30 @@ const ManageUsers = () => {
           Reset
         </button>
       </div>
-
-      <div className="overflow-x-auto bg-white rounded-lg shadow p-6 w-full max-w-4xl">
-        <table className="min-w-full text-sm">
+      <div className="overflow-x-auto bg-white rounded-lg shadow p-2 sm:p-6 w-full max-w-4xl">
+        <table className="min-w-full text-xs sm:text-sm">
           <thead>
             <tr>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('name')}>
+              <th className="px-2 sm:px-4 py-2 cursor-pointer" onClick={() => sortUsers('name')}>
                 Name <FaSort className="inline ml-1" />
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('email')}>
+              <th className="px-2 sm:px-4 py-2 cursor-pointer" onClick={() => sortUsers('email')}>
                 Email <FaSort className="inline ml-1" />
               </th>
-              <th className="px-4 py-2 cursor-pointer" onClick={() => sortUsers('role')}>
+              <th className="px-2 sm:px-4 py-2 cursor-pointer" onClick={() => sortUsers('role')}>
                 Role <FaSort className="inline ml-1" />
               </th>
-              <th className="px-4 py-2">Change Role</th>
-              <th className="px-4 py-2">Actions</th>
+              <th className="px-2 sm:px-4 py-2">Change Role</th>
+              <th className="px-2 sm:px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <tr key={user._id} className="border-t">
-                  <td className="px-4 py-2">{user.name}</td>
-                  <td className="px-4 py-2">{user.email}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 sm:px-4 py-2">{user.name}</td>
+                  <td className="px-2 sm:px-4 py-2">{user.email}</td>
+                  <td className="px-2 sm:px-4 py-2">
                     <span
                       className={`px-2 py-1 rounded-full text-white text-xs ${
                         user.publicMetadata?.role === 'admin'
@@ -215,7 +211,7 @@ const ManageUsers = () => {
                       {user.publicMetadata?.role || 'student'}
                     </span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-2 sm:px-4 py-2">
                     {/* Only allow role change for educators, not students or admins */}
                     {user.publicMetadata?.role === 'educator' ? (
                       <select
@@ -232,7 +228,7 @@ const ManageUsers = () => {
                       <span className="text-gray-500">Student</span>
                     )}
                   </td>
-                  <td className="px-4 py-2 flex gap-3">
+                  <td className="px-2 sm:px-4 py-2 flex gap-2 sm:gap-3">
                     <button
                       onClick={() => handleDeleteUser(user._id)}
                       className="text-red-600 hover:text-red-800"
@@ -256,7 +252,7 @@ const ManageUsers = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center px-4 py-2 text-gray-500">
+                <td colSpan="5" className="text-center px-2 sm:px-4 py-2 text-gray-500">
                   No users found.
                 </td>
               </tr>

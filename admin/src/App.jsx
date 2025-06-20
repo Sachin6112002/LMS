@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaUsers, FaCog } from 'react-icons/fa';
 
 import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
 import StudentManager from './pages/StudentManager';
 import Dashboard from './pages/Dashboard';
@@ -12,6 +13,7 @@ import Settings from './pages/Settings';
 import ManagePurchases from './pages/ManagePurchases';
 import ManageUsers from './pages/ManageUsers';
 import ManageCourses from './pages/ManageCourses';
+import Profile from './pages/Profile';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -64,24 +66,35 @@ const PrivateRoute = ({ children }) => {
 };
 
 const App = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       <ToastContainer />
-      <Navbar />
-      <main className="flex-1 flex items-center justify-center">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
-          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-          <Route path="/manage-purchases" element={<PrivateRoute><ManagePurchases /></PrivateRoute>} />
-          <Route path="/manage-users" element={<PrivateRoute><ManageUsers /></PrivateRoute>} />
-          <Route path="/manage-courses" element={<PrivateRoute><ManageCourses /></PrivateRoute>} />
-          {/* Add more admin-only routes here */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </main>
+      <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      <div className="flex flex-1 min-h-0">
+        {/* Sidebar for desktop, drawer for mobile */}
+        <div className={`fixed inset-0 z-40 bg-black bg-opacity-30 transition-opacity lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`} onClick={() => setSidebarOpen(false)}></div>
+        <aside className={`fixed z-50 top-0 left-0 h-full w-64 bg-green-50 border-r border-green-200 transform transition-transform duration-200 lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:block`}> 
+          <Sidebar />
+        </aside>
+        <main className="flex-1 flex flex-col min-w-0 lg:ml-64">
+          <div className="flex-1 flex items-center justify-center p-2 sm:p-4">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/students" element={<PrivateRoute><StudentManager /></PrivateRoute>} />
+              <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+              <Route path="/manage-purchases" element={<PrivateRoute><ManagePurchases /></PrivateRoute>} />
+              <Route path="/manage-users" element={<PrivateRoute><ManageUsers /></PrivateRoute>} />
+              <Route path="/manage-courses" element={<PrivateRoute><ManageCourses /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              {/* Add more admin-only routes here */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

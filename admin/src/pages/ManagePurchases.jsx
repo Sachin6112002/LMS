@@ -50,17 +50,17 @@ const ManagePurchases = () => {
   });
 
   return (
-    <div className="p-4 md:p-8 bg-green-50 min-h-screen">
-      <div className="flex flex-wrap gap-4 mb-8">
+    <div className="p-2 sm:p-4 md:p-8 bg-green-50 min-h-screen">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-8">
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold shadow flex items-center gap-2"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 w-full sm:w-auto"
         >
           Back to Dashboard
         </button>
       </div>
       <h1 className="text-2xl font-bold mb-6 text-green-900">Manage Purchases</h1>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
         <input
           type="text"
           placeholder="Search by user or course..."
@@ -83,15 +83,15 @@ const ManagePurchases = () => {
         <div>Loading...</div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-gray-100">
-          <table className="min-w-full bg-white rounded-xl text-sm">
+          <table className="min-w-full bg-white rounded-xl text-xs sm:text-sm">
             <thead className="bg-cyan-50">
               <tr>
-                <th className="px-4 py-2 text-left">User</th>
-                <th className="px-4 py-2 text-left">Email</th>
-                <th className="px-4 py-2 text-left">Course</th>
-                <th className="px-4 py-2 text-left">Amount</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-left">Date</th>
+                <th className="px-2 sm:px-4 py-2 text-left">User</th>
+                <th className="px-2 sm:px-4 py-2 text-left">Email</th>
+                <th className="px-2 sm:px-4 py-2 text-left">Course</th>
+                <th className="px-2 sm:px-4 py-2 text-left">Amount</th>
+                <th className="px-2 sm:px-4 py-2 text-left">Status</th>
+                <th className="px-2 sm:px-4 py-2 text-left">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -102,14 +102,14 @@ const ManagePurchases = () => {
               ) : (
                 filteredPurchases.map((p, idx) => (
                   <tr key={p._id || idx} className="border-t hover:bg-cyan-50 transition">
-                    <td className="px-4 py-2">{p.userId?.name || 'N/A'}</td>
-                    <td className="px-4 py-2">{p.userId?.email || 'N/A'}</td>
-                    <td className="px-4 py-2">{p.courseId?.courseTitle || 'N/A'}</td>
-                    <td className="px-4 py-2">${p.amount?.toFixed(2) || 'N/A'}</td>
-                    <td className="px-4 py-2 capitalize">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' ? 'bg-green-100 text-green-700' : p.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{p.status}</span>
+                    <td className="px-2 sm:px-4 py-2">{p.userId?.name || 'N/A'}</td>
+                    <td className="px-2 sm:px-4 py-2">{p.userId?.email || 'N/A'}</td>
+                    <td className="px-2 sm:px-4 py-2">{p.courseId?.courseTitle || 'N/A'}</td>
+                    <td className="px-2 sm:px-4 py-2">${p.amount?.toFixed(2) || 'N/A'}</td>
+                    <td className="px-2 sm:px-4 py-2 capitalize">
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' ? 'bg-green-100 text-green-700' : p.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{p.status}</span>
                     </td>
-                    <td className="px-4 py-2">{new Date(p.createdAt).toLocaleString()}</td>
+                    <td className="px-2 sm:px-4 py-2">{new Date(p.createdAt).toLocaleString()}</td>
                   </tr>
                 ))
               )}
