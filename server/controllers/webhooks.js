@@ -51,7 +51,17 @@ export const registerUser = async (req, res) => {
       publicMetadata: { role: 'student' }
     });
     await user.save();
-    res.status(201).json({ success: true, message: "User registered successfully" });
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.publicMetadata?.role || 'student',
+        imageUrl: user.imageUrl
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
