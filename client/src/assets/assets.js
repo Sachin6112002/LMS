@@ -30,12 +30,12 @@ import patients_icon from './patients_icon.svg'
 import play_icon from './play_icon.svg'
 import blue_tick_icon from './blue_tick_icon.svg'
 import lesson_icon from './lesson_icon.svg'
-import hero from './hero.png'
+// import hero from './hero.png'
 
 
 
 export const assets = {
-    hero,
+    // hero,
     logo,
     search_icon,
     sketch,
