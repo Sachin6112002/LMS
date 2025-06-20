@@ -87,6 +87,7 @@ const Profile = () => {
           <div className="mb-2"><span className="font-semibold">Name:</span> {profile?.name}</div>
           <div className="mb-2"><span className="font-semibold">Email:</span> {profile?.email}</div>
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
+          <button className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded" onClick={() => navigate('/reset-password')}>Reset Password</button>
         </div>
       ) : (
         <form className="bg-white rounded-lg shadow p-6" onSubmit={handleSave}>
@@ -113,15 +114,7 @@ const Profile = () => {
           {error && <div className="text-red-500 mt-2">{error}</div>}
         </form>
       )}
-      {/* DEBUG PANEL: Remove in production */}
-      <div style={{position:'fixed',bottom:0,right:0,background:'#fff',color:'#222',zIndex:9999,padding:'8px',border:'1px solid #ccc',fontSize:'12px'}}>
-        <strong>profile:</strong>
-        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(profile,null,2)}</pre>
-        <strong>userData:</strong>
-        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(userData,null,2)}</pre>
-        <strong>error:</strong>
-        <pre style={{maxWidth:'300px',maxHeight:'100px',overflow:'auto'}}>{JSON.stringify(error,null,2)}</pre>
-      </div>
+    
     </div>
   );
 };
