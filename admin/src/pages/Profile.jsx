@@ -83,6 +83,12 @@ const Profile = () => {
           <div className="mb-2"><span className="font-semibold">Name:</span> {profile.name}</div>
           <div className="mb-2"><span className="font-semibold">Email:</span> {profile.email}</div>
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
+          <button
+            className="mt-4 ml-4 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+            onClick={() => window.location.href = '/verify-otp'}
+          >
+            Forgot/Reset Password via OTP
+          </button>
         </div>
       ) : (
         <form className="bg-white rounded-lg shadow p-6" onSubmit={handleSave}>

@@ -13,6 +13,8 @@ import ManagePurchases from './pages/ManagePurchases';
 import ManageUsers from './pages/ManageUsers';
 import ManageCourses from './pages/ManageCourses';
 import Profile from './pages/Profile';
+import AdminForgotPassword from './pages/AdminForgotPassword';
+import AdminVerifyOtp from './pages/AdminVerifyOtp';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -105,6 +107,8 @@ const App = () => {
             <Route path="/manage-users" element={<PrivateRoute><ManageUsers /></PrivateRoute>} />
             <Route path="/manage-courses" element={<PrivateRoute><ManageCourses /></PrivateRoute>} />
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/forgot-password" element={<AdminForgotPassword />} />
+            <Route path="/verify-otp" element={<AdminVerifyOtp />} />
             {/* Add more admin-only routes here */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
