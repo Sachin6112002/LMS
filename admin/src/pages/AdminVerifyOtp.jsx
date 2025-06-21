@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { backendUrl } from '../context/AppContext';
 
 const AdminVerifyOtp = () => {
   const location = useLocation();
@@ -21,7 +22,7 @@ const AdminVerifyOtp = () => {
     setLoading(true);
     setMessage('');
     try {
-      const { data } = await axios.post('/api/admin/verify-otp', { email, otp, newPassword });
+      const { data } = await axios.post(`${backendUrl}/api/admin/verify-otp`, { email, otp, newPassword });
       setMessage(data.message || 'Password changed!');
     } catch (err) {
       setMessage('Failed to verify OTP or change password.');
