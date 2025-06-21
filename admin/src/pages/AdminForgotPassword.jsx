@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AdminForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,6 +15,10 @@ const AdminForgotPassword = () => {
     try {
       const { data } = await axios.post('/api/admin/send-otp', { email });
       setMessage(data.message || 'OTP sent! Check your email.');
+      // Redirect to verify-otp after short delay, passing email
+      setTimeout(() => {
+        navigate('/verify-otp', { state: { email } });
+      }, 1200);
     } catch (err) {
       setMessage('Failed to send OTP.');
     }
