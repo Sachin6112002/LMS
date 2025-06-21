@@ -1,7 +1,6 @@
 import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 import Otp from '../models/Otp.js';
-import bcrypt from 'bcryptjs';
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -45,9 +44,8 @@ export const verifyOtpAndChangePassword = async (req, res) => {
   }
   const user = await User.findOne({ email });
   if (!user) return res.json({ success: false, message: 'User not found' });
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(newPassword, salt);
+  // Assign plain password, let pre-save hook hash it
+  user.password = newPassword;
   await user.save();
   await Otp.deleteMany({ email });
   res.json({ success: true, message: 'Password changed successfully' });
