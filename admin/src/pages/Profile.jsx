@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { backendUrl } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -9,6 +10,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProfile();
@@ -85,7 +87,7 @@ const Profile = () => {
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
           <button
             className="mt-4 ml-4 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-            onClick={() => window.location.href = '/forgot-password'}
+            onClick={() => navigate('/forgot-password')}
           >
             Forgot/Reset Password via OTP
           </button>
