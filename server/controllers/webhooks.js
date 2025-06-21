@@ -91,6 +91,14 @@ export const loginUser = async (req, res) => {
 
 // Stripe Webhooks to Manage Payments Action
 export const stripeWebhooks = async (request, response) => {
+  // --- CORS HEADERS FOR SERVERLESS DEPLOYMENTS ---
+  response.setHeader('Access-Control-Allow-Origin', 'https://lms-client-one-lemon.vercel.app');
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (request.method === 'OPTIONS') {
+    response.status(200).end();
+    return;
+  }
   const sig = request.headers['stripe-signature'];
   let event;
   try {
