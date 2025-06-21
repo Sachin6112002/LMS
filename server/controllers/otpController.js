@@ -24,12 +24,15 @@ export const sendOtp = async (req, res) => {
       service: 'gmail',
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
-    await transporter.sendMail({
+    const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Your OTP for Password Reset',
       text: `Your OTP is: ${otp}`,
-    });
+    };
+    const info = await transporter.sendMail(mailOptions);
+    console.log('OTP email sent:', info.response);
+    console.log('Mail options:', mailOptions);
   } catch (err) {
     console.error('Failed to send OTP email:', err);
   }
