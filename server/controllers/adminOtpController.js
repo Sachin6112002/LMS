@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
-import nodemailer from 'nodemailer';
+import { sendMail } from '../utils/mailer.js';
 
 export const sendAdminOtp = async (req, res) => {
   const { email } = req.body;
@@ -16,19 +16,13 @@ export const sendAdminOtp = async (req, res) => {
   res.json({ success: true, message: 'OTP is being sent to email.' });
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    });
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendMail({
       to: email,
       subject: 'Your Admin OTP for Password Reset',
       text: `Your OTP is: ${otp}`,
-    };
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Admin OTP email sent:', info.response);
-    console.log('Mail options:', mailOptions);
+      html: `<p>Your OTP is: <b>${otp}</b></p>`,
+    });
+    console.log('Admin OTP email sent to:', email);
   } catch (err) {
     console.error('Failed to send Admin OTP email:', err);
   }

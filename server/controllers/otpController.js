@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import nodemailer from 'nodemailer';
 import Otp from '../models/Otp.js';
+import { sendMail } from '../utils/mailer.js';
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -20,19 +20,13 @@ export const sendOtp = async (req, res) => {
 
   // Send OTP via email in the background
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    });
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendMail({
       to: email,
       subject: 'Your OTP for Password Reset',
       text: `Your OTP is: ${otp}`,
-    };
-    const info = await transporter.sendMail(mailOptions);
-    console.log('OTP email sent:', info.response);
-    console.log('Mail options:', mailOptions);
+      html: `<p>Your OTP is: <b>${otp}</b></p>`,
+    });
+    console.log('OTP email sent to:', email);
   } catch (err) {
     console.error('Failed to send OTP email:', err);
   }
@@ -40,7 +34,8 @@ export const sendOtp = async (req, res) => {
 
 export const verifyOtpAndChangePassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
-  if (!email || !otp || !newPassword) return res.json({ success: false, message: 'All fields required' });
+  if (!email || !otp || !newPassword)
+    return res.json({ success: false, message: 'All fields required' });
   const otpRecord = await Otp.findOne({ email, otp });
   if (!otpRecord || otpRecord.expiresAt < new Date()) {
     return res.json({ success: false, message: 'Invalid or expired OTP' });
