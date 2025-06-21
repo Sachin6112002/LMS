@@ -40,11 +40,11 @@ export const registerUser = async (req, res) => {
       });
     };
     const imageUpload = await streamUpload(req.file.buffer);
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Do NOT hash password here; let the User model pre-save hook handle it
     const user = new User({
       _id: new mongoose.Types.ObjectId().toString(),
       email,
-      password: hashedPassword,
+      password, // plain password, will be hashed by pre-save hook
       name,
       imageUrl: imageUpload.secure_url,
       enrolledCourses: [],
