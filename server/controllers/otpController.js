@@ -16,18 +16,24 @@ export const sendOtp = async (req, res) => {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
   await Otp.create({ email, otp, expiresAt });
 
-  // Send OTP via email
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  });
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Your OTP for Password Reset',
-    text: `Your OTP is: ${otp}`,
-  });
-  res.json({ success: true, message: 'OTP sent to email.' });
+  // Respond immediately to avoid Vercel timeout
+  res.json({ success: true, message: 'OTP is being sent to email.' });
+
+  // Send OTP via email in the background
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP for Password Reset',
+      text: `Your OTP is: ${otp}`,
+    });
+  } catch (err) {
+    console.error('Failed to send OTP email:', err);
+  }
 };
 
 export const verifyOtpAndChangePassword = async (req, res) => {
