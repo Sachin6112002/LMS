@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AppContext } from '../context/AppContext';
 
 const ResetPassword = () => {
+  const { backendUrl } = useContext(AppContext);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
@@ -23,7 +25,7 @@ const ResetPassword = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || '/api'}/reset-password`, {
+      const res = await axios.post(`${backendUrl}/api/reset-password`, {
         token,
         password,
       });
