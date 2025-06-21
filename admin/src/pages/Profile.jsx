@@ -85,7 +85,7 @@ const Profile = () => {
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
           <button
             className="mt-4 ml-4 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-            onClick={() => window.location.href = '/verify-otp'}
+            onClick={() => window.location.href = '/forgot-password'}
           >
             Forgot/Reset Password via OTP
           </button>
