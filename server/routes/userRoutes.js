@@ -1,5 +1,6 @@
 import express from 'express'
-import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses, sendOtp, verifyOtpAndChangePassword } from '../controllers/userController.js';
+import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses } from '../controllers/userController.js';
+import { sendOtp, verifyOtpAndChangePassword } from '../controllers/otpController.js';
 import { registerUser, loginUser } from '../controllers/webhooks.js';
 import upload from '../configs/multer.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
