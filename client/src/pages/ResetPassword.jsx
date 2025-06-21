@@ -80,3 +80,5 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
+
+// This file is no longer needed for OTP-based reset and can be deleted.

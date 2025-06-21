@@ -19,8 +19,6 @@ const userSchema = new mongoose.Schema({
         },
         default: () => ({ role: 'student' })
     },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

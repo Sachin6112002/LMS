@@ -288,29 +288,3 @@ export const registerUser = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
-// Reset Password using token
-export const resetPassword = async (req, res) => {
-    try {
-        const { token, password } = req.body;
-        if (!token || !password) {
-            return res.status(400).json({ success: false, message: 'Token and new password are required.' });
-        }
-        // Find user with valid token and not expired
-        const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpires: { $gt: Date.now() }
-        });
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'Invalid or expired token.' });
-        }
-        // Update password and clear reset fields
-        user.password = password; // (Hashing should be applied if not already handled by a pre-save hook)
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-        res.json({ success: true, message: 'Password has been reset successfully.' });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};

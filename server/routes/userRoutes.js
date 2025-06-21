@@ -1,5 +1,5 @@
 import express from 'express'
-import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses, resetPassword, sendOtp, verifyOtpAndChangePassword } from '../controllers/userController.js';
+import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProgress, userEnrolledCourses, sendOtp, verifyOtpAndChangePassword } from '../controllers/userController.js';
 import { registerUser, loginUser } from '../controllers/webhooks.js';
 import upload from '../configs/multer.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
@@ -18,7 +18,6 @@ userRouter.post('/add-rating', jwtMiddleware, authenticate, addUserRating)
 // Register User (first user becomes admin)
 userRouter.post('/register', upload.single('image'), registerUser);
 userRouter.post('/login', loginUser);
-userRouter.post('/reset-password', resetPassword);
 userRouter.post('/send-otp', sendOtp);
 userRouter.post('/verify-otp', verifyOtpAndChangePassword);
 
