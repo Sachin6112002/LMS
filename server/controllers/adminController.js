@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import upload from '../configs/multer.js';
 import crypto from 'crypto';
 import { sendMail } from '../utils/mailer.js';
+import bcrypt from 'bcryptjs';
 
 // Assign admin role to the very first user
 export const assignAdminToFirstUser = async () => {
@@ -106,14 +107,15 @@ export const loginAdmin = async (req, res) => {
       if (!admin) {
         return res.status(401).json({ success: false, message: 'Admin not found' });
       }
-      // In production, use hashed passwords!
-      if (admin.password !== password) {
+      // Use bcrypt to compare hashed password
+      const isMatch = await bcrypt.compare(password, admin.password);
+      if (!isMatch) {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
       const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
       res.json({ success: true, token, admin: { name: admin.name, email: admin.email } });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
     }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
