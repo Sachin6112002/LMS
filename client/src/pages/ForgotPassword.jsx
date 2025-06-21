@@ -13,7 +13,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await axios.post(`${backendUrl}/api/send-otp`, { email });
+      const res = await axios.post(`${backendUrl}/api/user/send-otp`, { email });
       if (res.data.success) {
         setMessage('OTP sent! Check your email.');
         // Optionally, redirect to verify-otp page
