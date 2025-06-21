@@ -87,7 +87,7 @@ const Profile = () => {
           <div className="mb-2"><span className="font-semibold">Name:</span> {profile?.name}</div>
           <div className="mb-2"><span className="font-semibold">Email:</span> {profile?.email}</div>
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
-          <button className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded" onClick={() => navigate('/reset-password')}>Reset Password</button>
+          <button className="mt-2 bg-yellow-500 text-white px-4 py-2 rounded" onClick={() => navigate('/forgot-password')}>Forgot Password</button>
         </div>
       ) : (
         <form className="bg-white rounded-lg shadow p-6" onSubmit={handleSave}>
