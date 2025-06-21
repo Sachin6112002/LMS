@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
         },
         default: () => ({ role: 'student' })
     },
+    googleId: { type: String } // For Google OAuth users
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

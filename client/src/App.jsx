@@ -26,6 +26,7 @@ import Profile from "./pages/Profile";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
+import GoogleSuccess from "./pages/GoogleSuccess";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -128,6 +129,7 @@ const App = () => {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/verify-otp" element={<VerifyOtp />} />
+              <Route path="/google-success" element={<GoogleSuccess />} />
 
               {/* Educator Routes */}
               <Route path="/educator/*" element={<Educator />}>
