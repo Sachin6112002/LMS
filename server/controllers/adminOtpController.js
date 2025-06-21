@@ -38,6 +38,7 @@ export const verifyAdminOtpAndChangePassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   if (!email || !otp || !newPassword) return res.json({ success: false, message: 'All fields required' });
   const otpRecord = await Otp.findOne({ email, otp });
+  console.log('DEBUG OTP:', { email, otp, otpRecord, now: new Date() });
   if (!otpRecord || otpRecord.expiresAt < new Date()) {
     return res.json({ success: false, message: 'Invalid or expired OTP' });
   }
