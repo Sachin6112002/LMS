@@ -49,7 +49,7 @@ const ManageCourses = () => {
         prev.map(c => (c._id === courseId ? { ...c, isPublished: updated.isPublished } : c))
       );
     } catch (error) {
-      console.error('Failed to toggle publish state', error);
+      alert('Failed to toggle publish state');
     }
   };
 

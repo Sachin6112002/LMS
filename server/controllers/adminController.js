@@ -103,7 +103,6 @@ export const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
     try {
       const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
-      console.log('LOGIN DEBUG:', { email, password, found: admin ? { email: admin.email, password: admin.password } : null });
       if (!admin) {
         return res.status(401).json({ success: false, message: 'Admin not found' });
       }
@@ -356,9 +355,9 @@ export const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
-    const user = await User.findByIdAndUpdate(id, { 'publicMetadata.role': role }, { new: true });
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-    res.json({ success: true, user });
+    const updatedUser = await User.findByIdAndUpdate(id, { 'publicMetadata.role': role }, { new: true });
+    if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, user: updatedUser });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

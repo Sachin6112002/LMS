@@ -19,7 +19,6 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
 
     try {
       const url = `${backendUrl}/api/educator/upload-video`;
-      console.log('Uploading to:', url);
       const xhr = new window.XMLHttpRequest();
       xhr.open('POST', url);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
@@ -49,8 +48,8 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
                   body: JSON.stringify({ courseId, chapterId, lectureId, duration })
                 });
               } catch (err) {
-                // ignore error, just log
-                console.error('Failed to update duration', err);
+                // ignore error, just show alert
+                alert('Failed to update duration');
               }
               onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
             };

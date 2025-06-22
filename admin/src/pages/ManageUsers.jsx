@@ -41,7 +41,6 @@ const ManageUsers = () => {
           );
         }
       } catch (err) {
-        console.error(err);
         setUsers([]);
         setIsAdmin(false);
       } finally {
@@ -69,7 +68,6 @@ const ManageUsers = () => {
       try {
         data = JSON.parse(text);
       } catch (e) {
-        console.error('Expected JSON but got:', text);
         alert('Server error: invalid response.');
         return;
       }
@@ -94,21 +92,21 @@ const ManageUsers = () => {
         },
         body: JSON.stringify({ role: newRole }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        alert('Server error: invalid response.');
+        return;
+      }
       if (data.success) {
-        setUsers(
-          users.map((u) =>
-            u._id === userId
-              ? { ...u, publicMetadata: { ...u.publicMetadata, role: newRole } }
-              : u
-          )
-        );
+        setUsers(users.map((user) => (user._id === userId ? { ...user, publicMetadata: { ...user.publicMetadata, role: newRole } } : user)));
       } else {
         alert('Failed to update role.');
       }
     } catch (err) {
-      console.error(err);
-      alert('Error updating role.');
+      alert('Failed to update role.');
     }
   };
 

@@ -166,10 +166,6 @@ const AddCourse = () => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log(chapters);
-  }, [chapters]);
-
   return (
     <div className='h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0 bg-green-50'>
       {!createdCourse ? (

@@ -36,8 +36,6 @@ const Navbar = () => {
     }
   }
 
-  console.log('Navbar userData:', userData);
-
   return (
     <div className={`flex items-center justify-between px-4 sm:px-10 h-20 md:px-14 lg:px-36 border-b border-green-200 py-4 ${isCoursesListPage ? 'bg-white' : 'bg-green-100'}`}>
       <img onClick={() => navigate('/')} src={assets.logo} alt="Logo" className="w-28 lg:w-32 cursor-pointer" />
@@ -66,12 +64,12 @@ const Navbar = () => {
             Profile
           </Link>
         )}
-        {(!userData || userData?.publicMetadata?.role !== 'student') && (
+        {userData && (
           <a
             href="https://lms-admin-blond.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-red-500 text-white px-5 py-2 rounded-full ml-2 font-semibold hover:bg-red-600 transition"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full ml-2 font-semibold transition"
           >
             Admin Panel
           </a>
@@ -101,21 +99,16 @@ const Navbar = () => {
             Profile
           </Link>
         )}
-        {(!userData || userData?.publicMetadata?.role !== 'student') && (
+        {userData && (
           <a
             href="https://lms-admin-blond.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full font-semibold shadow ml-4 transition-colors"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full ml-2 font-semibold transition"
           >
             Admin Panel
           </a>
         )}
-      </div>
-      {/* DEBUG PANEL: Remove in production */}
-      <div style={{position:'fixed',bottom:0,right:0,background:'#fff',color:'#222',zIndex:9999,padding:'8px',border:'1px solid #ccc',fontSize:'12px'}}>
-        <strong>userData:</strong>
-        <pre style={{maxWidth:'300px',maxHeight:'200px',overflow:'auto'}}>{JSON.stringify(userData,null,2)}</pre>
       </div>
     </div>
   );

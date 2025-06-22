@@ -134,7 +134,6 @@ export const AppContextProvider = (props) => {
                 toast.error('Failed to fetch users.');
             }
         } catch (error) {
-            console.error('Error fetching users:', error);
             toast.error(error.response?.data?.message || 'Failed to fetch users.');
         }
     };
@@ -152,7 +151,6 @@ export const AppContextProvider = (props) => {
                 toast.error('Failed to fetch courses.');
             }
         } catch (error) {
-            console.error('Error fetching courses:', error);
             toast.error(error.response?.data?.message || 'Failed to fetch courses.');
         }
     };
@@ -188,7 +186,6 @@ export const AppContextProvider = (props) => {
                 toast.error(response.data.message);
             }
         } catch (error) {
-            console.error('Error managing courses:', error);
             toast.error(error.response?.data?.message || 'Failed to manage courses.');
         }
     };
@@ -206,7 +203,6 @@ export const AppContextProvider = (props) => {
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error('Error updating settings:', error);
             toast.error(error.response?.data?.message || 'Failed to update settings.');
         }
     };

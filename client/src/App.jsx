@@ -38,11 +38,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log the error and error information to the console
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
-
     // You can also send the error information to a logging service here
-
     this.setState({ error, errorInfo });
   }
 
@@ -75,7 +71,6 @@ class GlobalErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("Global Error caught:", error, errorInfo);
     this.setState({ error, errorInfo });
   }
 

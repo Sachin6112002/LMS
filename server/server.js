@@ -26,8 +26,12 @@ app.use(cors({
     'https://lms-client-one-lemon.vercel.app',
     'http://localhost:3000',
     'https://lms-admin-blond.vercel.app'
-  ].filter(Boolean),
-  credentials: true
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 // Register webhook route FIRST, before any body parser
