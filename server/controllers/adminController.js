@@ -387,3 +387,17 @@ export const getAdminProfile = async (req, res) => {
     res.json({ success: false, message: 'Failed to fetch profile' });
   }
 };
+
+// Dummy audit logs endpoint
+export const getAuditLogs = async (req, res) => {
+  try {
+    // Replace with real logs if you have a logs collection
+    const logs = [
+      { timestamp: new Date(), adminName: req.user.name, action: 'Login', details: 'Logged in' },
+      { timestamp: new Date(), adminName: req.user.name, action: 'Edit Profile', details: 'Changed name' },
+    ];
+    res.json({ success: true, logs });
+  } catch (err) {
+    res.json({ success: false, message: 'Failed to fetch logs' });
+  }
+};
