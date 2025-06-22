@@ -11,8 +11,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import testimonialRoutes from './routes/testimonialRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
-import session from 'express-session';
-import passport from './configs/passport.js';
 
 // Initialize Express
 const app = express()
@@ -46,16 +44,6 @@ app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // Serve favicon.ico statically if present
 app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
-
-// Session middleware (required for Passport)
-app.use(session({
-  secret: process.env.JWT_SECRET || 'secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }, // Set to true if using HTTPS
-}));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
