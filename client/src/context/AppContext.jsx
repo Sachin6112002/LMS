@@ -272,6 +272,36 @@ export const AppContextProvider = (props) => {
         }
     }, [jwt])
 
+    // On mount, validate JWT and clear userData if invalid
+    useEffect(() => {
+        const checkAuth = async () => {
+            if (!jwt) {
+                setUserData(null);
+                localStorage.removeItem('userData');
+                return;
+            }
+            try {
+                const { data } = await axios.get(
+                    backendUrl + '/api/user/data',
+                    { headers: { Authorization: `Bearer ${jwt}` } }
+                );
+                if (!data.success) {
+                    setUserData(null);
+                    setJwt(null);
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('jwtToken');
+                }
+            } catch (error) {
+                setUserData(null);
+                setJwt(null);
+                localStorage.removeItem('userData');
+                localStorage.removeItem('jwtToken');
+            }
+        };
+        checkAuth();
+        // eslint-disable-next-line
+    }, []);
+
     // TEMP: Force userData for debug
     useEffect(() => {
         if (!userData) {
