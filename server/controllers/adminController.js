@@ -346,6 +346,31 @@ export const updateAdminRole = async (req, res) => {
   }
 };
 
+// Update user role (for any user, not just admin)
+export const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+    const user = await User.findByIdAndUpdate(id, { 'publicMetadata.role': role }, { new: true });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Delete any user (admin, student, educator)
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Dummy audit logs endpoint
 export const getAuditLogs = async (req, res) => {
   try {
