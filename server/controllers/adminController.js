@@ -156,7 +156,7 @@ export const deleteCourseByAdmin = async (req, res) => {
 // Add another admin (must be authenticated as admin)
 export const addAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, imageUrl } = req.body;
     // Only allow if requester is admin
     if (!req.user || req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Not authorized' });
@@ -164,15 +164,20 @@ export const addAdmin = async (req, res) => {
     // Check if user with email already exists
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ success: false, message: 'User already exists' });
+    const _id = new mongoose.Types.ObjectId().toString();
+    const finalImageUrl = imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name);
     const newAdmin = new User({
+      _id,
       name,
       email,
-      password, // In production, hash the password!
+      password,
+      imageUrl: finalImageUrl,
       publicMetadata: { role: 'admin' },
     });
     await newAdmin.save();
     res.json({ success: true, message: 'Admin added successfully' });
   } catch (error) {
+    console.error('Add admin error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -368,32 +373,5 @@ export const deleteUser = async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// Dummy audit logs endpoint
-export const getAuditLogs = async (req, res) => {
-  try {
-    // Replace with real logs if you have a logs collection
-    const logs = [
-      { timestamp: new Date(), adminName: req.user.name, action: 'Login', details: 'Logged in' },
-      { timestamp: new Date(), adminName: req.user.name, action: 'Edit Profile', details: 'Changed name' },
-    ];
-    res.json({ success: true, logs });
-  } catch (err) {
-    res.json({ success: false, message: 'Failed to fetch logs' });
-  }
-};
-
-// Get admin profile (for Profile page)
-export const getAdminProfile = async (req, res) => {
-  try {
-    const admin = await User.findById(req.user.id).select('-password -__v');
-    if (!admin || admin.publicMetadata.role !== 'admin') {
-      return res.status(404).json({ success: false, message: 'Admin not found' });
-    }
-    res.json({ success: true, profile: admin });
-  } catch (err) {
-    res.json({ success: false, message: 'Failed to fetch profile' });
   }
 };
