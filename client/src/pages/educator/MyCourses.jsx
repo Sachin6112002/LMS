@@ -11,19 +11,21 @@ const MyCourses = () => {
   const [courses, setCourses] = useState(null)
 
   const fetchEducatorCourses = async () => {
-
     try {
-
-      const token = await getToken()
-
-      const { data } = await axios.get(backendUrl + '/api/educator/courses', { headers: { Authorization: `Bearer ${token}` } })
-
-      data.success && setCourses(data.courses)
-
+      const token = await getToken();
+      // Use new RESTful endpoint and filter for educator's courses
+      const { data } = await axios.get(backendUrl + '/api/courses', { headers: { Authorization: `Bearer ${token}` } });
+      if (data.success) {
+        // If backend returns all courses, filter by educatorId if needed
+        const educatorId = (typeof isEducator === 'object' && isEducator._id) ? isEducator._id : (userData && userData._id);
+        const myCourses = educatorId ? data.courses.filter(c => c.educator && (c.educator._id === educatorId || c.educator === educatorId)) : data.courses;
+        setCourses(myCourses);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
     }
-
   }
 
   // Helper: check if course thumbnail is missing and show a warning toast
