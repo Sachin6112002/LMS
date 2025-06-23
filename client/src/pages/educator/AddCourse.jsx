@@ -74,15 +74,15 @@ const AddCourse = () => {
 
   const addLecture = async () => {
     if (!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration) return;
+    let newLectureId = uniqid();
     setChapters(
       chapters.map((chapter) => {
         if (chapter.chapterId === currentChapterId) {
           const newLecture = {
             ...lectureDetails,
             lectureDuration: lectureVideoDuration,
-            lectureId: uniqid(),
+            lectureId: newLectureId,
             lectureOrder: chapter.chapterContent.length + 1,
-            // Do NOT include videoFile here; handle uploads separately if needed
           };
           chapter.chapterContent.push(newLecture);
         }
@@ -95,6 +95,24 @@ const AddCourse = () => {
       lectureDuration: '',
       isPreviewFree: false,
     });
+    // Upload video immediately after adding lecture
+    try {
+      const token = await getToken();
+      const formData = new FormData();
+      formData.append('video', lectureVideo);
+      formData.append('chapterId', currentChapterId);
+      formData.append('lectureId', newLectureId);
+      // If courseId is available, you can add it as well
+      if (createdCourse && createdCourse._id) {
+        formData.append('courseId', createdCourse._id);
+      }
+      await axios.post(`${backendUrl}/api/educator/upload-video`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Lecture video uploaded!');
+    } catch (err) {
+      toast.error('Failed to upload lecture video');
+    }
     setLectureVideo(null);
     setLectureVideoDuration('');
   };
