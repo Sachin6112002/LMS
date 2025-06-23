@@ -5,6 +5,7 @@ import { registerUser, loginUser } from '../controllers/webhooks.js';
 import upload from '../configs/multer.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { jwtMiddleware } from '../middlewares/jwtMiddleware.js';
+import { updateUserProfile } from '../controllers/updateProfileController.js';
 
 
 const userRouter = express.Router()
@@ -21,5 +22,6 @@ userRouter.post('/register', upload.single('image'), registerUser);
 userRouter.post('/login', loginUser);
 userRouter.post('/send-otp', sendOtp);
 userRouter.post('/verify-otp', verifyOtpAndChangePassword);
+userRouter.patch('/update', jwtMiddleware, authenticate, upload.single('photo'), updateUserProfile);
 
 export default userRouter;

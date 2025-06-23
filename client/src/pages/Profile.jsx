@@ -97,6 +97,14 @@ const Profile = () => {
     }
   };
 
+  // Helper to force image refresh
+  const getProfileImageUrl = () => {
+    const baseUrl = profile?.photo || profile?.imageUrl;
+    if (!baseUrl) return '/default-avatar.png';
+    // Add timestamp to force refresh after update
+    return `${baseUrl}?t=${Date.now()}`;
+  };
+
   if (error && !profile && userData) {
     // If fetch failed but userData exists, use it
     setProfile(userData);
@@ -112,7 +120,7 @@ const Profile = () => {
       {success && <div className="text-green-600 mb-4">{success}</div>}
       {!edit ? (
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-          <img src={profile?.photo || profile?.imageUrl || '/default-avatar.png'} alt="Profile" className="w-24 h-24 rounded-full mb-4 object-cover border" />
+          <img src={getProfileImageUrl()} alt="Profile" className="w-24 h-24 rounded-full mb-4 object-cover border" />
           <div className="mb-2"><span className="font-semibold">Name:</span> {profile?.name}</div>
           <div className="mb-2"><span className="font-semibold">Email:</span> {profile?.email}</div>
           <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setEdit(true)}>Edit Profile</button>
@@ -121,7 +129,7 @@ const Profile = () => {
       ) : (
         <form className="bg-white rounded-lg shadow p-6" onSubmit={handleSave}>
           <div className="mb-4 flex flex-col items-center">
-            <img src={form.photo && form.photo instanceof File ? URL.createObjectURL(form.photo) : (form.photo || profile?.imageUrl || '/default-avatar.png')} alt="Profile" className="w-24 h-24 rounded-full mb-2 object-cover border" />
+            <img src={form.photo && form.photo instanceof File ? URL.createObjectURL(form.photo) : getProfileImageUrl()} alt="Profile" className="w-24 h-24 rounded-full mb-2 object-cover border" />
             <input type="file" name="photo" accept="image/*" onChange={handleChange} className="mt-2" />
           </div>
           <div className="mb-4">
