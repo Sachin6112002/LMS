@@ -34,6 +34,9 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
+// Add this line to handle all OPTIONS preflight requests for CORS
+app.options('*', cors());
+
 // Register webhook route FIRST, before any body parser
 app.use('/api/webhook', webhookRoutes);
 
