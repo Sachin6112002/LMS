@@ -29,27 +29,38 @@ export const addCourse = async (req, res) => {
         return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
     }
     try {
-        const { courseData } = req.body
-        const imageFile = req.file
-        const educatorId = req.auth.userId
+        const imageFile = req.file;
+        const educatorId = req.auth.userId;
         // Debug log incoming fields and file
         console.log('addCourse fields:', req.body);
         console.log('addCourse file:', req.file);
         if (!imageFile) {
-            return res.json({ success: false, message: 'Thumbnail Not Attached' })
+            return res.json({ success: false, message: 'Thumbnail Not Attached' });
         }
-        const parsedCourseData = await JSON.parse(courseData)
-        parsedCourseData.educator = educatorId
-        // Ensure course is always created as draft
-        parsedCourseData.status = 'draft'
-        const newCourse = await Course.create(parsedCourseData)
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path)
-        newCourse.courseThumbnail = imageUpload.secure_url
-        await newCourse.save()
-        res.json({ success: true, message: 'Course Added', course: newCourse })
+        // Read course fields directly from req.body
+        const courseData = {
+            courseTitle: req.body.courseTitle,
+            courseDescription: req.body.courseDescription,
+            coursePrice: req.body.coursePrice,
+            discount: req.body.discount,
+            educator: educatorId,
+            status: 'draft'
+        };
+        const newCourse = await Course.create(courseData);
+        // Upload image to cloudinary
+        const imageUpload = await cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
+            if (error) {
+                console.log('Cloudinary upload error:', error);
+                return res.json({ success: false, message: 'Image upload failed' });
+            }
+            newCourse.courseThumbnail = result.secure_url;
+            await newCourse.save();
+            res.json({ success: true, message: 'Course Added', course: newCourse });
+        });
+        imageUpload.end(imageFile.buffer);
     } catch (error) {
         console.log('addCourse error:', error);
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
 }
 
