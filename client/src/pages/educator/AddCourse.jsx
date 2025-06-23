@@ -151,7 +151,27 @@ const AddCourse = () => {
       if (isSubmitting) return;
       setIsSubmitting(true);
       if (!image) {
-        toast.error('Thumbnail Not Selected')
+        toast.error('Thumbnail Not Selected');
+        setIsSubmitting(false);
+        return;
+      }
+      // Debug: log FormData contents
+      if (image) {
+        console.log('Image file:', image);
+        if (!(image instanceof File)) {
+          toast.error('Selected thumbnail is not a valid file.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      // Optionally: check file type and size
+      if (image && !image.type.startsWith('image/')) {
+        toast.error('Please select a valid image file for the thumbnail.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (image && image.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Thumbnail image is too large (max 5MB).');
         setIsSubmitting(false);
         return;
       }
