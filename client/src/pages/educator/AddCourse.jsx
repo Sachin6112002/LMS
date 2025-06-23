@@ -27,6 +27,7 @@ const AddCourse = () => {
     isPreviewFree: false,
   });
   const [lectureVideo, setLectureVideo] = useState(null);
+  const [lectureVideoDuration, setLectureVideoDuration] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdCourse, setCreatedCourse] = useState(null); // Holds the saved course with real IDs
   const [uploadToken, setUploadToken] = useState(''); // For video upload auth
@@ -72,15 +73,15 @@ const AddCourse = () => {
   };
 
   const addLecture = async () => {
+    if (!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration) return;
     setChapters(
       chapters.map((chapter) => {
         if (chapter.chapterId === currentChapterId) {
           const newLecture = {
             ...lectureDetails,
-            lectureOrder: chapter.chapterContent.length > 0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1 : 1,
+            lectureDuration: lectureVideoDuration,
             lectureId: uniqid(),
-            videoFile: '',
-            lectureUrl: '',
+            videoFile: lectureVideo,
           };
           chapter.chapterContent.push(newLecture);
         }
@@ -94,6 +95,7 @@ const AddCourse = () => {
       isPreviewFree: false,
     });
     setLectureVideo(null);
+    setLectureVideoDuration('');
   };
 
   const handleSubmit = async (e) => {
@@ -103,6 +105,15 @@ const AddCourse = () => {
       setIsSubmitting(true);
       if (!image) {
         toast.error('Thumbnail Not Selected')
+        setIsSubmitting(false);
+        return;
+      }
+      // Validation: Ensure all lectures have a duration
+      const allLecturesHaveDuration = chapters.every(chapter =>
+        chapter.chapterContent.every(lecture => !!lecture.lectureDuration)
+      );
+      if (!allLecturesHaveDuration) {
+        toast.error('Please upload all videos and wait for durations to be set before submitting the course.');
         setIsSubmitting(false);
         return;
       }
@@ -245,6 +256,33 @@ const AddCourse = () => {
                       onChange={(e) => setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
                     />
                   </div>
+                  <div className="mb-2">
+                    <p className='text-green-900'>Lecture Video</p>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        setLectureVideo(file);
+                        if (file) {
+                          const videoUrl = URL.createObjectURL(file);
+                          const tempVideo = document.createElement('video');
+                          tempVideo.preload = 'metadata';
+                          tempVideo.src = videoUrl;
+                          tempVideo.onloadedmetadata = () => {
+                            URL.revokeObjectURL(videoUrl);
+                            const duration = Math.round(tempVideo.duration / 60) || 1;
+                            setLectureVideoDuration(duration);
+                          };
+                        } else {
+                          setLectureVideoDuration('');
+                        }
+                      }}
+                    />
+                    {lectureVideo && lectureVideoDuration && (
+                      <div className="text-green-700 text-sm mt-1">Duration: {lectureVideoDuration} min</div>
+                    )}
+                  </div>
                   <div className="flex gap-2 my-4">
                     <p className='text-green-900'>Is Preview Free?</p>
                     <input
@@ -253,49 +291,22 @@ const AddCourse = () => {
                       onChange={(e) => setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })}
                     />
                   </div>
-                  <button type='button' className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onClick={addLecture}>Add</button>
+                  <button type='button' className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onClick={addLecture} disabled={!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration}>Add</button>
                   <img onClick={() => setShowPopup(false)} src={assets.cross_icon} className='absolute top-4 right-4 w-4 cursor-pointer' alt="" />
                 </div>
               </div>
             )}
           </div>
 
-          <button type="submit" className='bg-green-600 hover:bg-green-700 text-white w-max py-2.5 px-8 rounded my-4' disabled={isSubmitting}>
-            {isSubmitting ? 'ADDING...' : 'ADD'}
-          </button>
+          {createdCourse ? null : (
+            <button type="submit" className='bg-green-600 hover:bg-green-700 text-white w-max py-2.5 px-8 rounded my-4' disabled={isSubmitting}>
+              {isSubmitting ? 'ADDING...' : 'ADD'}
+            </button>
+          )}
         </form>
       ) : (
         <div className='w-full max-w-2xl'>
-          <h2 className='text-xl font-bold mb-4 text-green-900'>Upload Videos for Lectures</h2>
-          {createdCourse.courseContent.length === 0 || createdCourse.courseContent.every(chap => chap.chapterContent.length === 0) ? (
-            <div className="text-red-600 font-semibold mb-6">No lectures found. Please add at least one lecture to each chapter to enable video uploads.</div>
-          ) : null}
-          {createdCourse.courseContent.map((chapter) => (
-            <div key={chapter._id || chapter.chapterId} className='mb-6'>
-              <h3 className='font-semibold mb-2 text-green-900'>Chapter: {chapter.chapterTitle}</h3>
-              {chapter.chapterContent.length === 0 ? (
-                <div className="text-yellow-600 mb-4">No lectures in this chapter.</div>
-              ) : chapter.chapterContent.map((lecture) => (
-                <div key={lecture._id || lecture.lectureId} className='mb-4 p-3 border border-green-200 rounded'>
-                  <div className='mb-2'>
-                    <span className='font-medium text-green-900'>Lecture: {lecture.lectureTitle}</span>
-                    <span className='ml-2 text-sm text-green-700'>({lecture.lectureDuration} mins)</span>
-                  </div>
-                  <VideoUploadComponent
-                    backendUrl={backendUrl}
-                    token={uploadToken}
-                    courseId={createdCourse._id}
-                    chapterId={chapter._id || chapter.chapterId}
-                    lectureId={lecture._id || lecture.lectureId}
-                    onUploadSuccess={() => {
-                      toast.success('Video uploaded!');
-                      fetchLatestCourse();
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+          <h2 className='text-xl font-bold mb-4 text-green-900'>Course created successfully!</h2>
           <div className='mt-8'>
             <button className='bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded' onClick={() => window.location.reload()}>Create Another Course</button>
           </div>
