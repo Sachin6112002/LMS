@@ -40,6 +40,8 @@ export const addCourse = async (req, res) => {
         }
         const parsedCourseData = await JSON.parse(courseData)
         parsedCourseData.educator = educatorId
+        // Ensure course is always created as draft
+        parsedCourseData.status = 'draft'
         const newCourse = await Course.create(parsedCourseData)
         const imageUpload = await cloudinary.uploader.upload(imageFile.path)
         newCourse.courseThumbnail = imageUpload.secure_url
@@ -245,5 +247,33 @@ export const addLecture = async (req, res) => {
     } catch (err) {
         console.log('addLecture error:', err);
         res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// PUBLISH COURSE ENDPOINT
+export const publishCourse = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    try {
+        const { courseId } = req.body;
+        const course = await Course.findById(courseId);
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+        if (course.educator !== req.auth.userId) {
+            return res.status(403).json({ success: false, message: 'Not your course' });
+        }
+        // Must have at least one chapter and one lecture
+        if (!course.courseContent || course.courseContent.length === 0) {
+            return res.status(400).json({ success: false, message: 'Add at least one chapter before publishing.' });
+        }
+        const hasLecture = course.courseContent.some(ch => ch.chapterContent && ch.chapterContent.length > 0);
+        if (!hasLecture) {
+            return res.status(400).json({ success: false, message: 'Add at least one lecture before publishing.' });
+        }
+        course.status = 'published';
+        await course.save();
+        res.json({ success: true, message: 'Course published!', course });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
     }
 };
