@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import upload from '../configs/multer.js';
 import crypto from 'crypto';
-import { sendMail } from '../utils/mailer.js';
+import { sendMail } from '../utils/resendApi.js';
 import bcrypt from 'bcryptjs';
 
 // Assign admin role to the very first user

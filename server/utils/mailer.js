@@ -21,3 +21,6 @@ export const sendMail = async ({ to, subject, html, text }) => {
   };
   return transporter.sendMail(mailOptions);
 };
+
+// (This file is now obsolete and replaced by resendApi.js using Resend)
+// You can delete this file.

@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
-import { sendMail } from '../utils/mailersendApi.js';
+import { sendMail } from '../utils/resendApi.js';
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
