@@ -63,9 +63,38 @@ const Profile = () => {
     setSaving(true);
     setError('');
     setSuccess('');
-    // PATCH logic here (endpoint missing in backend, so just close edit mode for now)
-    setEdit(false);
-    setSaving(false);
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      if (form.photo && form.photo instanceof File) {
+        formData.append('photo', form.photo);
+      }
+      if (form.password) {
+        formData.append('password', form.password);
+      }
+      const res = await fetch(`${backendUrl}/api/user/update`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccess('Profile updated successfully!');
+        setEdit(false);
+        setForm({ ...form, password: '' });
+        fetchProfile(); // Refresh profile from server
+      } else {
+        setError(data.message || 'Failed to update profile');
+      }
+    } catch (err) {
+      setError('Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (error && !profile && userData) {
