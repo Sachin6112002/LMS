@@ -81,7 +81,8 @@ const AddCourse = () => {
             ...lectureDetails,
             lectureDuration: lectureVideoDuration,
             lectureId: uniqid(),
-            videoFile: lectureVideo,
+            lectureOrder: chapter.chapterContent.length + 1,
+            // Do NOT include videoFile here; handle uploads separately if needed
           };
           chapter.chapterContent.push(newLecture);
         }
