@@ -51,7 +51,12 @@ app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
-app.use('/api/educator', educatorRouter)
+app.use('/api/educator', (req, res, next) => {
+  if (req.url.startsWith('/add-course')) {
+    console.log('>>>> /api/educator/add-course route hit');
+  }
+  next();
+}, educatorRouter)
 app.use('/api/course', courseRouter)
 app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
@@ -65,4 +70,5 @@ const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log('>>>> LMS server startup log: This is the latest code running.');
 })
