@@ -304,20 +304,17 @@ const AddCourse = () => {
                 <span className="text-green-700">{chapter.chapterContent.length} Lectures</span>
                 <img onClick={() => handleChapter('remove', chapter._id || chapter.chapterId)} src={assets.cross_icon} alt="" className="cursor-pointer" />
               </div>
-              {/* Step 3: Lecture Management for this chapter */}
+              {/* No Add Lecture button here in Step 2 */}
               {!chapter.collapsed && (
                 <div className="p-4">
                   <h4 className="font-semibold mb-2 text-green-900">Lectures</h4>
-                  {chapter.chapterContent.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture below.</div>}
+                  {chapter.chapterContent.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture in Step 3.</div>}
                   {chapter.chapterContent.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
                       <span className="text-green-900">{lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.chapterContent.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
-                  <button className="inline-flex bg-green-100 p-2 rounded cursor-pointer mt-2 text-green-700 hover:bg-green-200" onClick={() => handleLecture('add', chapter._id || chapter.chapterId)}>
-                    + Add Lecture
-                  </button>
                 </div>
               )}
             </div>
