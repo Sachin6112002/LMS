@@ -1,24 +1,21 @@
-// utils/mailersendApi.js
-import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend';
+// utils/mailersendApi.js (now using Resend)
+import { Resend } from 'resend';
 
-const mailersend = new MailerSend({
-  apiKey: process.env.MAILERSEND_API_KEY,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendMail({ to, subject, text, html }) {
-  console.log('[MailerSend] sendMail called with:', { to, subject });
-  const emailParams = new EmailParams()
-    .setFrom(new Sender(process.env.MAILERSEND_FROM, 'eSiksha'))
-    .setTo([new Recipient(to, to)])
-    .setSubject(subject)
-    .setText(text)
-    .setHtml(html);
   try {
-    const response = await mailersend.email.send(emailParams);
-    console.log('[MailerSend] Email sent successfully:', response);
+    const response = await resend.emails.send({
+      from: process.env.RESEND_FROM, // e.g. 'YourApp <noreply@yourdomain.com>'
+      to,
+      subject,
+      text,
+      html,
+    });
+    console.log('[Resend] Email sent successfully:', response);
     return response;
   } catch (error) {
-    console.error('[MailerSend] Error sending email:', error);
+    console.error('[Resend] Error sending email:', error);
     throw error;
   }
 }
