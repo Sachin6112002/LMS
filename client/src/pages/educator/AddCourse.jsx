@@ -175,21 +175,18 @@ const AddCourse = () => {
         setIsSubmitting(false);
         return;
       }
-      const courseData = {
-        courseTitle,
-        courseDescription: quillRef.current.root.innerHTML,
-        coursePrice: Number(coursePrice),
-        discount: Number(discount),
-        courseContent: [],
-      }
-      const formData = new FormData()
-      formData.append('courseData', JSON.stringify(courseData))
-      formData.append('image', image)
-      const token = await getToken()
+      // Append all fields as top-level FormData fields
+      const formData = new FormData();
+      formData.append('courseTitle', courseTitle);
+      formData.append('courseDescription', quillRef.current.root.innerHTML);
+      formData.append('coursePrice', Number(coursePrice));
+      formData.append('discount', Number(discount));
+      formData.append('image', image);
+      const token = await getToken();
       setUploadToken(token);
       const { data } = await axios.post(backendUrl + '/api/educator/add-course', formData,
         { headers: { Authorization: `Bearer ${token}` } }
-      )
+      );
       if (data.success && data.course) {
         await fetchCourseById(data.course._id); // Always sync
         toast.success('Course created! Now upload lecture videos.');
@@ -198,7 +195,7 @@ const AddCourse = () => {
       }
       setIsSubmitting(false);
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
       setIsSubmitting(false);
     }
   };
