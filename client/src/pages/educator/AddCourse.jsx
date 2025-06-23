@@ -74,47 +74,56 @@ const AddCourse = () => {
 
   const addLecture = async () => {
     if (!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration) return;
-    let newLectureId = uniqid();
-    setChapters(
-      chapters.map((chapter) => {
-        if (chapter.chapterId === currentChapterId) {
-          const newLecture = {
-            ...lectureDetails,
-            lectureDuration: lectureVideoDuration,
-            lectureId: newLectureId,
-            lectureOrder: chapter.chapterContent.length + 1,
-          };
-          chapter.chapterContent.push(newLecture);
-        }
-        return chapter;
-      })
-    );
+    if (!createdCourse || !currentChapterId) {
+      toast.error('Course and chapter must be created before adding a lecture.');
+      return;
+    }
     setShowPopup(false);
     setLectureDetails({
       lectureTitle: '',
       lectureDuration: '',
       isPreviewFree: false,
     });
-    // Upload video immediately after adding lecture
+    setLectureVideo(null);
+    setLectureVideoDuration('');
+
     try {
       const token = await getToken();
       const formData = new FormData();
+      formData.append('lectureTitle', lectureDetails.lectureTitle);
+      formData.append('lectureDuration', lectureVideoDuration);
+      formData.append('isPreviewFree', lectureDetails.isPreviewFree);
       formData.append('video', lectureVideo);
+      formData.append('courseId', createdCourse._id);
       formData.append('chapterId', currentChapterId);
-      formData.append('lectureId', newLectureId);
-      // If courseId is available, you can add it as well
-      if (createdCourse && createdCourse._id) {
-        formData.append('courseId', createdCourse._id);
+      // Optionally: lectureOrder
+      const chapter = chapters.find(ch => ch.chapterId === currentChapterId);
+      if (chapter) {
+        formData.append('lectureOrder', chapter.chapterContent.length + 1);
       }
-      await axios.post(`${backendUrl}/api/educator/upload-video`, formData, {
+      const { data } = await axios.post(`${backendUrl}/api/educator/add-lecture`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success('Lecture video uploaded!');
+      if (data.success && data.lecture) {
+        // Update chapters state with new lecture from backend (with real lectureId)
+        setChapters(
+          chapters.map((chapter) => {
+            if (chapter.chapterId === currentChapterId) {
+              return {
+                ...chapter,
+                chapterContent: [...chapter.chapterContent, data.lecture],
+              };
+            }
+            return chapter;
+          })
+        );
+        toast.success('Lecture and video uploaded!');
+      } else {
+        toast.error(data.message || 'Failed to add lecture');
+      }
     } catch (err) {
-      toast.error('Failed to upload lecture video');
+      toast.error('Failed to upload lecture and video');
     }
-    setLectureVideo(null);
-    setLectureVideoDuration('');
   };
 
   const handleSubmit = async (e) => {
