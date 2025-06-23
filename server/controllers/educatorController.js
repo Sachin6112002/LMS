@@ -30,33 +30,24 @@ export const addCourse = async (req, res) => {
     }
     try {
         const { courseData } = req.body
-
         const imageFile = req.file
-
         const educatorId = req.auth.userId
-
+        // Debug log incoming fields and file
+        console.log('addCourse fields:', req.body);
+        console.log('addCourse file:', req.file);
         if (!imageFile) {
             return res.json({ success: false, message: 'Thumbnail Not Attached' })
         }
-
         const parsedCourseData = await JSON.parse(courseData)
-
         parsedCourseData.educator = educatorId
-
         const newCourse = await Course.create(parsedCourseData)
-
         const imageUpload = await cloudinary.uploader.upload(imageFile.path)
-
         newCourse.courseThumbnail = imageUpload.secure_url
-
         await newCourse.save()
-
         res.json({ success: true, message: 'Course Added', course: newCourse })
-
     } catch (error) {
-
+        console.log('addCourse error:', error);
         res.json({ success: false, message: error.message })
-
     }
 }
 
@@ -168,32 +159,32 @@ export const getEnrolledStudentsData = async (req, res) => {
     }
 };
 
-// Upload Lecture Video (Educator only)
-export const uploadLectureVideo = async (req, res) => {
-    try {
-        const { courseId, chapterId, lectureId } = req.body;
-        if (!req.file) return res.status(400).json({ message: 'No video file uploaded' });
-        const course = await Course.findById(courseId);
-        if (!course) return res.status(404).json({ message: 'Course not found' });
-        let updated = false;
-        for (const chapter of course.courseContent) {
-            if (chapter.chapterId === chapterId) {
-                for (const lecture of chapter.chapterContent) {
-                    if (lecture.lectureId === lectureId) {
-                        lecture.videoFile = req.file.filename;
-                        lecture.lectureUrl = req.file.filename; // <-- Fix: set lectureUrl to filename
-                        updated = true;
-                    }
-                }
-            }
-        }
-        if (!updated) return res.status(404).json({ message: 'Lecture not found' });
-        await course.save();
-        res.json({ success: true, filename: req.file.filename });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+// Remove legacy uploadLectureVideo controller
+// export const uploadLectureVideo = async (req, res) => {
+//     try {
+//         const { courseId, chapterId, lectureId } = req.body;
+//         if (!req.file) return res.status(400).json({ message: 'No video file uploaded' });
+//         const course = await Course.findById(courseId);
+//         if (!course) return res.status(404).json({ message: 'Course not found' });
+//         let updated = false;
+//         for (const chapter of course.courseContent) {
+//             if (chapter.chapterId === chapterId) {
+//                 for (const lecture of chapter.chapterContent) {
+//                     if (lecture.lectureId === lectureId) {
+//                         lecture.videoFile = req.file.filename;
+//                         lecture.lectureUrl = req.file.filename; // <-- Fix: set lectureUrl to filename
+//                         updated = true;
+//                     }
+//                 }
+//             }
+//         }
+//         if (!updated) return res.status(404).json({ message: 'Lecture not found' });
+//         await course.save();
+//         res.json({ success: true, filename: req.file.filename });
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
 
 // Add Chapter to Course
 export const addChapter = async (req, res) => {
@@ -223,6 +214,9 @@ export const addChapter = async (req, res) => {
 // Add Lecture to Chapter
 export const addLecture = async (req, res) => {
     try {
+        // Debug log incoming fields and file
+        console.log('addLecture fields:', req.body);
+        console.log('addLecture file:', req.file);
         const { courseId, chapterId, lectureTitle, lectureDuration, isPreviewFree, lectureOrder } = req.body;
         if (!courseId || !chapterId || !lectureTitle || !lectureDuration) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -249,6 +243,7 @@ export const addLecture = async (req, res) => {
         await course.save();
         res.json({ success: true, lecture: newLecture });
     } catch (err) {
+        console.log('addLecture error:', err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
