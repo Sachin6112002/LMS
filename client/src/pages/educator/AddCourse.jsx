@@ -274,6 +274,13 @@ const AddCourse = () => {
           {chapters.length === 0 && (
             <div className="text-yellow-700 mb-4">No chapters yet. Add your first chapter below.</div>
           )}
+          {/* Only show Add Chapter button if no chapters exist */}
+          {chapters.length === 0 && (
+            <button className="flex justify-center items-center bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg cursor-pointer w-full mb-4" onClick={() => handleChapter('add')}>
+              + Add Chapter
+            </button>
+          )}
+          {/* Show chapters and allow adding lectures only if at least one chapter exists */}
           {chapters.map((chapter) => (
             <div key={chapter._id || chapter.chapterId} className="bg-white border border-green-200 rounded-lg mb-4">
               <div className="flex justify-between items-center p-4 border-b border-green-200">
@@ -295,6 +302,7 @@ const AddCourse = () => {
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.chapterContent.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
+                  {/* Only show Add Lecture button if at least one chapter exists */}
                   <button className="inline-flex bg-green-100 p-2 rounded cursor-pointer mt-2 text-green-700 hover:bg-green-200" onClick={() => handleLecture('add', chapter._id || chapter.chapterId)}>
                     + Add Lecture
                   </button>
@@ -302,9 +310,6 @@ const AddCourse = () => {
               )}
             </div>
           ))}
-          <button className="flex justify-center items-center bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg cursor-pointer w-full mb-4" onClick={() => handleChapter('add')}>
-            + Add Chapter
-          </button>
         </div>
       )}
       {/* Step 3: Add Lecture Modal (only if chapters exist) */}
@@ -361,7 +366,13 @@ const AddCourse = () => {
           </div>
         </div>
       )}
-      {/* Step 4: Option to create another course */}
+      {/* Step 4: Publish Course (only if at least one chapter and one lecture exist) */}
+      {createdCourse && chapters.length > 0 && chapters.some(ch => ch.chapterContent.length > 0) && (
+        <div className="w-full max-w-2xl mt-8 flex justify-center">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded" onClick={() => toast.success('Publish logic to be implemented')}>Publish Course</button>
+        </div>
+      )}
+      {/* Step 5: Option to create another course */}
       {createdCourse && (
         <div className="w-full max-w-2xl mt-8 flex justify-center">
           <button className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded" onClick={() => window.location.reload()}>Create Another Course</button>
