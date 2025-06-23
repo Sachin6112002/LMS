@@ -6,7 +6,7 @@ const Profile = () => {
   const { userData, backendUrl } = useContext(AppContext);
   const [profile, setProfile] = useState(null);
   const [edit, setEdit] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', photo: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', photo: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -28,13 +28,13 @@ const Profile = () => {
       const data = await res.json();
       if (data.success) {
         setProfile(data.user);
-        setForm({ name: data.user.name, email: data.user.email, photo: data.user.photo || '', password: '' });
+        setForm({ name: data.user.name, email: data.user.email, photo: data.user.photo || '' });
       } else {
         setError(data.message || 'Failed to fetch profile');
         // Fallback to userData from context if available
         if (userData) {
           setProfile(userData);
-          setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '', password: '' });
+          setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '' });
         }
       }
     } catch {
@@ -42,7 +42,7 @@ const Profile = () => {
       // Fallback to userData from context if available
       if (userData) {
         setProfile(userData);
-        setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '', password: '' });
+        setForm({ name: userData.name, email: userData.email, photo: userData.imageUrl || '' });
       }
     } finally {
       setLoading(false);
@@ -71,9 +71,10 @@ const Profile = () => {
       if (form.photo && form.photo instanceof File) {
         formData.append('photo', form.photo);
       }
-      if (form.password) {
-        formData.append('password', form.password);
-      }
+      // Remove password from formData
+      // if (form.password) {
+      //   formData.append('password', form.password);
+      // }
       const res = await fetch(`${backendUrl}/api/user/update`, {
         method: 'PATCH',
         headers: {
@@ -85,7 +86,7 @@ const Profile = () => {
       if (data.success) {
         setSuccess('Profile updated successfully!');
         setEdit(false);
-        setForm({ ...form, password: '' });
+        setForm({ ...form });
         fetchProfile(); // Refresh profile from server
       } else {
         setError(data.message || 'Failed to update profile');
@@ -140,10 +141,7 @@ const Profile = () => {
             <label className="block mb-1 font-semibold">Email</label>
             <input name="email" value={form.email} onChange={handleChange} className="border rounded px-3 py-2 w-full" required type="email" />
           </div>
-          <div className="mb-4">
-            <label className="block mb-1 font-semibold">Password (leave blank to keep unchanged)</label>
-            <input name="password" value={form.password} onChange={handleChange} className="border rounded px-3 py-2 w-full" type="password" />
-          </div>
+          {/* Password field removed for security. Use Forgot Password instead. */}
           <div className="flex gap-2">
             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded" disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
             <button type="button" className="bg-gray-300 px-4 py-2 rounded" onClick={() => setEdit(false)}>Cancel</button>
