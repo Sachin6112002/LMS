@@ -5,7 +5,6 @@ import connectDB from './configs/mongodb.js'
 import connectCloudinary from './configs/cloudinary.js'
 import userRouter from './routes/userRoutes.js'
 import educatorRouter from './routes/educatorRoutes.js'
-import courseRouter from './routes/courseRoute.js'
 import adminRouter from './routes/adminRoutes.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -61,7 +60,6 @@ app.use('/api/educator', (req, res, next) => {
   }
   next();
 }, educatorRouter)
-app.use('/api/course', courseRouter)
 app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
