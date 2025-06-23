@@ -77,7 +77,18 @@ const AddCourse = () => {
 
   // Add a new lecture to the backend and update state with real lectureId
   const addLecture = async () => {
-    if (!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration) return;
+    if (!lectureDetails.lectureTitle) {
+      toast.error('Lecture title is required.');
+      return;
+    }
+    if (!lectureVideo) {
+      toast.error('Lecture video file is required.');
+      return;
+    }
+    if (!lectureVideoDuration) {
+      toast.error('Lecture video duration is required.');
+      return;
+    }
     if (!createdCourse || !currentChapterId) {
       toast.error('Course and chapter must be created before adding a lecture.');
       return;
@@ -113,7 +124,11 @@ const AddCourse = () => {
         toast.error(data.message || 'Failed to add lecture');
       }
     } catch (err) {
-      toast.error('Failed to upload lecture and video');
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error('Failed to upload lecture and video: ' + err.response.data.message);
+      } else {
+        toast.error('Failed to upload lecture and video');
+      }
     }
   };
 
