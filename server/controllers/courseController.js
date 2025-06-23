@@ -71,3 +71,13 @@ export const addLecture = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// Get all courses
+export const getAllCourses = async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.json({ success: true, courses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
