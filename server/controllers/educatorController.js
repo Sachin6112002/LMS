@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary'
 import Course from '../models/Course.js';
 import { Purchase } from '../models/Purchase.js';
 import User from '../models/User.js';
+import mongoose from 'mongoose';
 
 // update role to educator
 export const updateRoleToEducator = async (req, res) => {
@@ -191,5 +192,63 @@ export const uploadLectureVideo = async (req, res) => {
         res.json({ success: true, filename: req.file.filename });
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+};
+
+// Add Chapter to Course
+export const addChapter = async (req, res) => {
+    try {
+        const { courseId, chapterTitle, chapterOrder } = req.body;
+        if (!courseId || !chapterTitle) {
+            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        }
+        const course = await Course.findById(courseId);
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+
+        const chapterId = new mongoose.Types.ObjectId().toString();
+        const newChapter = {
+            chapterId,
+            chapterTitle,
+            chapterOrder,
+            chapterContent: []
+        };
+        course.courseContent.push(newChapter);
+        await course.save();
+        res.json({ success: true, chapter: newChapter });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// Add Lecture to Chapter
+export const addLecture = async (req, res) => {
+    try {
+        const { courseId, chapterId, lectureTitle, lectureDuration, isPreviewFree, lectureOrder } = req.body;
+        if (!courseId || !chapterId || !lectureTitle || !lectureDuration) {
+            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        }
+        if (!req.file) return res.status(400).json({ success: false, message: 'Missing required parameter - file' });
+
+        const course = await Course.findById(courseId);
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+
+        const chapter = course.courseContent.find(ch => ch.chapterId === chapterId);
+        if (!chapter) return res.status(404).json({ success: false, message: 'Chapter not found' });
+
+        const lectureId = new mongoose.Types.ObjectId().toString();
+        const newLecture = {
+            lectureId,
+            lectureTitle,
+            lectureDuration,
+            isPreviewFree,
+            lectureOrder,
+            videoFile: req.file.filename,
+            lectureUrl: req.file.filename
+        };
+        chapter.chapterContent.push(newLecture);
+        await course.save();
+        res.json({ success: true, lecture: newLecture });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 };
