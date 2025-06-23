@@ -42,10 +42,53 @@ const AddCourse = () => {
       });
       if (data.success && data.course) {
         setCreatedCourse(data.course);
-        setChapters(data.course.courseContent || []);
+        setChapters(data.course.chapters || []);
       }
     } catch (err) {
       toast.error('Failed to sync course data');
+    }
+  };
+
+  // Course creation (Step 1)
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      if (!image) {
+        toast.error('Thumbnail Not Selected');
+        setIsSubmitting(false);
+        return;
+      }
+      if (image && !image.type.startsWith('image/')) {
+        toast.error('Please select a valid image file for the thumbnail.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (image && image.size > 5 * 1024 * 1024) {
+        toast.error('Thumbnail image is too large (max 5MB).');
+        setIsSubmitting(false);
+        return;
+      }
+      const formData = new FormData();
+      formData.append('title', courseTitle);
+      formData.append('description', quillRef.current.root.innerHTML);
+      formData.append('thumbnail', image);
+      const token = await getToken();
+      const { data } = await axios.post(`${backendUrl}/api/courses`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (data.success && data.course) {
+        setCreatedCourse(data.course);
+        setChapters(data.course.chapters);
+        toast.success('Course created! Now add chapters.');
+      } else {
+        toast.error(data.message || 'Course creation failed');
+      }
+      setIsSubmitting(false);
+    } catch (error) {
+      toast.error(error.message);
+      setIsSubmitting(false);
     }
   };
 
@@ -57,15 +100,14 @@ const AddCourse = () => {
     }
     try {
       const token = await getToken();
-      const { data } = await axios.post(`${backendUrl}/api/educator/add-chapter`, {
-        courseId: createdCourse._id,
-        chapterTitle,
-        chapterOrder: chapters.length + 1,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (data.success && data.chapter) {
-        await fetchCourseById(createdCourse._id); // Always sync
+      const { data } = await axios.post(
+        `${backendUrl}/api/courses/${createdCourse._id}/chapters`,
+        { title: chapterTitle },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success && data.course) {
+        setCreatedCourse(data.course);
+        setChapters(data.course.chapters);
         toast.success('Chapter added!');
       } else {
         toast.error(data.message || 'Failed to add chapter');
@@ -89,7 +131,7 @@ const AddCourse = () => {
       toast.error('Lecture video duration is required.');
       return;
     }
-    if (!createdCourse || !currentChapterId) {
+    if (!createdCourse || currentChapterId === null) {
       toast.error('Course and chapter must be created before adding a lecture.');
       return;
     }
@@ -104,21 +146,18 @@ const AddCourse = () => {
     try {
       const token = await getToken();
       const formData = new FormData();
-      formData.append('lectureTitle', lectureDetails.lectureTitle);
-      formData.append('lectureDuration', lectureVideoDuration);
-      formData.append('isPreviewFree', lectureDetails.isPreviewFree);
-      formData.append('file', lectureVideo);
-      formData.append('courseId', createdCourse._id);
-      formData.append('chapterId', currentChapterId);
-      const chapter = chapters.find(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
-      if (chapter) {
-        formData.append('lectureOrder', chapter.chapterContent.length + 1);
-      }
-      const { data } = await axios.post(`${backendUrl}/api/educator/add-lecture`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (data.success && data.lecture) {
-        await fetchCourseById(createdCourse._id); // Always sync
+      formData.append('title', lectureDetails.lectureTitle);
+      formData.append('duration', lectureVideoDuration);
+      formData.append('video', lectureVideo);
+      const chapterIndex = chapters.findIndex(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
+      const { data } = await axios.post(
+        `${backendUrl}/api/courses/${createdCourse._id}/chapters/${chapterIndex}/lectures`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success && data.course) {
+        setCreatedCourse(data.course);
+        setChapters(data.course.chapters);
         toast.success('Lecture and video uploaded!');
       } else {
         toast.error(data.message || 'Failed to add lecture');
@@ -160,58 +199,12 @@ const AddCourse = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    try {
-      e.preventDefault();
-      if (isSubmitting) return;
-      setIsSubmitting(true);
-      if (!image) {
-        toast.error('Thumbnail Not Selected');
-        setIsSubmitting(false);
-        return;
-      }
-      // Debug: log FormData contents
-      if (image) {
-        console.log('Image file:', image);
-        if (!(image instanceof File)) {
-          toast.error('Selected thumbnail is not a valid file.');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-      // Optionally: check file type and size
-      if (image && !image.type.startsWith('image/')) {
-        toast.error('Please select a valid image file for the thumbnail.');
-        setIsSubmitting(false);
-        return;
-      }
-      if (image && image.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('Thumbnail image is too large (max 5MB).');
-        setIsSubmitting(false);
-        return;
-      }
-      // Append all fields as top-level FormData fields
-      const formData = new FormData();
-      formData.append('courseTitle', courseTitle);
-      formData.append('courseDescription', quillRef.current.root.innerHTML);
-      formData.append('coursePrice', Number(coursePrice));
-      formData.append('discount', Number(discount));
-      formData.append('image', image);
-      const token = await getToken();
-      setUploadToken(token);
-      const { data } = await axios.post(backendUrl + '/api/educator/add-course', formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (data.success && data.course) {
-        await fetchCourseById(data.course._id); // Always sync
-        toast.success('Course created! Now upload lecture videos.');
-      } else {
-        toast.error(data.message || 'Course creation failed');
-      }
-      setIsSubmitting(false);
-    } catch (error) {
-      toast.error(error.message);
-      setIsSubmitting(false);
+  // Move to next step only if requirements are met
+  const handleNext = () => {
+    if (step === 1 && createdCourse) {
+      setStep(2);
+    } else if (step === 2 && chapters.length > 0) {
+      setStep(3);
     }
   };
 
@@ -223,15 +216,6 @@ const AddCourse = () => {
       });
     }
   }, []);
-
-  // Move to next step only if requirements are met
-  const handleNext = () => {
-    if (step === 1 && createdCourse) {
-      setStep(2);
-    } else if (step === 2 && chapters.length > 0) {
-      setStep(3);
-    }
-  };
 
   return (
     <div className="h-screen overflow-scroll flex flex-col items-center md:p-8 p-4 bg-green-50">
@@ -299,20 +283,20 @@ const AddCourse = () => {
               <div className="flex justify-between items-center p-4 border-b border-green-200">
                 <div className="flex items-center">
                   <img className={`mr-2 cursor-pointer transition-all ${chapter.collapsed && "-rotate-90"}`} onClick={() => handleChapter('toggle', chapter._id || chapter.chapterId)} src={assets.dropdown_icon} width={14} alt="" />
-                  <span className="font-semibold text-green-900">{chapter.chapterTitle}</span>
+                  <span className="font-semibold text-green-900">{chapter.title}</span>
                 </div>
-                <span className="text-green-700">{chapter.chapterContent.length} Lectures</span>
+                <span className="text-green-700">{chapter.lectures.length} Lectures</span>
                 <img onClick={() => handleChapter('remove', chapter._id || chapter.chapterId)} src={assets.cross_icon} alt="" className="cursor-pointer" />
               </div>
               {/* No Add Lecture button here in Step 2 */}
               {!chapter.collapsed && (
                 <div className="p-4">
                   <h4 className="font-semibold mb-2 text-green-900">Lectures</h4>
-                  {chapter.chapterContent.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture in Step 3.</div>}
-                  {chapter.chapterContent.map((lecture) => (
+                  {chapter.lectures.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture in Step 3.</div>}
+                  {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
-                      <span className="text-green-900">{lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
-                      <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.chapterContent.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
+                      <span className="text-green-900">{lecture.title} - {lecture.duration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                      <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
                 </div>
@@ -333,19 +317,19 @@ const AddCourse = () => {
               <div className="flex justify-between items-center p-4 border-b border-green-200">
                 <div className="flex items-center">
                   <img className={`mr-2 cursor-pointer transition-all ${chapter.collapsed && "-rotate-90"}`} onClick={() => handleChapter('toggle', chapter._id || chapter.chapterId)} src={assets.dropdown_icon} width={14} alt="" />
-                  <span className="font-semibold text-green-900">{chapter.chapterTitle}</span>
+                  <span className="font-semibold text-green-900">{chapter.title}</span>
                 </div>
-                <span className="text-green-700">{chapter.chapterContent.length} Lectures</span>
+                <span className="text-green-700">{chapter.lectures.length} Lectures</span>
                 <img onClick={() => handleChapter('remove', chapter._id || chapter.chapterId)} src={assets.cross_icon} alt="" className="cursor-pointer" />
               </div>
               {/* Lectures for this chapter */}
               {!chapter.collapsed && (
                 <div className="p-4">
-                  {chapter.chapterContent.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture below.</div>}
-                  {chapter.chapterContent.map((lecture) => (
+                  {chapter.lectures.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture below.</div>}
+                  {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
-                      <span className="text-green-900">{lecture.lectureTitle} - {lecture.lectureDuration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
-                      <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.chapterContent.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
+                      <span className="text-green-900">{lecture.title} - {lecture.duration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                      <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
                   <button className="inline-flex bg-green-100 p-2 rounded cursor-pointer mt-2 text-green-700 hover:bg-green-200" onClick={() => handleLecture('add', chapter._id || chapter.chapterId)}>
@@ -410,7 +394,7 @@ const AddCourse = () => {
             </div>
           )}
           {/* Publish button only if at least one lecture exists */}
-          {chapters.some(ch => ch.chapterContent.length > 0) && createdCourse.status !== 'published' && (
+          {chapters.some(ch => ch.lectures.length > 0) && createdCourse.status !== 'published' && (
             <div className="w-full max-w-2xl mt-8 flex justify-center">
               <button
                 className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded"
