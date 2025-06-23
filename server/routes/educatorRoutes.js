@@ -60,5 +60,11 @@ educatorRouter.post('/publish-course', jwtMiddleware, protectEducator, async (re
   return publishCourse(req, res);
 });
 
+// Get single course by ID (for always up-to-date frontend sync)
+educatorRouter.get('/course', jwtMiddleware, protectEducator, async (req, res) => {
+  const { getCourseById } = await import('../controllers/educatorController.js');
+  return getCourseById(req, res);
+});
+
 
 export default educatorRouter;

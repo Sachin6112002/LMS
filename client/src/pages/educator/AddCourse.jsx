@@ -32,6 +32,23 @@ const AddCourse = () => {
   const [uploadToken, setUploadToken] = useState(''); // For video upload auth
   const [step, setStep] = useState(1); // 1: Course, 2: Chapters, 3: Lectures
 
+  // Always fetch latest course from backend after any change
+  const fetchCourseById = async (courseId) => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.get(`${backendUrl}/api/educator/course`, {
+        params: { courseId },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (data.success && data.course) {
+        setCreatedCourse(data.course);
+        setChapters(data.course.courseContent || []);
+      }
+    } catch (err) {
+      toast.error('Failed to sync course data');
+    }
+  };
+
   // Add a new chapter to the backend and update state with real chapterId
   const addChapter = async (chapterTitle) => {
     if (!createdCourse || !createdCourse._id) {
@@ -48,7 +65,7 @@ const AddCourse = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (data.success && data.chapter) {
-        setChapters([...chapters, { ...data.chapter, chapterContent: [] }]);
+        await fetchCourseById(createdCourse._id); // Always sync
         toast.success('Chapter added!');
       } else {
         toast.error(data.message || 'Failed to add chapter');
@@ -79,10 +96,9 @@ const AddCourse = () => {
       formData.append('lectureTitle', lectureDetails.lectureTitle);
       formData.append('lectureDuration', lectureVideoDuration);
       formData.append('isPreviewFree', lectureDetails.isPreviewFree);
-      formData.append('file', lectureVideo); // CHANGED from 'video' to 'file'
+      formData.append('file', lectureVideo);
       formData.append('courseId', createdCourse._id);
       formData.append('chapterId', currentChapterId);
-      // Optionally: lectureOrder
       const chapter = chapters.find(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
       if (chapter) {
         formData.append('lectureOrder', chapter.chapterContent.length + 1);
@@ -91,17 +107,7 @@ const AddCourse = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (data.success && data.lecture) {
-        setChapters(
-          chapters.map((chapter) => {
-            if ((chapter._id || chapter.chapterId) === currentChapterId) {
-              return {
-                ...chapter,
-                chapterContent: [...chapter.chapterContent, data.lecture],
-              };
-            }
-            return chapter;
-          })
-        );
+        await fetchCourseById(createdCourse._id); // Always sync
         toast.success('Lecture and video uploaded!');
       } else {
         toast.error(data.message || 'Failed to add lecture');
@@ -118,7 +124,8 @@ const AddCourse = () => {
         addChapter(title);
       }
     } else if (action === 'remove') {
-      setChapters(chapters.filter((chapter) => (chapter._id || chapter.chapterId) !== chapterId));
+      // Remove chapter logic (should call backend if implemented)
+      toast.error('Chapter removal not implemented.');
     } else if (action === 'toggle') {
       setChapters(
         chapters.map((chapter) =>
@@ -133,14 +140,8 @@ const AddCourse = () => {
       setCurrentChapterId(chapterId);
       setShowPopup(true);
     } else if (action === 'remove') {
-      setChapters(
-        chapters.map((chapter) => {
-          if (chapter.chapterId === chapterId) {
-            chapter.chapterContent.splice(lectureIndex, 1);
-          }
-          return chapter;
-        })
-      );
+      // Remove lecture logic (should call backend if implemented)
+      toast.error('Lecture removal not implemented.');
     }
   };
 
@@ -154,38 +155,24 @@ const AddCourse = () => {
         setIsSubmitting(false);
         return;
       }
-      // Validation: Ensure all lectures have a duration
-      const allLecturesHaveDuration = chapters.every(chapter =>
-        chapter.chapterContent.every(lecture => !!lecture.lectureDuration)
-      );
-      if (!allLecturesHaveDuration) {
-        toast.error('Please upload all videos and wait for durations to be set before submitting the course.');
-        setIsSubmitting(false);
-        return;
-      }
-
       const courseData = {
         courseTitle,
         courseDescription: quillRef.current.root.innerHTML,
         coursePrice: Number(coursePrice),
         discount: Number(discount),
-        courseContent: chapters,
+        courseContent: [],
       }
-
       const formData = new FormData()
       formData.append('courseData', JSON.stringify(courseData))
       formData.append('image', image)
-
       const token = await getToken()
-      setUploadToken(token); // Save for video upload
-
+      setUploadToken(token);
       const { data } = await axios.post(backendUrl + '/api/educator/add-course', formData,
         { headers: { Authorization: `Bearer ${token}` } }
       )
-
       if (data.success && data.course) {
+        await fetchCourseById(data.course._id); // Always sync
         toast.success('Course created! Now upload lecture videos.');
-        setCreatedCourse(data.course); // Save the real course object
       } else {
         toast.error(data.message || 'Course creation failed');
       }
@@ -193,24 +180,6 @@ const AddCourse = () => {
     } catch (error) {
       toast.error(error.message)
       setIsSubmitting(false);
-    }
-
-  };
-
-  // Fetch latest course data after video upload
-  const fetchLatestCourse = async () => {
-    try {
-      const token = await getToken();
-      const { data } = await axios.get(`${backendUrl}/api/educator/courses`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (data.success && data.courses) {
-        // Find the current course by ID
-        const updated = data.courses.find(c => c._id === createdCourse._id);
-        if (updated) setCreatedCourse(updated);
-      }
-    } catch (err) {
-      toast.error('Failed to refresh course data after upload');
     }
   };
 

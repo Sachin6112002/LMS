@@ -277,3 +277,16 @@ export const publishCourse = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+
+// Fetch a single course by ID (for always up-to-date frontend sync)
+export const getCourseById = async (req, res) => {
+    try {
+        const { courseId } = req.query;
+        if (!courseId) return res.status(400).json({ success: false, message: 'Missing courseId' });
+        const course = await Course.findById(courseId);
+        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+        res.json({ success: true, course });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
