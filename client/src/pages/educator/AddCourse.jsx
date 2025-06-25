@@ -82,6 +82,7 @@ const AddCourse = () => {
         setCreatedCourse(data.course);
         setChapters(data.course.chapters);
         toast.success('Course created! Now add chapters.');
+        setStep(2); // Auto-advance to Step 2 after course creation
       } else {
         toast.error(data.message || 'Course creation failed');
       }
