@@ -19,10 +19,9 @@ export const AppContextProvider = (props) => {
     })
     const [showLogin, setShowLogin] = useState(false)
     const [isEducator, setIsEducator] = useState(false)
-    const [allCourses, setAllCourses] = useState([])
+    const [courses, setCourses] = useState([])
     const [enrolledCourses, setEnrolledCourses] = useState([])
     const [users, setUsers] = useState([])
-    const [courses, setCourses] = useState([])
 
     // Auth helpers
     const getToken = () => jwt
@@ -73,21 +72,31 @@ export const AppContextProvider = (props) => {
         }
     }
 
-    // Fetch All Courses
-    const fetchAllCourses = async () => {
+    // Unified Fetch Courses
+    const fetchCourses = async (admin = false) => {
         try {
             const token = getToken();
+            const url = admin ? `${backendUrl}/api/admin/courses` : `${backendUrl}/api/courses`;
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
-            const { data } = await axios.get(backendUrl + '/api/courses', { headers });
-            if (data.success) {
-                setAllCourses(data.courses)
+            const { data } = await axios.get(url, { headers });
+            // Admin endpoint returns array, user endpoint returns { success, courses }
+            if (admin) {
+                if (Array.isArray(data)) {
+                    setCourses(data);
+                } else {
+                    toast.error('Failed to fetch courses.');
+                }
             } else {
-                toast.error(data.message)
+                if (data.success) {
+                    setCourses(data.courses);
+                } else {
+                    toast.error(data.message);
+                }
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.response?.data?.message || 'Failed to fetch courses.');
         }
-    }
+    }    
 
     // Fetch UserData (from backend, using JWT)
     const fetchUserData = async () => {
@@ -140,23 +149,6 @@ export const AppContextProvider = (props) => {
         }
     };
 
-    // Admin: Fetch Courses
-    const fetchCourses = async () => {
-        try {
-            const token = await getToken();
-            const { data } = await axios.get(`${backendUrl}/api/admin/courses`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (Array.isArray(data)) {
-                setCourses(data);
-            } else {
-                toast.error('Failed to fetch courses.');
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to fetch courses.');
-        }
-    };
-
     // Admin: Manage Courses
     const manageCourses = async (action, courseId, courseData) => {
         try {
@@ -183,7 +175,7 @@ export const AppContextProvider = (props) => {
 
             if (response.data.success) {
                 toast.success(response.data.message);
-                fetchAllCourses(); // Refresh courses after action
+                fetchCourses(true); // Refresh courses after action
             } else {
                 toast.error(response.data.message);
             }
@@ -208,6 +200,27 @@ export const AppContextProvider = (props) => {
             toast.error(error.response?.data?.message || 'Failed to update settings.');
         }
     };
+
+    // Add Chapter to Course
+    const addChapterToCourse = async (courseId, chapterData) => {
+        try {
+            const token = getToken();
+            if (!token) throw new Error('Not authenticated');
+            const { data } = await axios.post(
+                `${backendUrl}/api/courses/${courseId}/chapters`,
+                chapterData,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (data.success) {
+                toast.success('Chapter added successfully!');
+                fetchAllCourses(); // Optionally refresh courses
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        }
+    }
 
     // Function to Calculate Course Chapter Time
     const calculateChapterTime = (chapter) => {
@@ -264,7 +277,7 @@ export const AppContextProvider = (props) => {
     };
 
     useEffect(() => {
-        fetchAllCourses()
+        fetchCourses()
     }, [])
 
     useEffect(() => {
@@ -321,19 +334,21 @@ export const AppContextProvider = (props) => {
         showLogin, setShowLogin,
         backendUrl, currency, navigate,
         userData, setUserData, getToken,
-        allCourses, fetchAllCourses,
+        courses,
+        fetchCourses,
         enrolledCourses, fetchUserEnrolledCourses,
         isEducator, setIsEducator,
-        users, courses,
+        users,
         // Auth
         login, register, logout,
         // Function to Calculate Course Chapter Time
         calculateChapterTime, calculateCourseDuration,
         calculateRating, calculateNoOfLectures,
         // Admin
-        fetchAllUsers, fetchCourses, manageCourses, updateAdminSettings,
+        fetchAllUsers, manageCourses, updateAdminSettings,
         // Helper to reload userData (e.g., after registration or login)
-        reloadUserData
+        reloadUserData,
+        addChapterToCourse
     }
 
     return (
