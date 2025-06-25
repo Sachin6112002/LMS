@@ -36,4 +36,7 @@ export const authenticate = async (req, res, next) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-};
+}
+
+// Alias for backward compatibility
+export const authMiddleware = authenticate;
