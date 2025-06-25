@@ -263,12 +263,6 @@ const AddCourse = () => {
           </button>
         </form>
       )}
-      {step === 1 && createdCourse && (
-        <div className="w-full max-w-2xl flex flex-col items-center">
-          <div className="text-green-800 mb-4">Course saved! Click Next to add chapters.</div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-8 rounded" onClick={handleNext}>Next</button>
-        </div>
-      )}
       {/* Step 2: Chapter Management */}
       {step === 2 && createdCourse && (
         <div className="w-full max-w-2xl">
