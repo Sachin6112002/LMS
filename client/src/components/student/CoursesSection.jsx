@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const CoursesSection = () => {
 
-  const { allCourses } = useContext(AppContext)
+  const { courses } = useContext(AppContext)
 
   return (
     <div className="py-16 md:px-40 px-8 bg-green-50">
@@ -14,7 +14,7 @@ const CoursesSection = () => {
         Discover our top-rated courses across various categories. From coding and design to business and wellness, our courses are crafted to deliver results.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 md:px-0 md:my-16 my-10 gap-4">
-        {allCourses.slice(0, 4).map((course, index) => <CourseCard key={index} course={course} />)}
+        {(Array.isArray(courses) ? courses.slice(0, 4) : []).map((course, index) => <CourseCard key={index} course={course} />)}
       </div>
       <Link to={'/course-list'} onClick={() => scrollTo(0, 0)} className="text-green-600 border border-green-200 px-10 py-3 rounded">Show all courses</Link>
     </div>

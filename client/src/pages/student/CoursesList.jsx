@@ -10,16 +10,13 @@ const CoursesList = () => {
 
     const { input } = useParams()
 
-    const { allCourses, navigate } = useContext(AppContext)
+    const { courses, navigate } = useContext(AppContext)
 
     const [filteredCourse, setFilteredCourse] = useState([])
 
     useEffect(() => {
-
-        if (allCourses && allCourses.length > 0) {
-
-            const tempCourses = allCourses.slice()
-
+        if (Array.isArray(courses) && courses.length > 0) {
+            const tempCourses = courses.slice()
             input
                 ? setFilteredCourse(
                     tempCourses.filter(
@@ -27,10 +24,10 @@ const CoursesList = () => {
                     )
                 )
                 : setFilteredCourse(tempCourses)
-
+        } else {
+            setFilteredCourse([])
         }
-
-    }, [allCourses, input])
+    }, [courses, input])
 
     return (
         <>
