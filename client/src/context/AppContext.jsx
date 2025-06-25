@@ -76,7 +76,9 @@ export const AppContextProvider = (props) => {
     // Fetch All Courses
     const fetchAllCourses = async () => {
         try {
-            const { data } = await axios.get(backendUrl + '/api/courses');
+            const token = getToken();
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+            const { data } = await axios.get(backendUrl + '/api/courses', { headers });
             if (data.success) {
                 setAllCourses(data.courses)
             } else {
