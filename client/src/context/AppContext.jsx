@@ -317,19 +317,6 @@ export const AppContextProvider = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    // TEMP: Force userData for debug
-    useEffect(() => {
-        if (!userData) {
-            setUserData({
-                id: "testid",
-                email: "test@example.com",
-                name: "Test User",
-                role: "student",
-                imageUrl: ""
-            });
-        }
-    }, []);
-
     const value = {
         showLogin, setShowLogin,
         backendUrl, currency, navigate,
