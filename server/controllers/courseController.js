@@ -6,7 +6,13 @@ export const createCourse = async (req, res) => {
   try {
     const { title, description } = req.body;
     const createdBy = req.auth.userId;
-    if (!req.file) return res.status(400).json({ success: false, message: 'Thumbnail is required' });
+    // Defensive: check for required fields
+    if (!title || !description) {
+      return res.status(400).json({ success: false, message: 'Title and description are required' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Thumbnail is required' });
+    }
     // Upload thumbnail to Cloudinary /thumbnails/
     const uploadRes = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream({ folder: 'thumbnails' }, (err, result) => {
@@ -24,6 +30,7 @@ export const createCourse = async (req, res) => {
     });
     res.json({ success: true, course });
   } catch (err) {
+    console.error('Create course error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
