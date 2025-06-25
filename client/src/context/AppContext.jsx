@@ -213,7 +213,7 @@ export const AppContextProvider = (props) => {
             );
             if (data.success) {
                 toast.success('Chapter added successfully!');
-                fetchAllCourses(); // Optionally refresh courses
+                fetchCourses(); // Optionally refresh courses
             } else {
                 toast.error(data.message);
             }
