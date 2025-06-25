@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import testimonialRoutes from './routes/testimonialRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
+import courseRouter from './routes/courseRoute.js';
 
 // Initialize Express
 const app = express()
@@ -64,6 +65,7 @@ app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
 app.use('/api/courses', courseRoutes)
+app.use('/api/course', courseRouter)
 
 // Handle favicon.ico requests gracefully to avoid 500 errors
 app.get('/favicon.ico', (req, res) => res.status(204).end());

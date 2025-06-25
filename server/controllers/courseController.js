@@ -81,3 +81,15 @@ export const getAllCourses = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// Get Course Data By Id
+export const getCourseId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const courseData = await Course.findById(id);
+    if (!courseData) return res.status(404).json({ success: false, message: 'Course not found' });
+    res.json({ success: true, courseData });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
