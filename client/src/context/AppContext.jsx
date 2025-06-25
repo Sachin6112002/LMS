@@ -287,6 +287,29 @@ export const AppContextProvider = (props) => {
         }
     }, [jwt])
 
+    // Sync isEducator with userData to avoid stale state
+    useEffect(() => {
+        if (userData && userData.role === 'educator') {
+            setIsEducator(true);
+        } else {
+            setIsEducator(false);
+        }
+    }, [userData]);
+
+    // Defensive: If JWT is removed or invalid, clear all sensitive state and redirect to login
+    useEffect(() => {
+        if (!jwt) {
+            setUserData(null);
+            setIsEducator(false);
+            localStorage.removeItem('userData');
+            localStorage.removeItem('jwtToken');
+            if (window.location.pathname !== '/login') {
+                navigate('/login');
+            }
+        }
+        // eslint-disable-next-line
+    }, [jwt]);
+
     // On mount, validate JWT and clear userData if invalid
     useEffect(() => {
         const checkAuth = async () => {
