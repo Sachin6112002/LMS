@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import 'dotenv/config'
 import connectDB from './configs/mongodb.js'
-import connectCloudinary from './configs/cloudinary.js'
+import cloudinary from './configs/cloudinary.js' // updated import, no function call
 import userRouter from './routes/userRoutes.js'
 import educatorRouter from './routes/educatorRoutes.js'
 import adminRouter from './routes/adminRoutes.js'
@@ -18,7 +18,7 @@ const app = express()
 
 // Connect to database
 await connectDB()
-await connectCloudinary()
+// cloudinary config is imported and runs on import, no need to call a function
 
 // Middlewares
 app.use(cors({
