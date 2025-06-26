@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, Suspense } from 'react';
 import Footer from '../../components/student/Footer';
 import { assets } from '../../assets/assets';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -179,25 +179,27 @@ const CourseDetails = () => {
               : <img src={courseData.thumbnail} alt="" />
           }
           {/* Watch Button */}
-          <button
-            className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
-            disabled={
-              !isAlreadyEnrolled ||
-              safeChapters.length === 0 ||
-              safeChapters[0].lectures.length === 0
-            }
-            onClick={() => {
-              if (
-                isAlreadyEnrolled &&
-                safeChapters.length > 0 &&
-                safeChapters[0].lectures.length > 0
-              ) {
-                navigate('/player/' + courseData._id);
+          <Suspense fallback={<Loading />}>
+            <button
+              className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
+              disabled={
+                !isAlreadyEnrolled ||
+                safeChapters.length === 0 ||
+                safeChapters[0].lectures.length === 0
               }
-            }}
-          >
-            Watch
-          </button>
+              onClick={() => {
+                if (
+                  isAlreadyEnrolled &&
+                  safeChapters.length > 0 &&
+                  safeChapters[0].lectures.length > 0
+                ) {
+                  navigate('/player/' + courseData._id);
+                }
+              }}
+            >
+              Watch
+            </button>
+          </Suspense>
           <div className="p-5">
             {/* Price/discount/rating removed as not in new model */}
             <div className="flex items-center text-sm md:text-default gap-4 pt-2 md:pt-4 text-green-700">
