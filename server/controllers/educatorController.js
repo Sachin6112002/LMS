@@ -17,7 +17,8 @@ export const updateRoleToEducator = async (req, res) => {
         }
         user.publicMetadata.role = 'educator';
         await user.save();
-        res.json({ success: true, message: 'You can publish a course now' });
+        console.log('updateRoleToEducator: user after update', user);
+        res.json({ success: true, message: 'You can publish a course now', user });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
@@ -39,11 +40,10 @@ export const addCourse = async (req, res) => {
         }
         // Read course fields directly from req.body
         const courseData = {
-            courseTitle: req.body.courseTitle,
-            courseDescription: req.body.courseDescription,
-            coursePrice: req.body.coursePrice,
-            discount: req.body.discount,
-            educator: educatorId,
+            title: req.body.courseTitle,
+            description: req.body.courseDescription,
+            // If your model expects 'thumbnail', set it after upload
+            createdBy: educatorId,
             status: 'draft'
         };
         const newCourse = await Course.create(courseData);
@@ -53,7 +53,7 @@ export const addCourse = async (req, res) => {
                 console.log('Cloudinary upload error:', error);
                 return res.json({ success: false, message: 'Image upload failed' });
             }
-            newCourse.courseThumbnail = result.secure_url;
+            newCourse.thumbnail = result.secure_url;
             await newCourse.save();
             res.json({ success: true, message: 'Course Added', course: newCourse });
         });
@@ -70,15 +70,11 @@ export const getEducatorCourses = async (req, res) => {
         return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
     }
     try {
-
-        const educator = req.auth.userId
-
-        const courses = await Course.find({ educator })
-
-        res.json({ success: true, courses })
-
+        const educator = req.auth.userId;
+        const courses = await Course.find({ createdBy: educator });
+        res.json({ success: true, courses });
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -89,8 +85,7 @@ export const educatorDashboardData = async (req, res) => {
     }
     try {
         const educator = req.auth.userId;
-
-        const courses = await Course.find({ educator });
+        const courses = await Course.find({ createdBy: educator });
 
         const totalCourses = courses.length;
 
@@ -139,9 +134,8 @@ export const getEnrolledStudentsData = async (req, res) => {
     }
     try {
         const educator = req.auth.userId;
-
         // Fetch all courses created by the educator
-        const courses = await Course.find({ educator });
+        const courses = await Course.find({ createdBy: educator });
 
         // Get the list of course IDs
         const courseIds = courses.map(course => course._id);
@@ -271,15 +265,15 @@ export const publishCourse = async (req, res) => {
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
         // Debug log for educator and userId
-        console.log('publishCourse: req.auth.userId', req.auth.userId, 'course.educator', course.educator);
-        if (course.educator.toString() !== req.auth.userId.toString()) {
+        console.log('publishCourse: req.auth.userId', req.auth.userId, 'course.createdBy', course.createdBy);
+        if (course.createdBy.toString() !== req.auth.userId.toString()) {
             return res.status(403).json({ success: false, message: 'Not your course' });
         }
         // Must have at least one chapter and one lecture
-        if (!course.courseContent || course.courseContent.length === 0) {
+        if (!course.chapters || course.chapters.length === 0) {
             return res.status(400).json({ success: false, message: 'Add at least one chapter before publishing.' });
         }
-        const hasLecture = course.courseContent.some(ch => ch.chapterContent && ch.chapterContent.length > 0);
+        const hasLecture = course.chapters.some(ch => ch.lectures && ch.lectures.length > 0);
         if (!hasLecture) {
             return res.status(400).json({ success: false, message: 'Add at least one lecture before publishing.' });
         }
