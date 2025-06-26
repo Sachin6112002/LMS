@@ -8,8 +8,8 @@ import VideoUploadComponent from '../../components/educator/VideoUploadComponent
 import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
 
 // Set your actual Cloudinary values here
-const CLOUDINARY_CLOUD_NAME = 'denhmcs4e'; // <-- your actual cloud name
-const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset'; // <-- set this to your unsigned upload preset name
+const CLOUDINARY_CLOUD_NAME = 'denhmcs4e'; // your actual cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // use your unsigned upload preset
 
 const AddCourse = () => {
 
