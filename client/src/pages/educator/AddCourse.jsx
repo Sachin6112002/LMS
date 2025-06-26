@@ -5,6 +5,11 @@ import Quill from 'quill';
 import axios from 'axios'
 import { AppContext } from '../../context/AppContext';
 import VideoUploadComponent from '../../components/educator/VideoUploadComponent';
+import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
+
+// Set your actual Cloudinary values here
+const CLOUDINARY_CLOUD_NAME = 'denhmcs4e'; // <-- your actual cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset'; // <-- set this to your unsigned upload preset name
 
 const AddCourse = () => {
 
@@ -70,12 +75,15 @@ const AddCourse = () => {
         setIsSubmitting(false);
         return;
       }
-      const formData = new FormData();
-      formData.append('title', courseTitle);
-      formData.append('description', quillRef.current.root.innerHTML);
-      formData.append('thumbnail', image);
+      // Upload thumbnail to Cloudinary
+      const thumbRes = await uploadToCloudinary(image, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
+      const thumbnailUrl = thumbRes.secure_url;
       const token = await getToken();
-      const { data } = await axios.post(`${backendUrl}/api/courses`, formData, {
+      const { data } = await axios.post(`${backendUrl}/api/courses`, {
+        title: courseTitle,
+        description: quillRef.current.root.innerHTML,
+        thumbnail: thumbnailUrl
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (data.success && data.course) {
@@ -145,15 +153,18 @@ const AddCourse = () => {
     setLectureVideo(null);
     setLectureVideoDuration('');
     try {
+      // Upload video to Cloudinary
+      const videoRes = await uploadToCloudinary(lectureVideo, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
+      const videoUrl = videoRes.secure_url;
       const token = await getToken();
-      const formData = new FormData();
-      formData.append('title', lectureDetails.lectureTitle);
-      formData.append('duration', lectureVideoDuration);
-      formData.append('video', lectureVideo);
       const chapterIndex = chapters.findIndex(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
       const { data } = await axios.post(
         `${backendUrl}/api/courses/${createdCourse._id}/chapters/${chapterIndex}/lectures`,
-        formData,
+        {
+          title: lectureDetails.lectureTitle,
+          duration: lectureVideoDuration,
+          videoUrl: videoUrl
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success && data.course) {

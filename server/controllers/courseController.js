@@ -1,36 +1,22 @@
 import Course from '../models/Course.js';
-import cloudinary from '../configs/cloudinary.js';
 
-// Create a course with metadata and thumbnail
+// Create a course with metadata and thumbnail (thumbnail is now a URL)
 export const createCourse = async (req, res) => {
   try {
-    const { title, description } = req.body;
-    const createdBy = req.auth.userId;
+    const { title, description, thumbnail } = req.body;
     // Defensive: check for required fields
-    if (!title || !description) {
-      return res.status(400).json({ success: false, message: 'Title and description are required' });
+    if (!title || !description || !thumbnail) {
+      return res.status(400).json({ success: false, message: 'Title, description, and thumbnail are required' });
     }
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Thumbnail is required' });
-    }
-    // Upload thumbnail to Cloudinary /thumbnails/
-    const uploadRes = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream({ folder: 'thumbnails' }, (err, result) => {
-        if (err) reject(err);
-        else resolve(result);
-      });
-      stream.end(req.file.buffer);
-    });
     const course = await Course.create({
       title,
       description,
-      thumbnail: uploadRes.secure_url,
-      createdBy,
+      thumbnail,
+      createdBy: req.auth.userId,
       chapters: []
     });
     res.json({ success: true, course });
   } catch (err) {
-    console.error('Create course error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -50,26 +36,18 @@ export const addChapter = async (req, res) => {
   }
 };
 
-// Add lecture to a chapter
+// Add lecture to a chapter (videoUrl is now a URL)
 export const addLecture = async (req, res) => {
   try {
     const { id, chapterIndex } = req.params;
-    const { title, duration } = req.body;
-    if (!req.file) return res.status(400).json({ success: false, message: 'Video file is required' });
-    // Upload video to Cloudinary /lectures/
-    const uploadRes = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream({ folder: 'lectures', resource_type: 'video' }, (err, result) => {
-        if (err) reject(err);
-        else resolve(result);
-      });
-      stream.end(req.file.buffer);
-    });
+    const { title, duration, videoUrl } = req.body;
+    if (!videoUrl) return res.status(400).json({ success: false, message: 'Video URL is required' });
     const course = await Course.findById(id);
     if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
     if (!course.chapters[chapterIndex]) return res.status(404).json({ success: false, message: 'Chapter not found' });
     course.chapters[chapterIndex].lectures.push({
       title,
-      videoUrl: uploadRes.secure_url,
+      videoUrl,
       duration
     });
     await course.save();
