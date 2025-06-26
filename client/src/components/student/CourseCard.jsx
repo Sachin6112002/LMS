@@ -12,9 +12,9 @@ const CourseCard = ({ course }) => {
       to={'/course/' + course._id}
       className="border border-green-200 pb-6 overflow-hidden rounded-lg bg-white"
     >
-      <img className="w-full" src={course.courseThumbnail} alt="" />
+      <img className="w-full" src={course.thumbnail} alt="" />
       <div className="p-3 text-left">
-        <h3 className="text-base font-semibold text-green-900">{course.courseTitle}</h3>
+        <h3 className="text-base font-semibold text-green-900">{course.title}</h3>
         <p className="text-green-700">{course.educator?.name || 'Unknown Educator'}</p>
         <div className="flex items-center space-x-2">
           <p className="text-green-600">{calculateRating(course)}</p>
@@ -28,7 +28,7 @@ const CourseCard = ({ course }) => {
               />
             ))}
           </div>
-          <p className="text-green-700">({course.courseRatings.length})</p>
+          <p className="text-green-700">{(course.courseRatings?.length || 0)}</p>
         </div>
         <p className="text-base font-semibold text-green-800">
           {currency}
