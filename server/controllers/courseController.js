@@ -60,7 +60,8 @@ export const addLecture = async (req, res) => {
 // Get all courses
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find();
+    // Populate createdBy with educator's name
+    const courses = await Course.find().populate('createdBy', 'name');
     res.json({ success: true, courses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

@@ -11,7 +11,7 @@ const CourseCard = ({ course }) => {
       <img className="w-full" src={course.thumbnail} alt={course.title || 'Course Thumbnail'} />
       <div className="p-3 text-left">
         <h3 className="text-base font-semibold text-green-900">{course.title}</h3>
-        <p className="text-green-700">{course.createdBy || 'Unknown Educator'}</p>
+        <p className="text-green-700">{course.createdBy?.name || 'Unknown Educator'}</p>
         <div className="flex items-center space-x-2">
           <p className="text-green-600">Chapters: {(course.chapters?.length || 0)}</p>
           <p className="text-green-600">Lectures: {(course.lectures?.length || 0)}</p>
