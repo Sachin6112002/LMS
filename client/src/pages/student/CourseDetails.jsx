@@ -101,29 +101,27 @@ const CourseDetails = () => {
 
         <div className="max-w-xl z-10 text-green-700">
           <h1 className="md:text-course-deatails-heading-large text-course-deatails-heading-small font-semibold text-green-900">
-            {courseData.courseTitle || 'Untitled Course'}
+            {courseData.title || 'Untitled Course'}
           </h1>
-          <p className="pt-4 md:text-base text-sm" dangerouslySetInnerHTML={{ __html: courseData.courseDescription.slice(0, 200) }}>
+          <p className="pt-4 md:text-base text-sm" dangerouslySetInnerHTML={{ __html: (courseData.description || '').slice(0, 200) }}>
           </p>
 
           <div className='flex items-center space-x-2 pt-3 pb-1 text-sm'>
-            <p>{calculateRating(courseData)}</p>
-            <div className='flex'>
-              {[...Array(5)].map((_, i) => (<img key={i} src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank} alt=''
-                className='w-3.5 h-3.5' />
-              ))}
-            </div>
-            <p className='text-green-600'>({courseData.courseRatings.length} {courseData.courseRatings.length > 1 ? 'ratings' : 'rating'})</p>
-
-            <p>{courseData.enrolledStudents.length} {courseData.enrolledStudents.length > 1 ? 'students' : 'student'}</p>
+            {/* Ratings removed as not in new model */}
+            {/* <p>{calculateRating(courseData)}</p> */}
+            {/* <div className='flex'>
+              {[...Array(5)].map((_, i) => (<img key={i} src={i < Math.floor(calculateRating(courseData)) ? assets.star : assets.star_blank} alt='' className='w-3.5 h-3.5' />))}
+            </div> */}
+            {/* <p className='text-green-600'>({(courseData.courseRatings?.length || 0)} ratings)</p> */}
+            {/* <p>{(courseData.enrolledStudents?.length || 0)} students</p> */}
           </div>
 
-          <p className='text-sm'>Course by <span className='text-green-600 underline'>{courseData.educator && courseData.educator.name ? courseData.educator.name : 'Unknown Educator'}</span></p>
+          <p className='text-sm'>Course by <span className='text-green-600 underline'>{courseData.createdBy || 'Unknown Educator'}</span></p>
 
           <div className="pt-8 text-green-900">
             <h2 className="text-xl font-semibold">Course Structure</h2>
             <div className="pt-5">
-              {Array.isArray(courseData.courseContent) && courseData.courseContent.length > 0 ? courseData.courseContent.map((chapter, index) => (
+              {Array.isArray(courseData.chapters) && courseData.chapters.length > 0 ? courseData.chapters.map((chapter, index) => (
                 <div key={index} className="border border-green-200 bg-green-50 mb-2 rounded">
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
@@ -131,23 +129,23 @@ const CourseDetails = () => {
                   >
                     <div className="flex items-center gap-2">
                       <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
-                      <p className="font-medium md:text-base text-sm">{chapter.chapterTitle}</p>
+                      <p className="font-medium md:text-base text-sm">{chapter.title || chapter.chapterTitle}</p>
                     </div>
-                    <p className="text-sm md:text-default">{chapter.chapterContent.length} lectures - {calculateChapterTime(chapter)}</p>
+                    <p className="text-sm md:text-default">{(chapter.lectures?.length || 0)} lectures</p>
                   </div>
 
                   <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
                     <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
-                      {chapter.chapterContent.map((lecture, i) => (
+                      {(chapter.lectures || []).map((lecture, i) => (
                         <li key={i} className="flex items-start gap-2 py-1">
                           <img src={assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
                           <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
-                            <p>{lecture.lectureTitle}</p>
+                            <p>{lecture.title || lecture.lectureTitle}</p>
                             <div className='flex gap-2'>
-                              {lecture.isPreviewFree && <p onClick={() => setPlayerData({
-                                videoUrl: lecture.lectureUrl
-                              })} className='text-green-600 hover:underline cursor-pointer'>Preview</p>}
-                              <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>
+                              {/* Preview logic if available */}
+                              {lecture.isPreviewFree && lecture.lectureUrl && <p onClick={() => setPlayerData({ videoUrl: lecture.lectureUrl })} className='text-green-600 hover:underline cursor-pointer'>Preview</p>}
+                              {/* Duration if available */}
+                              {lecture.lectureDuration && <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                             </div>
                           </div>
                         </li>
@@ -161,7 +159,7 @@ const CourseDetails = () => {
 
           <div className="py-20 text-sm md:text-default">
             <h3 className="text-xl font-semibold text-green-900">Course Description</h3>
-            <p className="rich-text pt-3" dangerouslySetInnerHTML={{ __html: courseData.courseDescription }}>
+            <p className="rich-text pt-3" dangerouslySetInnerHTML={{ __html: courseData.description || '' }}>
             </p>
           </div>
         </div>
@@ -170,14 +168,14 @@ const CourseDetails = () => {
           {
             playerData
               ? <video controls autoPlay className="w-full aspect-video rounded-t" src={playerData.videoUrl} />
-              : <img src={courseData.courseThumbnail} alt="" />
+              : <img src={courseData.thumbnail} alt="" />
           }
           {/* Watch Button */}
           <button
             className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
-            disabled={!isAlreadyEnrolled || !courseData.courseContent?.length || !courseData.courseContent[0].chapterContent?.length}
+            disabled={!isAlreadyEnrolled || !(courseData.chapters?.length) || !(courseData.chapters[0]?.lectures?.length)}
             onClick={() => {
-              if (isAlreadyEnrolled && courseData.courseContent?.length && courseData.courseContent[0].chapterContent?.length) {
+              if (isAlreadyEnrolled && courseData.chapters?.length && courseData.chapters[0]?.lectures?.length) {
                 navigate('/player/' + courseData._id);
               }
             }}
@@ -185,31 +183,11 @@ const CourseDetails = () => {
             Watch
           </button>
           <div className="p-5">
-            <div className="flex items-center gap-2">
-              <img className="w-3.5" src={assets.time_left_clock_icon} alt="time left clock icon" />
-              <p className="text-green-700">
-                <span className="font-medium">5 days</span> left at this price!
-              </p>
-            </div>
-            <div className="flex gap-3 items-center pt-2">
-              <p className="text-green-900 md:text-4xl text-2xl font-semibold">{currency}{(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2)}</p>
-              <p className="md:text-lg text-green-400 line-through">{currency}{courseData.coursePrice}</p>
-              <p className="md:text-lg text-green-500">{courseData.discount}% off</p>
-            </div>
+            {/* Price/discount/rating removed as not in new model */}
             <div className="flex items-center text-sm md:text-default gap-4 pt-2 md:pt-4 text-green-700">
               <div className="flex items-center gap-1">
-                <img src={assets.star} alt="star icon" />
-                <p>{calculateRating(courseData)}</p>
-              </div>
-              <div className="h-4 w-px bg-green-200"></div>
-              <div className="flex items-center gap-1">
-                <img src={assets.time_clock_icon} alt="clock icon" />
-                <p>{calculateCourseDuration(courseData)}</p>
-              </div>
-              <div className="h-4 w-px bg-green-200"></div>
-              <div className="flex items-center gap-1">
-                <img src={assets.lesson_icon} alt="clock icon" />
-                <p>{calculateNoOfLectures(courseData)} lessons</p>
+                <img src={assets.lesson_icon} alt="lesson icon" />
+                <p>{courseData.chapters?.reduce((acc, ch) => acc + (ch.lectures?.length || 0), 0)} lessons</p>
               </div>
             </div>
             <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-green-600 hover:bg-green-700 text-white font-medium">
