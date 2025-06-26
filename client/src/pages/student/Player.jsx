@@ -135,6 +135,11 @@ const Player = ({ }) => {
   if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
   if (courseData.status !== 'published') return <p className="text-yellow-600 p-8">This course is not published yet.</p>;
 
+  // Defensive: check if courseData is valid
+  if (!courseData || typeof courseData !== 'object' || !Array.isArray(courseData.chapters)) {
+    return <p className="text-red-500 p-8">Course data is unavailable or corrupted.</p>;
+  }
+
   // Helper: force refresh course data (for educator after upload)
   const handleRefresh = () => {
     fetchUserEnrolledCourses();
