@@ -9,6 +9,11 @@ export async function uploadToCloudinary(file, uploadPreset, cloudName) {
     method: 'POST',
     body: formData,
   });
-  if (!res.ok) throw new Error('Cloudinary upload failed');
-  return await res.json(); // returns { secure_url, ... }
+  const data = await res.json();
+  if (!res.ok) {
+    // Log the error for debugging
+    console.error('Cloudinary upload error:', data);
+    throw new Error(data.error?.message || 'Cloudinary upload failed');
+  }
+  return data; // returns { secure_url, ... }
 }
