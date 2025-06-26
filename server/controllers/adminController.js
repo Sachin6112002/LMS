@@ -401,3 +401,20 @@ export const getAuditLogs = async (req, res) => {
     res.json({ success: false, message: 'Failed to fetch logs' });
   }
 };
+
+// Fetch a single published course by ID (for students)
+export const getPublishedCourseById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const course = await Course.findById(id);
+    if (!course || course.status !== 'published') {
+      return res.status(404).json({ success: false, message: 'Course not found or not published' });
+    }
+    res.json({ success: true, courseData: course });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// In your Express app or course routes file, add:
+// router.get('/api/course/:id', getPublishedCourseById);
