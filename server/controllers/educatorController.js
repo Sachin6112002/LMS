@@ -40,11 +40,12 @@ export const addCourse = async (req, res) => {
         }
         // Read course fields directly from req.body
         const courseData = {
-            title: req.body.courseTitle,
-            description: req.body.courseDescription,
-            // If your model expects 'thumbnail', set it after upload
+            title: req.body.title,
+            description: req.body.description,
+            thumbnail: '', // will be set after upload
             createdBy: educatorId,
-            status: 'draft'
+            status: 'draft',
+            chapters: []
         };
         const newCourse = await Course.create(courseData);
         // Upload image to cloudinary
