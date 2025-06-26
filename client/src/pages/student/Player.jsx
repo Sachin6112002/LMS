@@ -139,8 +139,13 @@ const Player = ({ }) => {
 
   // Defensive: support both new and old course structure
   const chapters = Array.isArray(courseData.chapters) ? courseData.chapters : [];
-  const allLectures = chapters.length > 0
-    ? chapters.flatMap(ch => Array.isArray(ch.lectures) ? ch.lectures : [])
+  // Defensive: always ensure lectures is an array for every chapter
+  const safeChapters = chapters.map(ch => ({
+    ...ch,
+    lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+  }));
+  const allLectures = safeChapters.length > 0
+    ? safeChapters.flatMap(ch => ch.lectures)
     : [];
   const allCompleted = progressData && allLectures.length > 0 && progressData.lectureCompleted && progressData.lectureCompleted.length === allLectures.length;
 
@@ -163,7 +168,7 @@ const Player = ({ }) => {
         <h2 className="text-xl font-semibold">Course Structure</h2>
         <button onClick={handleRefresh} className="mb-4 px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm">Refresh</button>
         <div className="pt-5">
-          {chapters.length > 0 ? chapters.map((chapter, index) => (
+          {safeChapters.length > 0 ? safeChapters.map((chapter, index) => (
             <div key={index} className="border border-green-200 bg-green-50 mb-2 rounded">
               <div
                 className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
@@ -173,11 +178,11 @@ const Player = ({ }) => {
                   <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
                   <p className="font-medium md:text-base text-sm">{chapter.title || chapter.chapterTitle}</p>
                 </div>
-                <p className="text-sm md:text-default">{(chapter.lectures?.length || 0)} lectures - {calculateChapterTime(chapter)}</p>
+                <p className="text-sm md:text-default">{chapter.lectures.length} lectures - {calculateChapterTime(chapter)}</p>
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
                 <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
-                  {(chapter.lectures || []).map((lecture, i) => (
+                  {chapter.lectures.map((lecture, i) => (
                     <li key={i} className="flex items-start gap-2 py-1">
                       <img src={progressData && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
                       <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
