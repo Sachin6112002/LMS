@@ -25,14 +25,17 @@ const Player = ({ }) => {
   const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
 
   const getCourseData = () => {
-    enrolledCourses.map((course) => {
+    if (!Array.isArray(enrolledCourses)) return;
+    enrolledCourses.forEach((course) => {
       if (course._id === courseId) {
         setCourseData(course)
-        course.courseRatings.map((item) => {
-          if (item.userId === userData.id) {
-            setInitialRating(item.rating)
-          }
-        })
+        if (Array.isArray(course.courseRatings)) {
+          course.courseRatings.forEach((item) => {
+            if (item.userId === userData.id) {
+              setInitialRating(item.rating)
+            }
+          })
+        }
       }
     })
   }
@@ -147,7 +150,7 @@ const Player = ({ }) => {
   const allLectures = safeChapters.length > 0
     ? safeChapters.flatMap(ch => ch.lectures)
     : [];
-  const allCompleted = progressData && allLectures.length > 0 && progressData.lectureCompleted && progressData.lectureCompleted.length === allLectures.length;
+  const allCompleted = progressData && Array.isArray(progressData.lectureCompleted) && allLectures.length > 0 && progressData.lectureCompleted.length === allLectures.length;
 
   // Defensive normalization to guarantee chapters/lectures structure
   useEffect(() => {
@@ -184,7 +187,7 @@ const Player = ({ }) => {
                 <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
                   {chapter.lectures.map((lecture, i) => (
                     <li key={i} className="flex items-start gap-2 py-1">
-                      <img src={progressData && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
+                      <img src={progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
                       <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                         <p>{lecture.title || lecture.lectureTitle}</p>
                         <div className='flex gap-2'>
@@ -237,7 +240,7 @@ const Player = ({ }) => {
                 <div className='flex justify-between items-center mt-1'>
                   <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
                   <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-green-600 hover:underline'>
-                    {progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
+                    {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
                   </button>
                 </div>
               </div>
