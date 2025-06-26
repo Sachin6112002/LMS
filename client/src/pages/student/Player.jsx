@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, Suspense } from 'react'
 import { AppContext } from '../../context/AppContext'
 import YouTube from 'react-youtube';
 import { assets } from '../../assets/assets';
@@ -220,6 +220,7 @@ const Player = ({ }) => {
         {testimonialSubmitted && <div className="text-green-600 text-center my-8 font-semibold">Thank you for submitting your testimonial!</div>}
       </div>
       <div className='md:mt-10'>
+        <Suspense fallback={<Loading />}>
         {
           playerData
             ? (
@@ -247,6 +248,7 @@ const Player = ({ }) => {
             )
             : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />
         }
+        </Suspense>
       </div>
     </div>
     <Footer />
