@@ -272,7 +272,7 @@ export const publishCourse = async (req, res) => {
         if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
         // Debug log for educator and userId
         console.log('publishCourse: req.auth.userId', req.auth.userId, 'course.educator', course.educator);
-        if (course.educator !== req.auth.userId) {
+        if (course.educator.toString() !== req.auth.userId.toString()) {
             return res.status(403).json({ success: false, message: 'Not your course' });
         }
         // Must have at least one chapter and one lecture
