@@ -20,7 +20,7 @@ const CoursesList = () => {
             input
                 ? setFilteredCourse(
                     tempCourses.filter(
-                        item => item.courseTitle.toLowerCase().includes(input.toLowerCase())
+                        item => (item.title || '').toLowerCase().includes((input || '').toLowerCase())
                     )
                 )
                 : setFilteredCourse(tempCourses)
@@ -44,7 +44,7 @@ const CoursesList = () => {
                     <img onClick={() => navigate('/course-list')} className='cursor-pointer' src={assets.cross_icon} alt="" />
                 </div>}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 my-16 gap-3 px-2 md:p-0">
-                    {filteredCourse.map((course, index) => <CourseCard key={index} course={course} />)}
+                    {(filteredCourse || []).map((course, index) => <CourseCard key={index} course={course} />)}
                 </div>
             </div>
             <Footer />
