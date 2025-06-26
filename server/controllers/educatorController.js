@@ -103,8 +103,15 @@ export const educatorDashboardData = async (req, res) => {
         // Collect unique enrolled student IDs with their course titles
         const enrolledStudentsData = [];
         for (const course of courses) {
+            // Defensive: ensure course.enrolledStudents is always an array
+            const enrolledStudentsArr = Array.isArray(course.enrolledStudents) ? course.enrolledStudents : [];
+            // Defensive: ensure chapters and lectures are always arrays
+            course.chapters = Array.isArray(course.chapters) ? course.chapters : [];
+            course.chapters.forEach(chapter => {
+                chapter.lectures = Array.isArray(chapter.lectures) ? chapter.lectures : [];
+            });
             const students = await User.find({
-                _id: { $in: course.enrolledStudents }
+                _id: { $in: enrolledStudentsArr }
             }, 'name imageUrl');
 
             students.forEach(student => {
