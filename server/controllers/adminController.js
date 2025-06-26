@@ -410,6 +410,8 @@ export const getPublishedCourseById = async (req, res) => {
     if (!course || course.status !== 'published') {
       return res.status(404).json({ success: false, message: 'Course not found or not published' });
     }
+    // Always ensure chapters is an array
+    if (!Array.isArray(course.chapters)) course.chapters = [];
     res.json({ success: true, courseData: course });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
