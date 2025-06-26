@@ -137,8 +137,11 @@ const Player = ({ }) => {
     setTimeout(() => getCourseData(), 500); // Give time for backend to update
   };
 
-  // After course completion UI (e.g., after all lectures completed)
-  const allLectures = courseData && courseData.courseContent ? courseData.courseContent.flatMap(ch => ch.chapterContent) : [];
+  // Defensive: support both new and old course structure
+  const chapters = Array.isArray(courseData.chapters) ? courseData.chapters : [];
+  const allLectures = chapters.length > 0
+    ? chapters.flatMap(ch => Array.isArray(ch.lectures) ? ch.lectures : [])
+    : [];
   const allCompleted = progressData && allLectures.length > 0 && progressData.lectureCompleted && progressData.lectureCompleted.length === allLectures.length;
 
   return (
@@ -148,7 +151,7 @@ const Player = ({ }) => {
         <h2 className="text-xl font-semibold">Course Structure</h2>
         <button onClick={handleRefresh} className="mb-4 px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm">Refresh</button>
         <div className="pt-5">
-          {courseData && courseData.courseContent.map((chapter, index) => (
+          {chapters.length > 0 ? chapters.map((chapter, index) => (
             <div key={index} className="border border-green-200 bg-green-50 mb-2 rounded">
               <div
                 className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
@@ -156,20 +159,20 @@ const Player = ({ }) => {
               >
                 <div className="flex items-center gap-2">
                   <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
-                  <p className="font-medium md:text-base text-sm">{chapter.chapterTitle}</p>
+                  <p className="font-medium md:text-base text-sm">{chapter.title || chapter.chapterTitle}</p>
                 </div>
-                <p className="text-sm md:text-default">{chapter.chapterContent.length} lectures - {calculateChapterTime(chapter)}</p>
+                <p className="text-sm md:text-default">{(chapter.lectures?.length || 0)} lectures - {calculateChapterTime(chapter)}</p>
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
                 <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
-                  {chapter.chapterContent.map((lecture, i) => (
+                  {(chapter.lectures || []).map((lecture, i) => (
                     <li key={i} className="flex items-start gap-2 py-1">
                       <img src={progressData && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
                       <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
-                        <p>{lecture.lectureTitle}</p>
+                        <p>{lecture.title || lecture.lectureTitle}</p>
                         <div className='flex gap-2'>
-                          {lecture.lectureUrl && <p onClick={() => setPlayerData({ ...lecture, chapter: index + 1, lecture: i + 1 })} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
-                          <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>
+                          {lecture.videoUrl && <p onClick={() => setPlayerData({ ...lecture, chapter: index + 1, lecture: i + 1 })} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
+                          {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                         </div>
                       </div>
                     </li>
@@ -177,7 +180,7 @@ const Player = ({ }) => {
                 </ul>
               </div>
             </div>
-          ))}
+          )) : <p>No course content available.</p>}
         </div>
         <div className=" flex items-center gap-2 py-3 mt-10">
           <h1 className="text-xl font-bold">Rate this Course:</h1>
