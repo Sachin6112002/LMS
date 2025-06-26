@@ -109,7 +109,7 @@ export const educatorDashboardData = async (req, res) => {
 
             students.forEach(student => {
                 enrolledStudentsData.push({
-                    courseTitle: course.courseTitle,
+                    courseTitle: course.title, // changed from course.courseTitle
                     student
                 });
             });
@@ -145,12 +145,12 @@ export const getEnrolledStudentsData = async (req, res) => {
         const purchases = await Purchase.find({
             courseId: { $in: courseIds },
             status: 'completed'
-        }).populate('userId', 'name imageUrl').populate('courseId', 'courseTitle');
+        }).populate('userId', 'name imageUrl').populate('courseId', 'title'); // changed from 'courseTitle' to 'title'
 
         // enrolled students data
         const enrolledStudents = purchases.map(purchase => ({
             student: purchase.userId,
-            courseTitle: purchase.courseId.courseTitle,
+            courseTitle: purchase.courseId.title, // changed from purchase.courseId.courseTitle
             purchaseDate: purchase.createdAt
         }));
 
