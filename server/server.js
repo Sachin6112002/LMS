@@ -21,6 +21,10 @@ await connectDB()
 // cloudinary config is imported and runs on import, no need to call a function
 
 // Middlewares
+app.use((req, res, next) => {
+  console.log('CORS DEBUG: Incoming origin:', req.headers.origin);
+  next();
+});
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
