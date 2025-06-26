@@ -133,6 +133,7 @@ const Player = ({ }) => {
   // Defensive: show loading if courseData is not loaded
   if (!courseData) return <Loading />;
   if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
+  if (courseData.status !== 'published') return <p className="text-yellow-600 p-8">This course is not published yet.</p>;
 
   // Helper: force refresh course data (for educator after upload)
   const handleRefresh = () => {

@@ -130,9 +130,9 @@ export const toggleCoursePublish = async (req, res) => {
     if (!course) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
-    course.isPublished = isPublished;
+    course.status = isPublished ? 'published' : 'draft';
     await course.save();
-    res.json({ success: true, isPublished: course.isPublished });
+    res.json({ success: true, status: course.status });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
