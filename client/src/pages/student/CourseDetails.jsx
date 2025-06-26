@@ -26,15 +26,17 @@ const CourseDetails = () => {
 
       const { data } = await axios.get(backendUrl + '/api/course/' + id)
 
-      if (data.success) {
+      if (data.success && data.courseData && Array.isArray(data.courseData.chapters)) {
         setCourseData(data.courseData)
       } else {
-        toast.error(data.message)
+        setCourseData(null);
+        toast.error(data.message || 'Course not found or not published')
       }
 
     } catch (error) {
 
-      toast.error(error.message)
+      setCourseData(null);
+      toast.error(error.response?.data?.message || error.message)
 
     }
 
