@@ -224,28 +224,28 @@ export const AppContextProvider = (props) => {
 
     // Function to Calculate Course Chapter Time
     const calculateChapterTime = (chapter) => {
-
-        let time = 0
-
-        chapter.chapterContent.map((lecture) => time += lecture.lectureDuration)
-
-        return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] })
-
+        let time = 0;
+        // Support both new and old model
+        (Array.isArray(chapter.lectures) ? chapter.lectures : (chapter.chapterContent || [])).forEach((lecture) => {
+            if (lecture.lectureDuration || lecture.duration) {
+                time += lecture.lectureDuration || lecture.duration;
+            }
+        });
+        return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
     }
 
     // Function to Calculate Course Duration
     const calculateCourseDuration = (course) => {
-
-        let time = 0
-
-        course.courseContent.map(
-            (chapter) => chapter.chapterContent.map(
-                (lecture) => time += lecture.lectureDuration
-            )
-        )
-
-        return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] })
-
+        let time = 0;
+        // Support both new and old model
+        (Array.isArray(course.chapters) ? course.chapters : (course.courseContent || [])).forEach((chapter) => {
+            (Array.isArray(chapter.lectures) ? chapter.lectures : (chapter.chapterContent || [])).forEach((lecture) => {
+                if (lecture.lectureDuration || lecture.duration) {
+                    time += lecture.lectureDuration || lecture.duration;
+                }
+            });
+        });
+        return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
     }
 
     const calculateRating = (course) => {
