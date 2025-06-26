@@ -134,17 +134,15 @@ export const stripeWebhooks = async (request, response) => {
       }
       // Prevent duplicate enrollments
       // Defensive: ensure enrolledStudents is always an array
-      const enrolledStudentsArr = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
-      if (!enrolledStudentsArr.map(id => id.toString()).includes(userData._id.toString())) {
-        courseData.enrolledStudents = enrolledStudentsArr;
+      courseData.enrolledStudents = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
+      if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
         courseData.enrolledStudents.push(userData._id);
         await courseData.save();
         console.log('User added to course.enrolledStudents');
       }
       // Defensive: ensure enrolledCourses is always an array
-      const enrolledCoursesArr = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
-      if (!enrolledCoursesArr.map(id => id.toString()).includes(courseData._id.toString())) {
-        userData.enrolledCourses = enrolledCoursesArr;
+      userData.enrolledCourses = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
+      if (!userData.enrolledCourses.map(id => id.toString()).includes(courseData._id.toString())) {
         userData.enrolledCourses.push(courseData._id);
         await userData.save();
         console.log('Course added to user.enrolledCourses');

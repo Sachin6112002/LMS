@@ -22,6 +22,10 @@ const courseSchema = new mongoose.Schema({
     },
     chapters: [chapterSchema],
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+    enrolledStudents: {
+        type: [{ type: String, ref: 'User' }],
+        default: []
+    },
     // Optionally add price, discount, ratings, students, etc. as needed
 }, { timestamps: true, minimize: false });
 
