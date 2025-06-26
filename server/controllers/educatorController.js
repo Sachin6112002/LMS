@@ -270,6 +270,8 @@ export const publishCourse = async (req, res) => {
         const { courseId } = req.body;
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+        // Debug log for educator and userId
+        console.log('publishCourse: req.auth.userId', req.auth.userId, 'course.educator', course.educator);
         if (course.educator !== req.auth.userId) {
             return res.status(403).json({ success: false, message: 'Not your course' });
         }
