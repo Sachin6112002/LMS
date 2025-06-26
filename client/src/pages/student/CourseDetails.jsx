@@ -21,25 +21,18 @@ const CourseDetails = () => {
 
 
   const fetchCourseData = async () => {
-
     try {
-
       const { data } = await axios.get(backendUrl + '/api/course/' + id)
-
-      if (data.success && data.courseData && Array.isArray(data.courseData.chapters)) {
+      if (data.success && data.courseData && typeof data.courseData === 'object' && Array.isArray(data.courseData.chapters)) {
         setCourseData(data.courseData)
       } else {
         setCourseData(null);
-        toast.error(data.message || 'Course not found or not published')
+        toast.error(data.message || 'Course not found, not published, or corrupted')
       }
-
     } catch (error) {
-
       setCourseData(null);
       toast.error(error.response?.data?.message || error.message)
-
     }
-
   }
 
   const [openSections, setOpenSections] = useState({});
@@ -101,11 +94,9 @@ const CourseDetails = () => {
       }))
     : [];
 
-  if (!courseData) return <Loading />;
-  if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
-  if (courseData.status !== 'published') return <p className="text-yellow-600 p-8">This course is not published yet.</p>;
+  // Defensive render check at the top of the component
   if (!courseData || typeof courseData !== 'object' || !Array.isArray(courseData.chapters)) {
-    return <p className="text-red-500 p-8">Course data is unavailable or corrupted.</p>;
+    return <p className="text-red-500 p-8">Course data is unavailable, not published, or corrupted.</p>;
   }
 
   return (
