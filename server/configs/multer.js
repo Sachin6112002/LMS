@@ -12,7 +12,7 @@ const upload = multer({
   }
 });
 
-// Multer config for video uploads (limit: 500MB, only video files)
+// Multer config for video uploads (no file size limit, only video files)
 export const videoUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -23,7 +23,7 @@ export const videoUpload = multer({
       cb(null, uniqueSuffix + '-' + file.originalname);
     }
   }),
-  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB
+  // No fileSize limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('video/')) {
       cb(null, true);
