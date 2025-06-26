@@ -133,12 +133,18 @@ export const stripeWebhooks = async (request, response) => {
         break;
       }
       // Prevent duplicate enrollments
-      if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
+      // Defensive: ensure enrolledStudents is always an array
+      const enrolledStudentsArr = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
+      if (!enrolledStudentsArr.map(id => id.toString()).includes(userData._id.toString())) {
+        courseData.enrolledStudents = enrolledStudentsArr;
         courseData.enrolledStudents.push(userData._id);
         await courseData.save();
         console.log('User added to course.enrolledStudents');
       }
-      if (!userData.enrolledCourses.map(id => id.toString()).includes(courseData._id.toString())) {
+      // Defensive: ensure enrolledCourses is always an array
+      const enrolledCoursesArr = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
+      if (!enrolledCoursesArr.map(id => id.toString()).includes(courseData._id.toString())) {
+        userData.enrolledCourses = enrolledCoursesArr;
         userData.enrolledCourses.push(courseData._id);
         await userData.save();
         console.log('Course added to user.enrolledCourses');
