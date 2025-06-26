@@ -100,11 +100,11 @@ const App = () => {
     <GlobalErrorBoundary>
       <ErrorBoundary>
         <AppContextProvider>
-          <Suspense fallback={<Loading />}>
-            <div className="text-default min-h-screen bg-white">
-              <ToastContainer />
-              {/* Render Student Navbar only if not on educator or admin routes */}
-              {!(isEducatorRoute || isAdminRoute) && <Navbar />}
+          <div className="text-default min-h-screen bg-white">
+            <ToastContainer />
+            {/* Render Student Navbar only if not on educator or admin routes */}
+            {!(isEducatorRoute || isAdminRoute) && <Navbar />}
+            <Suspense fallback={<Loading />}>
               <Routes>
                 {/* Student Routes */}
                 <Route path="/" element={<Home />} />
@@ -142,8 +142,8 @@ const App = () => {
                   <Route index element={<AdminDashboard />} />
                 </Route> */}
               </Routes>
-            </div>
-          </Suspense>
+            </Suspense>
+          </div>
         </AppContextProvider>
       </ErrorBoundary>
     </GlobalErrorBoundary>
