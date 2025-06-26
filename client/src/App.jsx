@@ -1,4 +1,4 @@
-import React, { useContext, Component } from "react";
+import React, { useContext, Component, Suspense } from "react";
 import { Routes, Route, useMatch } from "react-router-dom";
 import Navbar from "./components/student/Navbar";
 import Home from "./pages/student/Home";
@@ -100,48 +100,50 @@ const App = () => {
     <GlobalErrorBoundary>
       <ErrorBoundary>
         <AppContextProvider>
-          <div className="text-default min-h-screen bg-white">
-            <ToastContainer />
-            {/* Render Student Navbar only if not on educator or admin routes */}
-            {!(isEducatorRoute || isAdminRoute) && <Navbar />}
-            <Routes>
-              {/* Student Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/course/:id" element={<CourseDetails />} />
-              <Route path="/course-list" element={<CoursesList />} />
-              <Route path="/course-list/:input" element={<CoursesList />} />
-              <Route path="/my-enrollments" element={<MyEnrollments />} />
-              <Route path="/player/:courseId" element={<Player />} />
-              <Route path="/loading/:path" element={<Loading />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/testimonials" element={<Testimonials />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Suspense fallback={<Loading />}>
+            <div className="text-default min-h-screen bg-white">
+              <ToastContainer />
+              {/* Render Student Navbar only if not on educator or admin routes */}
+              {!(isEducatorRoute || isAdminRoute) && <Navbar />}
+              <Routes>
+                {/* Student Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/course/:id" element={<CourseDetails />} />
+                <Route path="/course-list" element={<CoursesList />} />
+                <Route path="/course-list/:input" element={<CoursesList />} />
+                <Route path="/my-enrollments" element={<MyEnrollments />} />
+                <Route path="/player/:courseId" element={<Player />} />
+                <Route path="/loading/:path" element={<Loading />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/testimonials" element={<Testimonials />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/verify-otp" element={<VerifyOtp />} />
 
-              {/* Educator Routes */}
-              <Route path="/educator/*" element={<Educator />}>
-                <Route index element={<Dashboard />} />
-                <Route path="add-course" element={<AddCourse />} />
-                <Route path="my-courses" element={<MyCourses />} />
-                <Route path="student-enrolled" element={<StudentsEnrolled />} />
-              </Route>
+                {/* Educator Routes */}
+                <Route path="/educator/*" element={<Educator />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="add-course" element={<AddCourse />} />
+                  <Route path="my-courses" element={<MyCourses />} />
+                  <Route path="student-enrolled" element={<StudentsEnrolled />} />
+                </Route>
 
-              {/* Admin Routes */}
-              {/* <Route path="/admin/*" element={<Admin />}>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="manage-users" element={<ManageUsers />} />
-                <Route path="manage-courses" element={<ManageCourses />} />
-                <Route path="settings" element={<AdminSettings />} />
-                <Route index element={<AdminDashboard />} />
-              </Route> */}
-            </Routes>
-          </div>
+                {/* Admin Routes */}
+                {/* <Route path="/admin/*" element={<Admin />}>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="manage-users" element={<ManageUsers />} />
+                  <Route path="manage-courses" element={<ManageCourses />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route index element={<AdminDashboard />} />
+                </Route> */}
+              </Routes>
+            </div>
+          </Suspense>
         </AppContextProvider>
       </ErrorBoundary>
     </GlobalErrorBoundary>
