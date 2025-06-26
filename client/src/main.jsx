@@ -4,21 +4,20 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AppContextProvider } from './context/AppContext.jsx'
+import Loading from './components/student/Loading';
 
 const ErrorBoundary = ({ children }) => {
-  return (
-    <React.Suspense fallback={<div>Loading...</div>}>
-      {children}
-    </React.Suspense>
-  );
+  return children;
 };
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AppContextProvider>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </Suspense>
     </AppContextProvider>
   </BrowserRouter>,
 )
