@@ -144,6 +144,18 @@ const Player = ({ }) => {
     : [];
   const allCompleted = progressData && allLectures.length > 0 && progressData.lectureCompleted && progressData.lectureCompleted.length === allLectures.length;
 
+  // Defensive normalization to guarantee chapters/lectures structure
+  useEffect(() => {
+    if (courseData) {
+      if (!Array.isArray(courseData.chapters)) courseData.chapters = [];
+      courseData.chapters = courseData.chapters.map(ch => ({
+        ...ch,
+        lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+      }));
+      setCourseData({ ...courseData }); // force re-render with normalized data
+    }
+  }, [courseData]);
+
   return (
     <>
     <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36' >
