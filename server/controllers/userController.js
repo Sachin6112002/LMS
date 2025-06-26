@@ -81,7 +81,7 @@ export const purchaseCourse = async (req, res) => {
             price_data: {
                 currency,
                 product_data: {
-                    name: courseData.courseTitle
+                    name: courseData.title // Use new model's title field
                 },
                 unit_amount: Math.floor(newPurchase.amount) * 100
             },
