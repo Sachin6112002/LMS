@@ -197,23 +197,20 @@ export const getEnrolledStudentsData = async (req, res) => {
 // Add Chapter to Course
 export const addChapter = async (req, res) => {
     try {
-        const { courseId, chapterTitle, chapterOrder } = req.body;
-        if (!courseId || !chapterTitle) {
+        const { courseId, title } = req.body;
+        if (!courseId || !title) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
 
-        const chapterId = new mongoose.Types.ObjectId().toString();
         const newChapter = {
-            chapterId,
-            chapterTitle,
-            chapterOrder,
-            chapterContent: []
+            title,
+            lectures: []
         };
-        course.courseContent.push(newChapter);
+        course.chapters.push(newChapter);
         await course.save();
-        res.json({ success: true, chapter: newChapter });
+        res.json({ success: true, chapter: newChapter, course });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -225,31 +222,22 @@ export const addLecture = async (req, res) => {
         // Debug log incoming fields and file
         console.log('addLecture fields:', req.body);
         console.log('addLecture file:', req.file);
-        const { courseId, chapterId, lectureTitle, lectureDuration, isPreviewFree, lectureOrder } = req.body;
-        if (!courseId || !chapterId || !lectureTitle || !lectureDuration) {
+        const { courseId, chapterIndex, title, duration, videoUrl, isPreviewFree } = req.body;
+        if (courseId === undefined || chapterIndex === undefined || !title || !duration || !videoUrl) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
         }
-        if (!req.file) return res.status(400).json({ success: false, message: 'Missing required parameter - file' });
-
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
-
-        const chapter = course.courseContent.find(ch => ch.chapterId === chapterId);
-        if (!chapter) return res.status(404).json({ success: false, message: 'Chapter not found' });
-
-        const lectureId = new mongoose.Types.ObjectId().toString();
+        if (!course.chapters[chapterIndex]) return res.status(404).json({ success: false, message: 'Chapter not found' });
         const newLecture = {
-            lectureId,
-            lectureTitle,
-            lectureDuration,
-            isPreviewFree,
-            lectureOrder,
-            videoFile: req.file.filename,
-            lectureUrl: req.file.filename
+            title,
+            duration,
+            videoUrl,
+            isPreviewFree: !!isPreviewFree
         };
-        chapter.chapterContent.push(newLecture);
+        course.chapters[chapterIndex].lectures.push(newLecture);
         await course.save();
-        res.json({ success: true, lecture: newLecture });
+        res.json({ success: true, lecture: newLecture, course });
     } catch (err) {
         console.log('addLecture error:', err);
         res.status(500).json({ success: false, message: err.message });
@@ -274,8 +262,9 @@ export const publishCourse = async (req, res) => {
         if (!course.chapters || course.chapters.length === 0) {
             return res.status(400).json({ success: false, message: 'Add at least one chapter before publishing.' });
         }
-        const hasLecture = course.chapters.some(ch => ch.lectures && ch.lectures.length > 0);
-        if (!hasLecture) {
+        // Must have at least one chapter and one lecture
+        const hasAnyLecture = course.chapters.some(ch => ch.lectures && ch.lectures.length > 0);
+        if (!hasAnyLecture) {
             return res.status(400).json({ success: false, message: 'Add at least one lecture before publishing.' });
         }
         course.status = 'published';
