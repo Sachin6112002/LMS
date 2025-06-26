@@ -91,6 +91,14 @@ const CourseDetails = () => {
     }
   }, [userData, courseData])
 
+  // Defensive normalization: always ensure chapters and lectures are arrays
+  const safeChapters = Array.isArray(courseData.chapters)
+    ? courseData.chapters.map(ch => ({
+        ...ch,
+        lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+      }))
+    : [];
+
   if (!courseData) return <Loading />;
   if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
 
@@ -175,18 +183,14 @@ const CourseDetails = () => {
             className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
             disabled={
               !isAlreadyEnrolled ||
-              !Array.isArray(courseData.chapters) ||
-              courseData.chapters.length === 0 ||
-              !Array.isArray(courseData.chapters[0]?.lectures) ||
-              courseData.chapters[0].lectures.length === 0
+              safeChapters.length === 0 ||
+              safeChapters[0].lectures.length === 0
             }
             onClick={() => {
               if (
                 isAlreadyEnrolled &&
-                Array.isArray(courseData.chapters) &&
-                courseData.chapters.length > 0 &&
-                Array.isArray(courseData.chapters[0]?.lectures) &&
-                courseData.chapters[0].lectures.length > 0
+                safeChapters.length > 0 &&
+                safeChapters[0].lectures.length > 0
               ) {
                 navigate('/player/' + courseData._id);
               }
@@ -199,7 +203,7 @@ const CourseDetails = () => {
             <div className="flex items-center text-sm md:text-default gap-4 pt-2 md:pt-4 text-green-700">
               <div className="flex items-center gap-1">
                 <img src={assets.lesson_icon} alt="lesson icon" />
-                <p>{Array.isArray(courseData.chapters) ? courseData.chapters.reduce((acc, ch) => acc + (Array.isArray(ch.lectures) ? ch.lectures.length : 0), 0) : 0} lessons</p>
+                <p>{safeChapters.reduce((acc, ch) => acc + ch.lectures.length, 0)} lessons</p>
               </div>
             </div>
             <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-green-600 hover:bg-green-700 text-white font-medium">
