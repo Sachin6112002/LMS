@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, Suspense } from 'react'
 import { AppContext } from '../../context/AppContext'
-import YouTube from 'react-youtube';
 import { assets } from '../../assets/assets';
 import { useParams } from 'react-router-dom';
 import humanizeDuration from 'humanize-duration';
@@ -125,28 +124,33 @@ const Player = ({ }) => {
   }
 
   useEffect(() => {
-
     getCourseProgress()
-
   }, [])
-
-  // Defensive: show loading if courseData is not loaded
-  if (!courseData || typeof courseData !== 'object' || !Array.isArray(courseData.chapters)) {
-    return <p className="text-red-500 p-8">Course data is unavailable, not published, or corrupted.</p>;
-  }
-  if (!courseData._id) return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
-  if (courseData.status !== 'published') return <p className="text-yellow-600 p-8">This course is not published yet.</p>;
-
-  // Defensive: check if courseData is valid
-  if (!courseData || typeof courseData !== 'object' || !Array.isArray(courseData.chapters)) {
-    return <p className="text-red-500 p-8">Course data is unavailable or corrupted.</p>;
-  }
 
   // Helper: force refresh course data (for educator after upload)
   const handleRefresh = () => {
     fetchUserEnrolledCourses();
     setTimeout(() => getCourseData(), 500); // Give time for backend to update
   };
+
+  // Early return if no course data
+  if (!courseData || typeof courseData !== 'object') {
+    return (
+      <div className="p-8 text-center">
+        <Loading />
+        <p className="text-gray-500 mt-4">Loading course data...</p>
+      </div>
+    );
+  }
+
+  // Early return for invalid course
+  if (!courseData._id) {
+    return <p className="text-red-500 p-8">Course not found or unavailable.</p>;
+  }
+
+  if (courseData.status !== 'published') {
+    return <p className="text-yellow-600 p-8">This course is not published yet.</p>;
+  }
 
   // Defensive: support both new and old course structure
   const chapters = Array.isArray(courseData.chapters) ? courseData.chapters : [];
@@ -159,18 +163,6 @@ const Player = ({ }) => {
     ? safeChapters.flatMap(ch => ch.lectures)
     : [];
   const allCompleted = progressData && Array.isArray(progressData.lectureCompleted) && allLectures.length > 0 && progressData.lectureCompleted.length === allLectures.length;
-
-  // Defensive normalization to guarantee chapters/lectures structure
-  useEffect(() => {
-    if (courseData) {
-      if (!Array.isArray(courseData.chapters)) courseData.chapters = [];
-      courseData.chapters = courseData.chapters.map(ch => ({
-        ...ch,
-        lectures: Array.isArray(ch.lectures) ? ch.lectures : []
-      }));
-      setCourseData({ ...courseData }); // force re-render with normalized data
-    }
-  }, [courseData]);
 
   return (
     <>
@@ -199,7 +191,7 @@ const Player = ({ }) => {
                       <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                         <p>{lecture.title || lecture.lectureTitle}</p>
                         <div className='flex gap-2'>
-                          {lecture.videoUrl && <p onClick={() => setPlayerData({ ...lecture, chapter: index + 1, lecture: i + 1 })} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
+                          {lecture.videoUrl && <p onClick={() => setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lecture.lectureId || lecture._id, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 })} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
                           {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                         </div>
                       </div>
@@ -229,37 +221,58 @@ const Player = ({ }) => {
       </div>
       <div className='md:mt-10'>
         <Suspense fallback={<Loading />}>
-          {playerData ? (
-            <div>
-              {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
-                <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
-              ) : playerData.lectureUrl ? (
-                <video
-                  className='w-full aspect-video'
-                  src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
-                  controls
-                  crossOrigin="anonymous"
-                  onError={e => { e.target.onerror = null; e.target.poster = ''; toast.error('Video failed to load. Please refresh or contact support.'); }}
-                />
-              ) : (
-                <div className='w-full aspect-video bg-green-100 flex items-center justify-center text-green-700'>No video available</div>
-              )}
-              <div className='flex justify-between items-center mt-1'>
-                <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
-                <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-green-600 hover:underline'>
-                  {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className='w-full aspect-video bg-gray-100 flex items-center justify-center'>
-              {courseData && courseData.courseThumbnail ? (
-                <img src={courseData.courseThumbnail} alt="Course thumbnail" className='max-w-full max-h-full object-contain' />
-              ) : (
-                <div className='text-gray-500 text-lg'>Select a lecture to start watching</div>
-              )}
-            </div>
-          )}
+          {(() => {
+            try {
+              if (playerData && playerData.lectureUrl) {
+                return (
+                  <div>
+                    <video
+                      className='w-full aspect-video'
+                      src={`${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
+                      controls
+                      onError={e => { 
+                        e.target.onerror = null; 
+                        e.target.poster = ''; 
+                        toast.error('Video failed to load. Please refresh or contact support.'); 
+                      }}
+                    />
+                    <div className='flex justify-between items-center mt-1'>
+                      <p className='text-xl'>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
+                      <button 
+                        onClick={() => markLectureAsCompleted(playerData.lectureId)} 
+                        className='text-green-600 hover:underline'
+                        disabled={!playerData.lectureId}
+                      >
+                        {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className='w-full aspect-video bg-gray-100 flex items-center justify-center'>
+                    {courseData && courseData.courseThumbnail ? (
+                      <img 
+                        src={courseData.courseThumbnail} 
+                        alt="Course thumbnail" 
+                        className='max-w-full max-h-full object-contain'
+                        onError={e => e.target.style.display = 'none'}
+                      />
+                    ) : (
+                      <div className='text-gray-500 text-lg'>Select a lecture to start watching</div>
+                    )}
+                  </div>
+                );
+              }
+            } catch (error) {
+              console.error('Player error:', error);
+              return (
+                <div className='w-full aspect-video bg-red-100 flex items-center justify-center'>
+                  <div className='text-red-500 text-lg'>Error loading player</div>
+                </div>
+              );
+            }
+          })()}
         </Suspense>
       </div>
     </div>
