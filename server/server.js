@@ -31,8 +31,11 @@ app.use((req, res, next) => {
 // Enhanced CORS configuration
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // Always allow requests with no origin (like mobile apps, Postman, curl)
+    if (!origin) {
+      console.log('CORS DEBUG: No origin, allowing request');
+      return callback(null, true);
+    }
     
     const allowedOrigins = [
       process.env.FRONTEND_URL,
@@ -42,38 +45,48 @@ app.use(cors({
       'https://lms-admin-blond.vercel.app'
     ];
     
-    // For debugging - temporarily allow all origins
     console.log('CORS DEBUG: Origin check:', origin);
     console.log('CORS DEBUG: Allowed origins:', allowedOrigins);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      // Temporarily allow all origins for debugging
-      console.log('CORS DEBUG: Allowing origin for debugging:', origin);
-      callback(null, true);
-    }
+    // Allow all origins for debugging - this should fix immediate CORS issues
+    console.log('CORS DEBUG: Allowing all origins for debugging');
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   preflightContinue: false,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  maxAge: 86400 // 24 hours
 }));
 
-// Add this line to handle all OPTIONS preflight requests for CORS
-app.options('*', cors());
+// Handle all OPTIONS preflight requests FIRST - this is critical for CORS
+app.options('*', (req, res) => {
+  console.log('OPTIONS request received for:', req.path);
+  console.log('Origin:', req.headers.origin);
+  
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  return res.status(200).end();
+});
 
-// Global CORS headers as fallback
+// Global CORS headers as fallback for all requests
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} from origin: ${req.headers.origin}`);
+  
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.header('Access-Control-Allow-Credentials', 'true');
   
+  // Double-check: if this is still an OPTIONS request, handle it
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    console.log('Fallback OPTIONS handler triggered for:', req.path);
+    return res.status(200).end();
   }
   
   next();
@@ -103,6 +116,17 @@ app.get('/api/cors-test', (req, res) => {
     success: true, 
     message: 'CORS is working!', 
     origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Test endpoint for OPTIONS specifically
+app.all('/api/options-test', (req, res) => {
+  res.json({
+    success: true,
+    method: req.method,
+    message: `${req.method} request handled successfully`,
+    headers: req.headers,
     timestamp: new Date().toISOString()
   });
 });

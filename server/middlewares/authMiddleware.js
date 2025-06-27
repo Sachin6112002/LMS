@@ -3,6 +3,11 @@ import User from '../models/User.js'
 // Middleware ( Protect Educator Routes )
 export const protectEducator = async (req,res,next) => {
     try {
+        // Skip authentication for OPTIONS requests
+        if (req.method === 'OPTIONS') {
+            return next();
+        }
+        
         if (!req.auth || !req.auth.userId) {
             console.log('protectEducator: No userId in req.auth');
             return res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -28,6 +33,11 @@ export const protectEducator = async (req,res,next) => {
 // Middleware to authenticate users
 export const authenticate = async (req, res, next) => {
     try {
+        // Skip authentication for OPTIONS requests
+        if (req.method === 'OPTIONS') {
+            return next();
+        }
+        
         const userId = req.auth?.userId;
         if (!userId) {
             return res.status(401).json({ success: false, message: 'Unauthorized' });

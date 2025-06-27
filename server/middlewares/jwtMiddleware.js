@@ -2,6 +2,11 @@ import jwt from 'jsonwebtoken';
 
 // Middleware to decode JWT and set req.auth.userId
 export const jwtMiddleware = (req, res, next) => {
+    // Skip JWT processing for OPTIONS requests
+    if (req.method === 'OPTIONS') {
+        return next();
+    }
+    
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         req.auth = {};
