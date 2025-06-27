@@ -2,6 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const CourseCard = ({ course }) => {
+  // Defensive: ensure course and chapters are valid
+  if (!course || typeof course !== 'object' || !course._id) {
+    return null;
+  }
+  const chaptersCount = Array.isArray(course.chapters) ? course.chapters.length : 0;
+  const lecturesCount = Array.isArray(course.chapters)
+    ? course.chapters.reduce((acc, ch) => acc + (Array.isArray(ch.lectures) ? ch.lectures.length : 0), 0)
+    : 0;
   return (
     <Link
       onClick={() => scrollTo(0, 0)}
@@ -19,8 +27,8 @@ const CourseCard = ({ course }) => {
                 : 'Unknown Educator')}
         </p>
         <div className="flex items-center space-x-2">
-          <p className="text-green-600">Chapters: {(course.chapters?.length || 0)}</p>
-          <p className="text-green-600">Lectures: {(course.lectures?.length || 0)}</p>
+          <span className="text-green-600">Chapters: {chaptersCount}</span>
+          <span className="text-green-600">Lectures: {lecturesCount}</span>
         </div>
         <p className="text-green-800 text-sm mt-2">{course.description}</p>
       </div>
