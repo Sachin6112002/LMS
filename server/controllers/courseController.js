@@ -60,9 +60,19 @@ export const addLecture = async (req, res) => {
 // Get all courses
 export const getAllCourses = async (req, res) => {
   try {
-    // Populate createdBy with educator's name
-    const courses = await Course.find().populate('createdBy', 'name');
-    res.json({ success: true, courses });
+    // Populate createdBy with educator's name and only return published courses
+    const courses = await Course.find({ status: 'published' }).populate('createdBy', 'name');
+    // Ensure each course has proper chapters structure
+    const safeCourses = courses.map(course => {
+      const courseObj = course.toObject();
+      courseObj.chapters = Array.isArray(courseObj.chapters) ? courseObj.chapters : [];
+      courseObj.chapters = courseObj.chapters.map(ch => ({
+        ...ch,
+        lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+      }));
+      return courseObj;
+    });
+    res.json({ success: true, courses: safeCourses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -73,7 +83,16 @@ export const getCourseId = async (req, res) => {
   try {
     const { id } = req.params;
     const courseData = await Course.findById(id);
-    if (!courseData) return res.status(404).json({ success: false, message: 'Course not found' });
+    if (!courseData || courseData.status !== 'published') {
+      return res.status(404).json({ success: false, message: 'Course not found or not published' });
+    }
+    // Always ensure chapters is an array
+    if (!Array.isArray(courseData.chapters)) courseData.chapters = [];
+    // Ensure lectures are arrays in each chapter
+    courseData.chapters = courseData.chapters.map(ch => ({
+      ...ch.toObject?.() || ch,
+      lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+    }));
     res.json({ success: true, courseData });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

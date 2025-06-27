@@ -23,7 +23,11 @@ const CourseDetails = () => {
   const fetchCourseData = async () => {
     try {
       const { data } = await axios.get(backendUrl + '/api/course/' + id)
-      if (data.success && data.courseData && typeof data.courseData === 'object' && Array.isArray(data.courseData.chapters)) {
+      if (data.success && data.courseData && typeof data.courseData === 'object') {
+        // Ensure chapters is always an array
+        if (!Array.isArray(data.courseData.chapters)) {
+          data.courseData.chapters = [];
+        }
         setCourseData(data.courseData)
       } else {
         setCourseData(null);
@@ -86,18 +90,16 @@ const CourseDetails = () => {
     }
   }, [userData, courseData])
 
-  // Defensive normalization: always ensure chapters and lectures are arrays
-  const safeChapters = Array.isArray(courseData.chapters)
-    ? courseData.chapters.map(ch => ({
-        ...ch,
-        lectures: Array.isArray(ch.lectures) ? ch.lectures : []
-      }))
-    : [];
-
-  // Defensive render check at the top of the component
+  // Early defensive check - must be first, before any courseData usage
   if (!courseData || typeof courseData !== 'object' || !Array.isArray(courseData.chapters)) {
     return <p className="text-red-500 p-8">Course data is unavailable, not published, or corrupted.</p>;
   }
+
+  // Defensive normalization: always ensure chapters and lectures are arrays
+  const safeChapters = courseData.chapters.map(ch => ({
+    ...ch,
+    lectures: Array.isArray(ch.lectures) ? ch.lectures : []
+  }));
 
   return (
     <>
