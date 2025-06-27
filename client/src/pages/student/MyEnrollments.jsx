@@ -50,8 +50,11 @@ const MyEnrollments = () => {
     };
 
     useEffect(() => {
+        console.log('MyEnrollments useEffect - userData:', userData);
         if (userData) {
             fetchUserEnrolledCourses()
+        } else {
+            console.log('No userData available, cannot fetch enrolled courses');
         }
     }, [userData])
 
@@ -62,6 +65,18 @@ const MyEnrollments = () => {
         }
 
     }, [enrolledCourses])
+
+    // Defensive: show loading if userData is not available
+    if (!userData) {
+        return (
+            <div className="min-h-screen bg-green-50 flex items-center justify-center">
+                <div className="text-center">
+                    <Loading />
+                    <p className="text-green-700 mt-4">Loading user data...</p>
+                </div>
+            </div>
+        );
+    }
 
     // Defensive: show loading if enrolledCourses is not loaded
     if (!Array.isArray(enrolledCourses)) return <Loading />;

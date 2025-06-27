@@ -22,7 +22,13 @@ export const getUserData = async (req, res) => {
             return res.json({ success: false, message: 'User Not Found' })
         }
 
-        res.json({ success: true, user })
+        res.json({ 
+            success: true, 
+            user: {
+                ...user.toObject(),
+                role: user.publicMetadata.role
+            }
+        })
 
     } catch (error) {
         res.json({ success: false, message: error.message })
@@ -118,7 +124,11 @@ export const userEnrolledCourses = async (req, res) => {
         const userData = await User.findById(userId)
             .populate('enrolledCourses')
 
-        res.json({ success: true, enrolledCourses: userData.enrolledCourses })
+        if (!userData) {
+            return res.status(404).json({ success: false, message: 'User data not found' });
+        }
+
+        res.json({ success: true, enrolledCourses: userData.enrolledCourses || [] })
 
     } catch (error) {
         res.json({ success: false, message: error.message })
@@ -290,6 +300,44 @@ export const registerUser = async (req, res) => {
         // Re-fetch user to get updated role
         const updatedUser = await User.findById(newUser._id);
         res.status(201).json({ success: true, user: updatedUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Change user role to educator
+export const becomeEducator = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
+    try {
+        const userId = req.auth.userId;
+        
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        
+        // Check if user is already an educator
+        if (user.publicMetadata.role === 'educator') {
+            return res.json({ success: false, message: 'User is already an educator' });
+        }
+        
+        // Update user role to educator
+        user.publicMetadata.role = 'educator';
+        await user.save();
+        
+        res.json({ 
+            success: true, 
+            message: 'Successfully became an educator!',
+            user: {
+                ...user.toObject(),
+                role: user.publicMetadata.role
+            }
+        });
+        
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

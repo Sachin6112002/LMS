@@ -62,7 +62,9 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 saveAuth(data.token, data.user)
                 toast.success('Login successful!')
-                if (data.user.role === 'educator') setIsEducator(true)
+                // Check role from publicMetadata or direct role field
+                const userRole = data.user.publicMetadata?.role || data.user.role;
+                if (userRole === 'educator') setIsEducator(true)
                 navigate('/')
             } else {
                 toast.error(data.message)
@@ -100,35 +102,59 @@ export const AppContextProvider = (props) => {
 
     // Fetch UserData (from backend, using JWT)
     const fetchUserData = async () => {
-        if (!jwt) return
+        if (!jwt) {
+            console.log('No JWT token available for fetching user data');
+            return;
+        }
         try {
+            console.log('Fetching user data...');
             const { data } = await axios.get(backendUrl + '/api/user/data',
                 { headers: { Authorization: `Bearer ${jwt}` } })
             if (data.success) {
                 setUserData(data.user)
                 localStorage.setItem('userData', JSON.stringify(data.user))
-                if (data.user.role === 'educator') setIsEducator(true)
+                // Check role from publicMetadata or direct role field
+                const userRole = data.user.publicMetadata?.role || data.user.role;
+                if (userRole === 'educator') setIsEducator(true)
+                console.log('User data fetched successfully:', data.user);
             } else {
+                console.error('Failed to fetch user data:', data.message);
                 toast.error(data.message)
             }
         } catch (error) {
-            toast.error(error.message)
+            console.error('Error fetching user data:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Failed to fetch user data. Please try logging in again.');
+            }
         }
     }
 
     // Fetch User Enrolled Courses
     const fetchUserEnrolledCourses = async () => {
-        if (!jwt) return
+        if (!jwt) {
+            console.log('No JWT token available for fetching enrolled courses');
+            return;
+        }
         try {
+            console.log('Fetching enrolled courses for user...');
             const { data } = await axios.get(backendUrl + '/api/user/enrolled-courses',
                 { headers: { Authorization: `Bearer ${jwt}` } })
             if (data.success) {
                 setEnrolledCourses(data.enrolledCourses.reverse())
+                console.log('Enrolled courses fetched successfully:', data.enrolledCourses.length, 'courses');
             } else {
-                toast.error(data.message)
+                console.error('Failed to fetch enrolled courses:', data.message);
+                toast.error(data.message || 'Failed to fetch enrolled courses')
             }
         } catch (error) {
-            toast.error(error.message)
+            console.error('Error fetching enrolled courses:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Failed to fetch enrolled courses. Please try logging in again.');
+            }
         }
     }
 
@@ -221,6 +247,41 @@ export const AppContextProvider = (props) => {
             toast.error(error.response?.data?.message || error.message);
         }
     }
+
+    // Become Educator
+    const becomeEducator = async () => {
+        try {
+            const token = getToken();
+            if (!token) {
+                toast.error('Please login first');
+                return false;
+            }
+            
+            const { data } = await axios.post(
+                `${backendUrl}/api/user/become-educator`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            
+            if (data.success) {
+                // Update local state
+                setIsEducator(true);
+                const updatedUserData = { ...userData, role: 'educator' };
+                setUserData(updatedUserData);
+                localStorage.setItem('userData', JSON.stringify(updatedUserData));
+                
+                toast.success('Congratulations! You are now an educator!');
+                return true;
+            } else {
+                toast.error(data.message || 'Failed to become educator');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error becoming educator:', error);
+            toast.error(error.response?.data?.message || 'Failed to become educator');
+            return false;
+        }
+    };
 
     // Function to Calculate Course Chapter Time
     const calculateChapterTime = (chapter) => {
@@ -377,7 +438,8 @@ export const AppContextProvider = (props) => {
         fetchAllUsers, manageCourses, updateAdminSettings,
         // Helper to reload userData (e.g., after registration or login)
         reloadUserData,
-        addChapterToCourse
+        addChapterToCourse,
+        becomeEducator
     }
 
     return (

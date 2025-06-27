@@ -11,28 +11,36 @@ const Navbar = () => {
 
   const isCoursesListPage = location.pathname.includes('/course-list');
 
-  const { backendUrl, isEducator, setIsEducator, navigate, getToken, userData, logout } = useContext(AppContext)
+  const { backendUrl, isEducator, setIsEducator, navigate, getToken, userData, logout, becomeEducator } = useContext(AppContext)
 
-  const becomeEducator = async () => {
-
+  const handleBecomeEducator = async () => {
     try {
-
       if (isEducator) {
         navigate('/educator')
         return;
       }
 
-      const token = getToken()
-      const { data } = await axios.get(backendUrl + '/api/educator/update-role', { headers: { Authorization: `Bearer ${token}` } })
-      if (data.success) {
-        toast.success(data.message)
-        setIsEducator(true)
-      } else {
-        toast.error(data.message)
-      }
+      // Show confirmation dialog
+      const confirmed = window.confirm(
+        'Are you sure you want to become an educator? This will allow you to create and manage courses.'
+      );
+      
+      if (!confirmed) return;
 
+      const success = await becomeEducator();
+      if (success) {
+        // Optionally navigate to educator dashboard
+        setTimeout(() => {
+          const goToDashboard = window.confirm(
+            'You are now an educator! Would you like to go to the educator dashboard?'
+          );
+          if (goToDashboard) {
+            navigate('/educator');
+          }
+        }, 1000);
+      }
     } catch (error) {
-      toast.error(error.message)
+      console.error('Error in handleBecomeEducator:', error);
     }
   }
 
@@ -43,7 +51,7 @@ const Navbar = () => {
         <div className="flex items-center gap-5">
           {
             userData && <>
-              <button onClick={becomeEducator} className="hover:underline text-green-600">{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
+              <button onClick={handleBecomeEducator} className="hover:underline text-green-600">{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
               | <Link to='/my-enrollments' className="hover:underline text-green-600">My Enrollments</Link>
             </>
           }
@@ -78,7 +86,7 @@ const Navbar = () => {
       {/* For Phone Screens */}
       <div className='md:hidden flex items-center gap-2 sm:gap-5 text-green-800'>
         <div className="flex items-center gap-1 sm:gap-2 max-sm:text-xs">
-          <button onClick={becomeEducator} className="hover:underline text-green-600">{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
+          <button onClick={handleBecomeEducator} className="hover:underline text-green-600">{isEducator ? 'Educator Dashboard' : 'Become Educator'}</button>
           | {
             userData && <Link to='/my-enrollments' className="hover:underline text-green-600">My Enrollments</Link>
           }
