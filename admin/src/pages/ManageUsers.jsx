@@ -11,6 +11,7 @@ const ManageUsers = () => {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   const navigate = useNavigate();
 
@@ -49,6 +50,24 @@ const ManageUsers = () => {
     };
     fetchUsers();
   }, [backendUrl, aToken]);
+
+  // Function to manually refresh users list
+  const refreshUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${backendUrl}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${aToken}` },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.error('Failed to refresh users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDeleteUser = async (userId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this user?");
@@ -132,6 +151,17 @@ const ManageUsers = () => {
       u.email.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Auto-refresh users every 30 seconds
+  useEffect(() => {
+    if (!autoRefresh) return;
+    
+    const interval = setInterval(() => {
+      refreshUsers();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, backendUrl, aToken]);
+
   if (loading) return <div>Loading...</div>;
   if (isAdmin === false)
     return (
@@ -150,6 +180,23 @@ const ManageUsers = () => {
         >
           Back to Dashboard
         </button>
+        <button
+          onClick={refreshUsers}
+          disabled={loading}
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 w-full sm:w-auto"
+        >
+          <FaUsers className="h-4 w-4" />
+          {loading ? 'Refreshing...' : 'Refresh Users'}
+        </button>
+        <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg shadow">
+          <input
+            type="checkbox"
+            checked={autoRefresh}
+            onChange={(e) => setAutoRefresh(e.target.checked)}
+            className="w-4 h-4"
+          />
+          <span className="text-sm font-medium text-gray-700">Auto-refresh (30s)</span>
+        </label>
       </div>
       <div className="flex flex-col items-center mb-6">
         <FaUsers className="h-10 w-10 sm:h-12 sm:w-12 text-blue-600 mb-2" />
@@ -197,17 +244,24 @@ const ManageUsers = () => {
                   <td className="px-2 sm:px-4 py-2">{user.name}</td>
                   <td className="px-2 sm:px-4 py-2">{user.email}</td>
                   <td className="px-2 sm:px-4 py-2">
-                    <span
-                      className={`px-2 py-1 rounded-full text-white text-xs ${
-                        user.publicMetadata?.role === 'admin'
-                          ? 'bg-green-600'
-                          : user.publicMetadata?.role === 'educator'
-                          ? 'bg-yellow-600'
-                          : 'bg-blue-500'
-                      }`}
-                    >
-                      {user.publicMetadata?.role || 'student'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-1 rounded-full text-white text-xs font-semibold ${
+                          user.publicMetadata?.role === 'admin'
+                            ? 'bg-green-600'
+                            : user.publicMetadata?.role === 'educator'
+                            ? 'bg-orange-500'
+                            : 'bg-blue-500'
+                        }`}
+                      >
+                        {user.publicMetadata?.role || 'student'}
+                      </span>
+                      {user.publicMetadata?.role === 'educator' && (
+                        <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded">
+                          📚 Can create courses
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-2 sm:px-4 py-2">
                     {/* Only allow role change for educators, not students or admins */}
