@@ -125,12 +125,12 @@ export const loginAdmin = async (req, res) => {
 export const toggleCoursePublish = async (req, res) => {
   try {
     const { id } = req.params;
-    const { isPublished } = req.body;
+    const { status } = req.body;
     const course = await Course.findById(id);
     if (!course) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
-    course.status = isPublished ? 'published' : 'draft';
+    course.status = status || (course.status === 'published' ? 'draft' : 'published');
     await course.save();
     res.json({ success: true, status: course.status });
   } catch (error) {

@@ -34,20 +34,23 @@ const ManageCourses = () => {
     fetchCourses();
   }, [backendUrl, aToken]);
 
-  const togglePublish = async (courseId, isPublished) => {
+  const togglePublish = async (courseId, status) => {
     try {
+      const newStatus = status === 'published' ? 'draft' : 'published';
       const res = await fetch(`${backendUrl}/api/admin/courses/${courseId}/publish`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${aToken}`,
         },
-        body: JSON.stringify({ isPublished: !isPublished }),
+        body: JSON.stringify({ status: newStatus }),
       });
-      const updated = await res.json();
-      setCourses(prev =>
-        prev.map(c => (c._id === courseId ? { ...c, isPublished: updated.isPublished } : c))
-      );
+      const data = await res.json();
+      if (data.success) {
+        setCourses(prev =>
+          prev.map(c => (c._id === courseId ? { ...c, status: newStatus } : c))
+        );
+      }
     } catch (error) {
       alert('Failed to toggle publish state');
     }
@@ -76,10 +79,10 @@ const ManageCourses = () => {
   const exportToCSV = () => {
     const headers = ['Title', 'Description', 'Price', 'Published'];
     const rows = courses.map((c) => [
-      c.courseTitle,
-      c.courseDescription,
-      c.coursePrice,
-      c.isPublished ? 'Yes' : 'No',
+      c.title || 'N/A',
+      (c.description || '').replace(/<[^>]+>/g, '') || 'N/A',
+      c.price || 'Free',
+      c.status === 'published' ? 'Yes' : 'No',
     ]);
     const csvContent =
       'data:text/csv;charset=utf-8,' +
@@ -143,25 +146,25 @@ const ManageCourses = () => {
             {courses.length > 0 ? (
               courses
                 .filter(course =>
-                  course.courseTitle.toLowerCase().includes(search.toLowerCase()) ||
-                  course.courseDescription.toLowerCase().includes(search.toLowerCase())
+                  (course.title || '').toLowerCase().includes(search.toLowerCase()) ||
+                  (course.description || '').toLowerCase().includes(search.toLowerCase())
                 )
                 .map((course, idx) => (
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
-                    <td className="px-4 py-2">{course.courseTitle}</td>
-                    <td className="px-4 py-2">{course.courseDescription.replace(/<[^>]+>/g, '')}</td>
-                    <td className="px-4 py-2">{course.coursePrice}</td>
+                    <td className="px-4 py-2">{course.title || 'N/A'}</td>
+                    <td className="px-4 py-2">{(course.description || '').replace(/<[^>]+>/g, '') || 'N/A'}</td>
+                    <td className="px-4 py-2">{course.price || 'Free'}</td>
                     <td className="px-4 py-2 flex items-center gap-2">
                       <button
-                        onClick={() => togglePublish(course._id, course.isPublished)}
+                        onClick={() => togglePublish(course._id, course.status)}
                         className={`px-2 py-1 rounded text-white text-xs flex items-center gap-1 ${
-                          course.isPublished ? 'bg-red-500' : 'bg-green-500'
+                          course.status === 'published' ? 'bg-red-500' : 'bg-green-500'
                         }`}
-                        title={course.isPublished ? 'Unpublish' : 'Publish'}
+                        title={course.status === 'published' ? 'Unpublish' : 'Publish'}
                       >
-                        {course.isPublished ? <FaTimes /> : <FaCheck />}
-                        {course.isPublished ? 'Unpublish' : 'Publish'}
+                        {course.status === 'published' ? <FaTimes /> : <FaCheck />}
+                        {course.status === 'published' ? 'Unpublish' : 'Publish'}
                       </button>
                       <button
                         onClick={() => deleteCourse(course._id)}
