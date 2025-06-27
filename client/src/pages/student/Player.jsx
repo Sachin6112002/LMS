@@ -56,6 +56,8 @@ const Player = ({ }) => {
   const markLectureAsCompleted = async (lectureId) => {
 
     try {
+      
+      console.log('Marking lecture as completed:', { lectureId, courseId }); // Debug log
 
       const token = await getToken()
 
@@ -63,6 +65,8 @@ const Player = ({ }) => {
         { courseId, lectureId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
+
+      console.log('Server response:', data); // Debug log
 
       if (data.success) {
         toast.success(data.message)
@@ -72,6 +76,7 @@ const Player = ({ }) => {
       }
 
     } catch (error) {
+      console.error('Error marking lecture as completed:', error); // Debug log
       toast.error(error.message)
     }
 
@@ -185,21 +190,30 @@ const Player = ({ }) => {
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
                 <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
-                  {chapter.lectures.map((lecture, i) => (
-                    <li key={i} className="flex items-start gap-2 py-1">
-                      <img src={progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
-                      <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
-                        <p>{lecture.title || lecture.lectureTitle}</p>
-                        <div className='flex gap-2'>
-                          {lecture.videoUrl && <p onClick={() => {
-                            console.log('Setting player data:', { ...lecture, lectureUrl: lecture.videoUrl });
-                            setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lecture.lectureId || lecture._id, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
-                          }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
-                          {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
+                  {chapter.lectures.map((lecture, i) => {
+                    const lectureId = lecture.lectureId || lecture._id;
+                    const isCompleted = progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(lectureId);
+                    console.log(`Lecture ${i}:`, { lecture, lectureId, isCompleted, completedIds: progressData?.lectureCompleted });
+                    
+                    return (
+                      <li key={i} className="flex items-start gap-2 py-1">
+                        <img src={isCompleted ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
+                        <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
+                          <p>{lecture.title || lecture.lectureTitle}</p>
+                          <div className='flex gap-2'>
+                            {lecture.videoUrl && <p onClick={() => {
+                              const lectureId = lecture.lectureId || lecture._id;
+                              console.log('Raw lecture object:', lecture);
+                              console.log('Extracted lectureId:', lectureId);
+                              console.log('Setting player data:', { ...lecture, lectureUrl: lecture.videoUrl, lectureId });
+                              setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
+                            }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
+                            {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             </div>

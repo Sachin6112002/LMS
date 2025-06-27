@@ -4,12 +4,12 @@ const lectureSchema = new mongoose.Schema({
     title: { type: String, required: true },
     videoUrl: { type: String, required: true },
     duration: { type: Number, required: true }
-}, { _id: false });
+});
 
 const chapterSchema = new mongoose.Schema({
     title: { type: String, required: true },
     lectures: [lectureSchema]
-}, { _id: false });
+});
 
 const courseSchema = new mongoose.Schema({
     title: { type: String, required: true },

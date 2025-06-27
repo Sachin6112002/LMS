@@ -136,31 +136,39 @@ export const updateUserCourseProgress = async (req, res) => {
         const userId = req.auth.userId
 
         const { courseId, lectureId } = req.body
+        
+        console.log('updateUserCourseProgress called with:', { userId, courseId, lectureId }); // Debug log
 
         const progressData = await CourseProgress.findOne({ userId, courseId })
+        
+        console.log('Existing progress data:', progressData); // Debug log
 
         if (progressData) {
 
             if (progressData.lectureCompleted.includes(lectureId)) {
+                console.log('Lecture already completed'); // Debug log
                 return res.json({ success: true, message: 'Lecture Already Completed' })
             }
 
             progressData.lectureCompleted.push(lectureId)
             await progressData.save()
+            console.log('Updated progress data:', progressData.lectureCompleted); // Debug log
 
         } else {
 
-            await CourseProgress.create({
+            const newProgress = await CourseProgress.create({
                 userId,
                 courseId,
                 lectureCompleted: [lectureId]
             })
+            console.log('Created new progress data:', newProgress); // Debug log
 
         }
 
         res.json({ success: true, message: 'Progress Updated' })
 
     } catch (error) {
+        console.error('Error in updateUserCourseProgress:', error); // Debug log
         res.json({ success: false, message: error.message })
     }
 
