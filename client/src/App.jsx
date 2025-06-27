@@ -15,6 +15,7 @@ import { AppContextProvider } from "./context/AppContext";
 import Register from "./pages/student/Register";
 import Dashboard from "./pages/educator/Dashboard";
 import AddCourse from "./pages/educator/AddCourse";
+import EditCourse from "./pages/educator/EditCourse";
 import MyCourses from "./pages/educator/MyCourses";
 import StudentsEnrolled from "./pages/educator/StudentsEnrolled";
 import Login from "./pages/student/Login";
@@ -130,6 +131,7 @@ const App = () => {
                 <Route path="/educator/*" element={<Educator />}>
                   <Route index element={<Dashboard />} />
                   <Route path="add-course" element={<AddCourse />} />
+                  <Route path="edit-course/:courseId" element={<EditCourse />} />
                   <Route path="my-courses" element={<MyCourses />} />
                   <Route path="student-enrolled" element={<StudentsEnrolled />} />
                 </Route>

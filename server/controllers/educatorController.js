@@ -295,3 +295,93 @@ export const getCourseById = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// Edit existing course
+export const editCourse = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
+    try {
+        const { courseId } = req.params;
+        const educatorId = req.auth.userId;
+        const imageFile = req.file;
+        
+        console.log('editCourse: courseId:', courseId);
+        console.log('editCourse: fields:', req.body);
+        console.log('editCourse: file:', req.file);
+        
+        // Find the course and verify ownership
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        
+        // Check if the educator owns this course
+        if (course.educator.toString() !== educatorId) {
+            return res.status(403).json({ success: false, message: 'Not authorized to edit this course' });
+        }
+        
+        // Prepare update data
+        const updateData = {};
+        
+        if (req.body.courseTitle) updateData.courseTitle = req.body.courseTitle;
+        if (req.body.description) updateData.description = req.body.description;
+        if (req.body.coursePrice !== undefined) updateData.coursePrice = parseInt(req.body.coursePrice) || 0;
+        if (req.body.discount !== undefined) updateData.discount = parseInt(req.body.discount) || 0;
+        if (req.body.category) updateData.category = req.body.category;
+        if (req.body.status) updateData.status = req.body.status;
+        
+        // Handle thumbnail update if new image is provided
+        if (imageFile) {
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+                resource_type: 'image'
+            });
+            updateData.courseThumbnail = imageUpload.secure_url;
+        }
+        
+        // Update the course
+        const updatedCourse = await Course.findByIdAndUpdate(
+            courseId,
+            updateData,
+            { new: true }
+        );
+        
+        res.json({ 
+            success: true, 
+            message: 'Course updated successfully', 
+            course: updatedCourse 
+        });
+        
+    } catch (error) {
+        console.error('editCourse error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Get single course for editing (with ownership check)
+export const getCourseForEdit = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
+    try {
+        const { courseId } = req.params;
+        const educatorId = req.auth.userId;
+        
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        
+        // Check if the educator owns this course
+        if (course.educator.toString() !== educatorId) {
+            return res.status(403).json({ success: false, message: 'Not authorized to access this course' });
+        }
+        
+        res.json({ success: true, courseData: course });
+    } catch (error) {
+        console.error('getCourseForEdit error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
