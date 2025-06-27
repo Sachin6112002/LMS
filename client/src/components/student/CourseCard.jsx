@@ -3,13 +3,11 @@ import { Link } from 'react-router-dom';
 
 const CourseCard = ({ course }) => {
   // Defensive: ensure course and chapters are valid
-  if (!course || typeof course !== 'object' || !course._id) {
+  if (!course || typeof course !== 'object' || !course._id || !Array.isArray(course.chapters)) {
     return null;
   }
-  const chaptersCount = Array.isArray(course.chapters) ? course.chapters.length : 0;
-  const lecturesCount = Array.isArray(course.chapters)
-    ? course.chapters.reduce((acc, ch) => acc + (Array.isArray(ch.lectures) ? ch.lectures.length : 0), 0)
-    : 0;
+  const chaptersCount = course.chapters.length;
+  const lecturesCount = course.chapters.reduce((acc, ch) => acc + (Array.isArray(ch.lectures) ? ch.lectures.length : 0), 0);
   return (
     <Link
       onClick={() => scrollTo(0, 0)}
