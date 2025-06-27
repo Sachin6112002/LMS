@@ -224,10 +224,15 @@ export const AppContextProvider = (props) => {
 
     // Function to Calculate Course Chapter Time
     const calculateChapterTime = (chapter) => {
+        if (!chapter) return "0m";
+        
         let time = 0;
         // Support both new and old model
-        (Array.isArray(chapter.lectures) ? chapter.lectures : (chapter.chapterContent || [])).forEach((lecture) => {
-            if (lecture.lectureDuration || lecture.duration) {
+        const lectures = Array.isArray(chapter.lectures) ? chapter.lectures : 
+                        (Array.isArray(chapter.chapterContent) ? chapter.chapterContent : []);
+        
+        lectures.forEach((lecture) => {
+            if (lecture && (lecture.lectureDuration || lecture.duration)) {
                 time += lecture.lectureDuration || lecture.duration;
             }
         });
@@ -236,21 +241,29 @@ export const AppContextProvider = (props) => {
 
     // Function to Calculate Course Duration
     const calculateCourseDuration = (course) => {
+        if (!course) return "0m";
+        
         let time = 0;
         // Support both new and old model
-        (Array.isArray(course.chapters) ? course.chapters : (course.courseContent || [])).forEach((chapter) => {
-            (Array.isArray(chapter.lectures) ? chapter.lectures : (chapter.chapterContent || [])).forEach((lecture) => {
-                if (lecture.lectureDuration || lecture.duration) {
-                    time += lecture.lectureDuration || lecture.duration;
-                }
-            });
+        const chapters = Array.isArray(course.chapters) ? course.chapters : 
+                        (Array.isArray(course.courseContent) ? course.courseContent : []);
+        
+        chapters.forEach((chapter) => {
+            if (chapter) {
+                const lectures = Array.isArray(chapter.lectures) ? chapter.lectures : 
+                               (Array.isArray(chapter.chapterContent) ? chapter.chapterContent : []);
+                lectures.forEach((lecture) => {
+                    if (lecture && (lecture.lectureDuration || lecture.duration)) {
+                        time += lecture.lectureDuration || lecture.duration;
+                    }
+                });
+            }
         });
         return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
     }
 
     const calculateRating = (course) => {
-
-        if (course.courseRatings.length === 0) {
+        if (!course || !Array.isArray(course.courseRatings) || course.courseRatings.length === 0) {
             return 0
         }
 
@@ -262,11 +275,17 @@ export const AppContextProvider = (props) => {
     }
 
     const calculateNoOfLectures = (course) => {
+        if (!course) return 0;
+        
         let totalLectures = 0;
-        course.courseContent.forEach(chapter => {
-            if (Array.isArray(chapter.chapterContent)) {
-                totalLectures += chapter.chapterContent.length;
-            }
+        // Support both old courseContent and new chapters structure
+        const chapters = Array.isArray(course.chapters) ? course.chapters : 
+                        (Array.isArray(course.courseContent) ? course.courseContent : []);
+        
+        chapters.forEach(chapter => {
+            const lectures = Array.isArray(chapter.lectures) ? chapter.lectures :
+                           (Array.isArray(chapter.chapterContent) ? chapter.chapterContent : []);
+            totalLectures += lectures.length;
         });
         return totalLectures;
     }

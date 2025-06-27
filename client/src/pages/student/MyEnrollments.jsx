@@ -13,28 +13,39 @@ const MyEnrollments = () => {
 
     const getCourseProgress = async () => {
         try {
+            if (!Array.isArray(enrolledCourses) || enrolledCourses.length === 0) {
+                return;
+            }
+            
             const token = await getToken();
 
             // Use Promise.all to handle multiple async operations
             const tempProgressArray = await Promise.all(
                 enrolledCourses.map(async (course) => {
-                    const { data } = await axios.post(
-                        `${backendUrl}/api/user/get-course-progress`,
-                        { courseId: course._id },
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
+                    try {
+                        const { data } = await axios.post(
+                            `${backendUrl}/api/user/get-course-progress`,
+                            { courseId: course._id },
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
 
-                    // Calculate total lectures
-                    let totalLectures = calculateNoOfLectures(course);
+                        // Calculate total lectures safely
+                        let totalLectures = calculateNoOfLectures(course) || 0;
 
-                    const lectureCompleted = data.progressData ? data.progressData.lectureCompleted.length : 0;
-                    return { totalLectures, lectureCompleted };
+                        const lectureCompleted = data.progressData && Array.isArray(data.progressData.lectureCompleted) 
+                            ? data.progressData.lectureCompleted.length 
+                            : 0;
+                        return { totalLectures, lectureCompleted };
+                    } catch (error) {
+                        console.error('Error getting progress for course:', course._id, error);
+                        return { totalLectures: 0, lectureCompleted: 0 };
+                    }
                 })
             );
 
             setProgressData(tempProgressArray);
         } catch (error) {
-            toast.error(error.message);
+            console.error('Error in getCourseProgress:', error);
         }
     };
 
