@@ -6,7 +6,7 @@ import Loading from '../../components/student/Loading';
 
 const MyCourses = () => {
 
-  const { backendUrl, isEducator, currency, getToken } = useContext(AppContext)
+  const { backendUrl, isEducator, currency, getToken, userData } = useContext(AppContext)
 
   const [courses, setCourses] = useState(null)
 
@@ -17,7 +17,8 @@ const MyCourses = () => {
       const { data } = await axios.get(backendUrl + '/api/courses', { headers: { Authorization: `Bearer ${token}` } });
       if (data.success) {
         // If backend returns all courses, filter by educatorId if needed
-        const educatorId = (typeof isEducator === 'object' && isEducator._id) ? isEducator._id : (userData && userData._id);
+        const educatorId = (typeof isEducator === 'object' && isEducator._id) ? isEducator._id : 
+                          (userData && userData._id) ? userData._id : null;
         const myCourses = educatorId ? data.courses.filter(c => c.educator && (c.educator._id === educatorId || c.educator === educatorId)) : data.courses;
         setCourses(myCourses);
       } else {
