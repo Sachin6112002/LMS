@@ -88,7 +88,7 @@ const AddCourse = () => {
       });
       if (data.success && data.course) {
         setCreatedCourse(data.course);
-        setChapters(data.course.chapters);
+        setChapters(data.course.chapters || []);
         toast.success('Course created! Now add chapters.');
         setStep(2); // Auto-advance to Step 2 after course creation
       } else {
@@ -116,7 +116,7 @@ const AddCourse = () => {
       );
       if (data.success && data.course) {
         setCreatedCourse(data.course);
-        setChapters(data.course.chapters);
+        setChapters(data.course.chapters || []);
         toast.success('Chapter added!');
       } else {
         toast.error(data.message || 'Failed to add chapter');
@@ -157,6 +157,11 @@ const AddCourse = () => {
       const videoRes = await uploadToCloudinary(lectureVideo, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
       const videoUrl = videoRes.secure_url;
       const token = await getToken();
+      // Ensure chapters is an array before calling findIndex
+      if (!Array.isArray(chapters)) {
+        toast.error('Invalid chapters data. Please refresh and try again.');
+        return;
+      }
       const chapterIndex = chapters.findIndex(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
       const { data } = await axios.post(
         `${backendUrl}/api/courses/${createdCourse._id}/chapters/${chapterIndex}/lectures`,
@@ -169,7 +174,7 @@ const AddCourse = () => {
       );
       if (data.success && data.course) {
         setCreatedCourse(data.course);
-        setChapters(data.course.chapters);
+        setChapters(data.course.chapters || []);
         toast.success('Lecture and video uploaded!');
       } else {
         toast.error(data.message || 'Failed to add lecture');

@@ -215,6 +215,11 @@ export const addUserRating = async (req, res) => {
         }
 
         // Check is user already rated
+        // Ensure courseRatings exists (for backwards compatibility with existing courses)
+        if (!course.courseRatings) {
+            course.courseRatings = [];
+        }
+        
         const existingRatingIndex = course.courseRatings.findIndex(r => r.userId === userId);
 
         if (existingRatingIndex > -1) {
