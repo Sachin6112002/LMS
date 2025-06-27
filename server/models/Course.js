@@ -3,8 +3,9 @@ import mongoose from 'mongoose';
 const lectureSchema = new mongoose.Schema({
     title: { type: String, required: true },
     videoUrl: { type: String, required: true },
-    duration: { type: Number, required: true }
-});
+    duration: { type: Number, required: true },
+    isPreviewFree: { type: Boolean, default: false }
+}, { _id: true });
 
 const chapterSchema = new mongoose.Schema({
     title: { type: String, required: true },

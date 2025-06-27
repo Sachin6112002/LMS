@@ -51,6 +51,27 @@ const ManageUsers = () => {
     fetchUsers();
   }, [backendUrl, aToken]);
 
+  // Auto-refresh users list every 30 seconds if enabled
+  useEffect(() => {
+    if (!autoRefresh) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`${backendUrl}/api/admin/users`, {
+          headers: { Authorization: `Bearer ${aToken}` },
+        });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.users)) {
+          setUsers(data.users);
+        }
+      } catch (err) {
+        console.error('Auto-refresh failed:', err);
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [backendUrl, aToken, autoRefresh]);
+
   // Function to manually refresh users list
   const refreshUsers = async () => {
     setLoading(true);
@@ -121,6 +142,8 @@ const ManageUsers = () => {
       }
       if (data.success) {
         setUsers(users.map((user) => (user._id === userId ? { ...user, publicMetadata: { ...user.publicMetadata, role: newRole } } : user)));
+        // Force refresh to ensure consistency
+        setTimeout(() => refreshUsers(), 1000);
       } else {
         alert('Failed to update role.');
       }

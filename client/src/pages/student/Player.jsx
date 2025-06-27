@@ -200,6 +200,20 @@ const Player = ({ }) => {
                             {lecture.videoUrl && <p onClick={() => {
                               setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
                             }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
+                            {lecture.isPreviewFree && lecture.videoUrl && (
+                              <p onClick={() => {
+                                setPlayerData({ 
+                                  ...lecture, 
+                                  lectureUrl: lecture.videoUrl, 
+                                  lectureTitle: lecture.title || lecture.lectureTitle,
+                                  isPreview: true,
+                                  chapter: index + 1,
+                                  lecture: i + 1
+                                });
+                              }} className='text-orange-600 hover:underline cursor-pointer font-semibold bg-orange-100 px-2 py-1 rounded'>
+                                🎬 Free Preview
+                              </p>
+                            )}
                             {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                           </div>
                         </div>
@@ -245,9 +259,6 @@ const Player = ({ }) => {
                   videoSrc = `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`;
                 }
                 
-                console.log('Final Video URL:', videoSrc); // Debug log
-                console.log('Player Data:', playerData); // Debug log
-                
                 return (
                   <div>
                     <video
@@ -256,26 +267,29 @@ const Player = ({ }) => {
                       controls
                       onError={e => { 
                         console.error('Video error:', e.target.error);
-                        console.error('Failed video src:', e.target.src);
                         e.target.onerror = null; 
                         e.target.poster = ''; 
-                        toast.error(`Video failed to load: ${playerData.lectureUrl}. Please check if the file exists.`); 
+                        toast.error(`Video failed to load. Please check if the file exists.`); 
                       }}
-                      onLoadStart={() => console.log('Video loading started...')}
-                      onCanPlay={() => console.log('Video can play')}
                     />
                     <div className='flex justify-between items-center mt-1'>
-                      <p className='text-xl'>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
-                      <button 
-                        onClick={() => markLectureAsCompleted(playerData.lectureId)} 
-                        className='text-green-600 hover:underline'
-                        disabled={!playerData.lectureId}
-                      >
-                        {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
-                      </button>
-                    </div>
-                    <div className='mt-2 text-sm text-gray-600'>
-                      Video path: {videoSrc}
+                      <div className='flex flex-col'>
+                        <p className='text-xl'>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
+                        {playerData.isPreview && (
+                          <span className='text-orange-600 text-sm font-semibold bg-orange-100 px-2 py-1 rounded mt-1 inline-block w-fit'>
+                            🎬 Free Preview
+                          </span>
+                        )}
+                      </div>
+                      {!playerData.isPreview && (
+                        <button 
+                          onClick={() => markLectureAsCompleted(playerData.lectureId)} 
+                          className='text-green-600 hover:underline'
+                          disabled={!playerData.lectureId}
+                        >
+                          {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

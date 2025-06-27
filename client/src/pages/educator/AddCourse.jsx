@@ -168,7 +168,8 @@ const AddCourse = () => {
         {
           title: lectureDetails.lectureTitle,
           duration: lectureVideoDuration,
-          videoUrl: videoUrl
+          videoUrl: videoUrl,
+          isPreviewFree: lectureDetails.isPreviewFree
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );

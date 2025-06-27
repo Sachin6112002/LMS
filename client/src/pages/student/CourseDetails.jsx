@@ -150,9 +150,20 @@ const CourseDetails = () => {
                             <p>{lecture.title || lecture.lectureTitle}</p>
                             <div className='flex gap-2'>
                               {/* Preview logic if available */}
-                              {lecture.isPreviewFree && lecture.lectureUrl && <p onClick={() => setPlayerData({ videoUrl: lecture.lectureUrl })} className='text-green-600 hover:underline cursor-pointer'>Preview</p>}
+                              {lecture.isPreviewFree && lecture.videoUrl && (
+                                <p 
+                                  onClick={() => setPlayerData({ 
+                                    videoUrl: lecture.videoUrl,
+                                    title: lecture.title,
+                                    isPreview: true
+                                  })} 
+                                  className='text-green-600 hover:underline cursor-pointer font-semibold'
+                                >
+                                  🎬 Free Preview
+                                </p>
+                              )}
                               {/* Duration if available */}
-                              {lecture.lectureDuration && <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>}
+                              {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                             </div>
                           </div>
                         </li>
@@ -174,7 +185,50 @@ const CourseDetails = () => {
         <div className="max-w-course-card z-10 shadow-custom-card rounded-t md:rounded-none overflow-hidden bg-green-50 min-w-[300px] sm:min-w-[420px]">
           {
             playerData
-              ? <video controls autoPlay className="w-full aspect-video rounded-t" src={playerData.videoUrl} />
+              ? (
+                <div className="relative">
+                  {(() => {
+                    let videoSrc;
+                    if (playerData.videoUrl.startsWith('http')) {
+                      // It's already a full URL (Cloudinary)
+                      videoSrc = playerData.videoUrl;
+                    } else {
+                      // It's a local file, prepend server URL
+                      videoSrc = `${backendUrl.replace(/\/$/, '')}/videos/${playerData.videoUrl}`;
+                    }
+                    
+                    return (
+                      <video 
+                        controls 
+                        autoPlay 
+                        className="w-full aspect-video rounded-t" 
+                        src={videoSrc}
+                        onError={e => { 
+                          console.error('Video error:', e.target.error);
+                          e.target.onerror = null; 
+                          e.target.poster = ''; 
+                        }}
+                      />
+                    );
+                  })()}
+                  {playerData.isPreview && (
+                    <div className="absolute top-2 left-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      🎬 Free Preview
+                    </div>
+                  )}
+                  {playerData.title && (
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white px-3 py-1 rounded text-sm">
+                      {playerData.title}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setPlayerData(null)}
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+              )
               : <img src={courseData.thumbnail} alt="" />
           }
           {/* Watch Button */}

@@ -40,7 +40,7 @@ export const addChapter = async (req, res) => {
 export const addLecture = async (req, res) => {
   try {
     const { id, chapterIndex } = req.params;
-    const { title, duration, videoUrl } = req.body;
+    const { title, duration, videoUrl, isPreviewFree } = req.body;
     if (!videoUrl) return res.status(400).json({ success: false, message: 'Video URL is required' });
     const course = await Course.findById(id);
     if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
@@ -48,7 +48,8 @@ export const addLecture = async (req, res) => {
     course.chapters[chapterIndex].lectures.push({
       title,
       videoUrl,
-      duration
+      duration,
+      isPreviewFree: !!isPreviewFree
     });
     await course.save();
     res.json({ success: true, course });
