@@ -45,7 +45,7 @@ export const addCourse = async (req, res) => {
             thumbnail: '', // will be set after upload
             createdBy: educatorId,
             status: 'draft',
-            chapters: []
+            chapters: Array.isArray(req.body.chapters) ? req.body.chapters : []
         };
         const newCourse = await Course.create(courseData);
         // Upload image to cloudinary
