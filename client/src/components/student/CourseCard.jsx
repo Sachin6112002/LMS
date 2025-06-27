@@ -32,7 +32,9 @@ const CourseCard = ({ course }) => {
           <span className="text-green-600">Chapters: {chaptersCount}</span>
           <span className="text-green-600">Lectures: {lecturesCount}</span>
         </div>
-        <p className="text-green-800 text-sm mt-2">{course.description}</p>
+        <p className="text-green-800 text-sm mt-2">
+          {course.description ? course.description.replace(/<[^>]+>/g, '') : 'No description available'}
+        </p>
       </div>
     </Link>
   );
