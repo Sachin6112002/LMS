@@ -97,6 +97,8 @@ const CourseDetails = () => {
   useEffect(() => {
     if (userData && courseData) {
       setIsAlreadyEnrolled(userData.enrolledCourses && userData.enrolledCourses.includes(courseData._id))
+    } else {
+      setIsAlreadyEnrolled(false)
     }
   }, [userData, courseData])
 

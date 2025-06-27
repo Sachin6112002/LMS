@@ -24,7 +24,7 @@ const Player = ({ }) => {
   const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
 
   const getCourseData = () => {
-    if (!Array.isArray(enrolledCourses)) return;
+    if (!Array.isArray(enrolledCourses) || !userData) return;
     enrolledCourses.forEach((course) => {
       if (course._id === courseId) {
         setCourseData(course)
@@ -48,10 +48,10 @@ const Player = ({ }) => {
 
 
   useEffect(() => {
-    if (enrolledCourses && enrolledCourses.length > 0) {
+    if (enrolledCourses && enrolledCourses.length > 0 && userData) {
       getCourseData()
     }
-  }, [enrolledCourses])
+  }, [enrolledCourses, userData])
 
   const markLectureAsCompleted = async (lectureId) => {
 
