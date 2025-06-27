@@ -224,17 +224,25 @@ const Player = ({ }) => {
           {(() => {
             try {
               if (playerData && playerData.lectureUrl) {
+                const videoSrc = `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`;
+                console.log('Video URL:', videoSrc); // Debug log
+                console.log('Player Data:', playerData); // Debug log
+                
                 return (
                   <div>
                     <video
                       className='w-full aspect-video'
-                      src={`${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
+                      src={videoSrc}
                       controls
                       onError={e => { 
+                        console.error('Video error:', e.target.error);
+                        console.error('Failed video src:', e.target.src);
                         e.target.onerror = null; 
                         e.target.poster = ''; 
-                        toast.error('Video failed to load. Please refresh or contact support.'); 
+                        toast.error(`Video failed to load: ${playerData.lectureUrl}. Please check if the file exists.`); 
                       }}
+                      onLoadStart={() => console.log('Video loading started...')}
+                      onCanPlay={() => console.log('Video can play')}
                     />
                     <div className='flex justify-between items-center mt-1'>
                       <p className='text-xl'>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
@@ -245,6 +253,9 @@ const Player = ({ }) => {
                       >
                         {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
                       </button>
+                    </div>
+                    <div className='mt-2 text-sm text-gray-600'>
+                      Video path: {videoSrc}
                     </div>
                   </div>
                 );
