@@ -482,24 +482,7 @@ export const fixPendingPurchases = async (req, res) => {
     }
 };
 
-// Get all purchases with status
-export const getAllPurchases = async (req, res) => {
-    try {
-        const purchases = await Purchase.find()
-            .populate('courseId', 'title')
-            .populate('userId', 'name email')
-            .sort({ createdAt: -1 })
-            .limit(100);
 
-        res.json({
-            success: true,
-            purchases: purchases || []
-        });
-
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-};
 
 // In your Express app or course routes file, add:
 // router.get('/api/course/:id', getPublishedCourseById);
