@@ -191,7 +191,10 @@ const Player = ({ }) => {
                       <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                         <p>{lecture.title || lecture.lectureTitle}</p>
                         <div className='flex gap-2'>
-                          {lecture.videoUrl && <p onClick={() => setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lecture.lectureId || lecture._id, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 })} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
+                          {lecture.videoUrl && <p onClick={() => {
+                            console.log('Setting player data:', { ...lecture, lectureUrl: lecture.videoUrl });
+                            setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lecture.lectureId || lecture._id, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
+                          }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
                           {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                         </div>
                       </div>
@@ -224,8 +227,19 @@ const Player = ({ }) => {
           {(() => {
             try {
               if (playerData && playerData.lectureUrl) {
-                const videoSrc = `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`;
-                console.log('Video URL:', videoSrc); // Debug log
+                // Handle both Cloudinary URLs and local server videos
+                console.log('Raw lectureUrl:', playerData.lectureUrl);
+                
+                let videoSrc;
+                if (playerData.lectureUrl.startsWith('http')) {
+                  // It's already a full URL (Cloudinary)
+                  videoSrc = playerData.lectureUrl;
+                } else {
+                  // It's a local file, prepend server URL
+                  videoSrc = `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`;
+                }
+                
+                console.log('Final Video URL:', videoSrc); // Debug log
                 console.log('Player Data:', playerData); // Debug log
                 
                 return (
