@@ -229,33 +229,37 @@ const Player = ({ }) => {
       </div>
       <div className='md:mt-10'>
         <Suspense fallback={<Loading />}>
-        {
-          playerData
-            ? (
-              <div>
-                {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
-                  <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
-                ) : playerData.lectureUrl ? (
-                  <video
-                    className='w-full aspect-video'
-                    src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
-                    controls
-                    crossOrigin="anonymous"
-                    onError={e => { e.target.onerror = null; e.target.poster = ''; toast.error('Video failed to load. Please refresh or contact support.'); }}
-                  />
-                ) : (
-                  <div className='w-full aspect-video bg-green-100 flex items-center justify-center text-green-700'>No video available</div>
-                )}
-                <div className='flex justify-between items-center mt-1'>
-                  <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
-                  <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-green-600 hover:underline'>
-                    {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
-                  </button>
-                </div>
+          {playerData ? (
+            <div>
+              {playerData.lectureUrl && (playerData.lectureUrl.startsWith('http') && playerData.lectureUrl.includes('youtube')) ? (
+                <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
+              ) : playerData.lectureUrl ? (
+                <video
+                  className='w-full aspect-video'
+                  src={playerData.lectureUrl.startsWith('http') ? playerData.lectureUrl : `${backendUrl.replace(/\/$/, '')}/videos/${playerData.lectureUrl}`}
+                  controls
+                  crossOrigin="anonymous"
+                  onError={e => { e.target.onerror = null; e.target.poster = ''; toast.error('Video failed to load. Please refresh or contact support.'); }}
+                />
+              ) : (
+                <div className='w-full aspect-video bg-green-100 flex items-center justify-center text-green-700'>No video available</div>
+              )}
+              <div className='flex justify-between items-center mt-1'>
+                <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle || playerData.title || 'Untitled Lecture'}</p>
+                <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-green-600 hover:underline'>
+                  {progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}
+                </button>
               </div>
-            )
-            : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />
-        }
+            </div>
+          ) : (
+            <div className='w-full aspect-video bg-gray-100 flex items-center justify-center'>
+              {courseData && courseData.courseThumbnail ? (
+                <img src={courseData.courseThumbnail} alt="Course thumbnail" className='max-w-full max-h-full object-contain' />
+              ) : (
+                <div className='text-gray-500 text-lg'>Select a lecture to start watching</div>
+              )}
+            </div>
+          )}
         </Suspense>
       </div>
     </div>
