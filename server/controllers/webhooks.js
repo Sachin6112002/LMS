@@ -92,9 +92,24 @@ export const loginUser = async (req, res) => {
 // Stripe Webhooks to Manage Payments Action
 export const stripeWebhooks = async (request, response) => {
   // --- CORS HEADERS FOR SERVERLESS DEPLOYMENTS ---
-  response.setHeader('Access-Control-Allow-Origin', 'https://lms-client-one-lemon.vercel.app');
-  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const allowedOrigins = [
+    'https://lms-client-one-lemon.vercel.app',
+    'https://lms-admin-blond.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ];
+  
+  const origin = request.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    response.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  response.setHeader('Access-Control-Allow-Credentials', 'true');
+  
   if (request.method === 'OPTIONS') {
     response.status(200).end();
     return;

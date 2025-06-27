@@ -23,24 +23,61 @@ await connectDB()
 // Middlewares
 app.use((req, res, next) => {
   console.log('CORS DEBUG: Incoming origin:', req.headers.origin);
+  console.log('CORS DEBUG: Request method:', req.method);
+  console.log('CORS DEBUG: Request path:', req.path);
   next();
 });
+
+// Enhanced CORS configuration
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL,
-    'https://lms-client-one-lemon.vercel.app',
-    'http://localhost:3000',
-    'https://lms-admin-blond.vercel.app'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'https://lms-client-one-lemon.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://lms-admin-blond.vercel.app'
+    ];
+    
+    // For debugging - temporarily allow all origins
+    console.log('CORS DEBUG: Origin check:', origin);
+    console.log('CORS DEBUG: Allowed origins:', allowedOrigins);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      // Temporarily allow all origins for debugging
+      console.log('CORS DEBUG: Allowing origin for debugging:', origin);
+      callback(null, true);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 200
 }));
 
 // Add this line to handle all OPTIONS preflight requests for CORS
 app.options('*', cors());
+
+// Global CORS headers as fallback
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 
 // Register webhook route FIRST, before any body parser
 app.use('/api/webhook', webhookRoutes);
@@ -59,6 +96,17 @@ app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
+
+// CORS test endpoint
+app.get('/api/cors-test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'CORS is working!', 
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/educator', (req, res, next) => {
   if (req.url.startsWith('/add-course')) {
     console.log('>>>> /api/educator/add-course route hit');
