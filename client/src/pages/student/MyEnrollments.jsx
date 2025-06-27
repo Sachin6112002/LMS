@@ -4,6 +4,7 @@ import axios from 'axios'
 import { Line } from 'rc-progress';
 import Footer from '../../components/student/Footer';
 import Loading from '../../components/student/Loading'; // Adjust the import based on your project structure
+import PendingPurchases from '../../components/student/PendingPurchases';
 
 const MyEnrollments = () => {
 
@@ -86,6 +87,9 @@ const MyEnrollments = () => {
         <>
             <div className="min-h-screen bg-green-50">
                 <h1 className="text-3xl font-bold text-green-900 py-8 text-center">My Enrollments</h1>
+                <div className="px-8 max-w-6xl mx-auto">
+                    <PendingPurchases />
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-8 pb-16">
                     {enrolledCourses.map((course, idx) => (
                         <div key={course._id} className="bg-white border border-green-200 rounded-lg shadow p-6 flex flex-col gap-4">

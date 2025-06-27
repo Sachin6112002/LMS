@@ -418,5 +418,88 @@ export const getPublishedCourseById = async (req, res) => {
   }
 };
 
+// Fix pending purchases (admin utility)
+export const fixPendingPurchases = async (req, res) => {
+    try {
+        // Find all pending purchases older than 10 minutes
+        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+        const pendingPurchases = await Purchase.find({
+            status: 'pending',
+            createdAt: { $lt: tenMinutesAgo }
+        });
+
+        console.log(`Found ${pendingPurchases.length} pending purchases to process`);
+
+        let completedCount = 0;
+        let failedCount = 0;
+
+        for (const purchase of pendingPurchases) {
+            try {
+                const userData = await User.findById(purchase.userId);
+                const courseData = await Course.findById(purchase.courseId);
+
+                if (!userData || !courseData) {
+                    purchase.status = 'failed';
+                    await purchase.save();
+                    failedCount++;
+                    continue;
+                }
+
+                // Complete the enrollment
+                courseData.enrolledStudents = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
+                if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
+                    courseData.enrolledStudents.push(userData._id);
+                    await courseData.save();
+                }
+
+                userData.enrolledCourses = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
+                if (!userData.enrolledCourses.map(id => id.toString()).includes(courseData._id.toString())) {
+                    userData.enrolledCourses.push(courseData._id);
+                    await userData.save();
+                }
+
+                purchase.status = 'completed';
+                await purchase.save();
+                completedCount++;
+            } catch (error) {
+                console.error('Error processing purchase:', purchase._id, error);
+                failedCount++;
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Processed ${pendingPurchases.length} purchases`,
+            details: {
+                total: pendingPurchases.length,
+                completed: completedCount,
+                failed: failedCount
+            }
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// Get all purchases with status
+export const getAllPurchases = async (req, res) => {
+    try {
+        const purchases = await Purchase.find()
+            .populate('courseId', 'title')
+            .populate('userId', 'name email')
+            .sort({ createdAt: -1 })
+            .limit(100);
+
+        res.json({
+            success: true,
+            purchases: purchases || []
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
 // In your Express app or course routes file, add:
 // router.get('/api/course/:id', getPublishedCourseById);

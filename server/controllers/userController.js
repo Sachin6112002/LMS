@@ -72,10 +72,35 @@ export const purchaseCourse = async (req, res) => {
         const purchaseData = {
             courseId: courseData._id,
             userId,
-            amount: 0, // No price/discount in new model, so set to 0
+            amount: courseData.price || 0, // Use course price if available, otherwise 0 for free courses
         }
 
         const newPurchase = await Purchase.create(purchaseData)
+
+        // Handle free courses differently
+        if (newPurchase.amount === 0) {
+            // For free courses, complete enrollment immediately
+            courseData.enrolledStudents = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
+            if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
+                courseData.enrolledStudents.push(userData._id);
+                await courseData.save();
+            }
+
+            userData.enrolledCourses = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
+            if (!userData.enrolledCourses.map(id => id.toString()).includes(courseData._id.toString())) {
+                userData.enrolledCourses.push(courseData._id);
+                await userData.save();
+            }
+
+            newPurchase.status = 'completed';
+            await newPurchase.save();
+
+            return res.json({ 
+                success: true, 
+                message: 'Free course enrolled successfully!',
+                isFree: true
+            });
+        }
 
         // Stripe Gateway Initialize
         const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
@@ -89,7 +114,7 @@ export const purchaseCourse = async (req, res) => {
                 product_data: {
                     name: courseData.title // Use new model's title field
                 },
-                unit_amount: Math.floor(newPurchase.amount) * 100
+                unit_amount: Math.max(Math.floor(newPurchase.amount) * 100, 100) // Minimum $1 for Stripe
             },
             quantity: 1
         }]
@@ -340,5 +365,83 @@ export const becomeEducator = async (req, res) => {
         
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Manual purchase completion for debugging
+export const completePendingPurchase = async (req, res) => {
+    try {
+        const { purchaseId } = req.body;
+        const userId = req.auth.userId;
+
+        if (!purchaseId) {
+            return res.json({ success: false, message: 'Purchase ID is required' });
+        }
+
+        const purchaseData = await Purchase.findById(purchaseId);
+        if (!purchaseData) {
+            return res.json({ success: false, message: 'Purchase not found' });
+        }
+
+        // Verify the purchase belongs to the user
+        if (purchaseData.userId !== userId) {
+            return res.json({ success: false, message: 'Unauthorized access to purchase' });
+        }
+
+        if (purchaseData.status === 'completed') {
+            return res.json({ success: false, message: 'Purchase already completed' });
+        }
+
+        const userData = await User.findById(purchaseData.userId);
+        const courseData = await Course.findById(purchaseData.courseId?.toString());
+
+        if (!userData || !courseData) {
+            return res.json({ success: false, message: 'User or Course not found' });
+        }
+
+        // Prevent duplicate enrollments
+        courseData.enrolledStudents = Array.isArray(courseData.enrolledStudents) ? courseData.enrolledStudents : [];
+        if (!courseData.enrolledStudents.map(id => id.toString()).includes(userData._id.toString())) {
+            courseData.enrolledStudents.push(userData._id);
+            await courseData.save();
+        }
+
+        userData.enrolledCourses = Array.isArray(userData.enrolledCourses) ? userData.enrolledCourses : [];
+        if (!userData.enrolledCourses.map(id => id.toString()).includes(courseData._id.toString())) {
+            userData.enrolledCourses.push(courseData._id);
+            await userData.save();
+        }
+
+        purchaseData.status = 'completed';
+        await purchaseData.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Purchase completed successfully',
+            courseTitle: courseData.title
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// Get user's pending purchases
+export const getUserPendingPurchases = async (req, res) => {
+    try {
+        const userId = req.auth.userId;
+
+        const pendingPurchases = await Purchase.find({ 
+            userId, 
+            status: 'pending' 
+        }).populate('courseId', 'title description thumbnail');
+
+        res.json({ 
+            success: true, 
+            pendingPurchases: pendingPurchases || []
+        });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
     }
 };

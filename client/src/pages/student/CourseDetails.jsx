@@ -69,8 +69,18 @@ const CourseDetails = () => {
       )
 
       if (data.success) {
-        const { session_url } = data
-        window.location.replace(session_url)
+        if (data.isFree) {
+          // For free courses, refresh user data and navigate to enrollments
+          toast.success(data.message);
+          // Refresh user data to update enrolled courses
+          setTimeout(() => {
+            window.location.href = '/my-enrollments';
+          }, 1500);
+        } else {
+          // For paid courses, redirect to Stripe
+          const { session_url } = data
+          window.location.replace(session_url)
+        }
       } else {
         toast.error(data.message)
       }

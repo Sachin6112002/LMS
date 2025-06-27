@@ -26,6 +26,7 @@ import Profile from "./pages/Profile";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
+import PaymentResult from "./pages/student/PaymentResult";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -113,7 +114,7 @@ const App = () => {
                 <Route path="/course-list/:input" element={<CoursesList />} />
                 <Route path="/my-enrollments" element={<MyEnrollments />} />
                 <Route path="/player/:courseId" element={<Player />} />
-                <Route path="/loading/:path" element={<Loading />} />
+                <Route path="/loading/:redirectTo" element={<PaymentResult />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/about" element={<About />} />

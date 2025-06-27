@@ -31,7 +31,8 @@ const courseSchema = new mongoose.Schema({
         userId: { type: String, ref: 'User', required: true },
         rating: { type: Number, required: true, min: 1, max: 5 }
     }],
-    // Optionally add price, discount, ratings, students, etc. as needed
+    price: { type: Number, default: 0 }, // Course price in dollars, 0 for free courses
+    // Optionally add discount, ratings, students, etc. as needed
 }, { timestamps: true, minimize: false });
 
 const Course = mongoose.model('Course', courseSchema);
