@@ -41,7 +41,8 @@ const MyCourses = () => {
           return;
         }
       } catch (educatorError) {
-        console.log('MyCourses: Educator endpoint not available, falling back to filtering');
+        console.log('MyCourses: Educator endpoint error:', educatorError.response?.data?.message || educatorError.message);
+        console.log('MyCourses: Falling back to filtering all courses');
       }
       
       // Fallback: Use general courses endpoint and filter
@@ -63,11 +64,12 @@ const MyCourses = () => {
         }
       } else {
         console.error('MyCourses: API error:', data.message);
-        toast.error(data.message);
+        toast.error(data.message || 'Failed to fetch courses');
       }
     } catch (error) {
       console.error('MyCourses: Fetch error:', error);
-      toast.error(error.response?.data?.message || error.message);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch course data';
+      toast.error(errorMessage);
     }
   }
 
@@ -76,7 +78,7 @@ const MyCourses = () => {
     if (courses && courses.length > 0) {
       const missingThumb = courses.find(c => !c.courseThumbnail || c.courseThumbnail === '');
       if (missingThumb) {
-        toast.warn(`Some courses are missing a thumbnail. Please ensure you upload a thumbnail when creating a course.`);
+        toast.warn(`Some courses are missing a thumbnail. Please upload a thumbnail to improve course visibility.`);
       }
     }
   }, [courses]);

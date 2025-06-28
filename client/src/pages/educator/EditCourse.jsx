@@ -10,8 +10,6 @@ const EditCourse = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
 
-  console.log('EditCourse: Component mounted with courseId:', courseId);
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [courseData, setCourseData] = useState({
@@ -31,10 +29,8 @@ const EditCourse = () => {
   }, [courseId]);
 
   const fetchCourseData = async () => {
-    console.log('EditCourse: fetchCourseData called with courseId:', courseId);
     try {
       const token = await getToken();
-      console.log('EditCourse: Token obtained, making API call to:', `${backendUrl}/api/educator/course/${courseId}`);
       const { data } = await axios.get(`${backendUrl}/api/educator/course/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -42,15 +38,15 @@ const EditCourse = () => {
       if (data.success) {
         const course = data.courseData || data.course;
         setCourseData({
-          courseTitle: course.courseTitle || '',
+          courseTitle: course.courseTitle || course.title || '', // Handle both field names
           description: course.description || '',
-          coursePrice: course.coursePrice || '',
+          coursePrice: course.coursePrice || course.price || '', // Handle both field names
           discount: course.discount || '',
           category: course.category || '',
           courseThumbnail: null,
           status: course.status || 'draft'
         });
-        setThumbnailPreview(course.courseThumbnail || '');
+        setThumbnailPreview(course.courseThumbnail || course.thumbnail || ''); // Handle both field names
       } else {
         toast.error('Failed to fetch course data');
         navigate('/educator/my-courses');
@@ -103,6 +99,7 @@ const EditCourse = () => {
       const token = await getToken();
       const formData = new FormData();
       
+      // Append all course data to FormData
       formData.append('courseTitle', courseData.courseTitle);
       formData.append('description', courseData.description);
       formData.append('coursePrice', courseData.coursePrice);
@@ -114,16 +111,12 @@ const EditCourse = () => {
         formData.append('image', courseData.courseThumbnail);
       }
 
-      const { data } = await axios.put(
-        `${backendUrl}/api/educator/edit-course/${courseId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
+      const { data } = await axios.put(`${backendUrl}/api/educator/edit-course/${courseId}`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
-      );
+      });
 
       if (data.success) {
         toast.success('Course updated successfully!');
@@ -151,16 +144,16 @@ const EditCourse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-green-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold text-green-900">Edit Course</h1>
             <button
               onClick={() => navigate('/educator/my-courses')}
               className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
             >
-              ← Back to My Courses
+              Cancel
             </button>
           </div>
 
@@ -190,43 +183,42 @@ const EditCourse = () => {
                 name="description"
                 value={courseData.description}
                 onChange={handleInputChange}
-                rows="5"
+                rows="4"
                 className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter course description"
               />
             </div>
 
-            {/* Price and Discount */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-green-700 mb-2">
-                  Course Price
-                </label>
-                <input
-                  type="number"
-                  name="coursePrice"
-                  value={courseData.coursePrice}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Enter price"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-green-700 mb-2">
-                  Discount (%)
-                </label>
-                <input
-                  type="number"
-                  name="discount"
-                  value={courseData.discount}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Enter discount percentage"
-                  min="0"
-                  max="100"
-                />
-              </div>
+            {/* Course Price */}
+            <div>
+              <label className="block text-sm font-medium text-green-700 mb-2">
+                Course Price
+              </label>
+              <input
+                type="number"
+                name="coursePrice"
+                value={courseData.coursePrice}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Enter course price"
+              />
+            </div>
+
+            {/* Discount */}
+            <div>
+              <label className="block text-sm font-medium text-green-700 mb-2">
+                Discount (%)
+              </label>
+              <input
+                type="number"
+                name="discount"
+                value={courseData.discount}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Enter discount percentage"
+                min="0"
+                max="100"
+              />
             </div>
 
             {/* Category */}
@@ -241,13 +233,13 @@ const EditCourse = () => {
                 className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="">Select a category</option>
-                <option value="Programming">Programming</option>
-                <option value="Design">Design</option>
-                <option value="Business">Business</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Photography">Photography</option>
-                <option value="Music">Music</option>
-                <option value="Other">Other</option>
+                <option value="programming">Programming</option>
+                <option value="design">Design</option>
+                <option value="business">Business</option>
+                <option value="marketing">Marketing</option>
+                <option value="photography">Photography</option>
+                <option value="music">Music</option>
+                <option value="other">Other</option>
               </select>
             </div>
 
@@ -256,24 +248,27 @@ const EditCourse = () => {
               <label className="block text-sm font-medium text-green-700 mb-2">
                 Course Thumbnail
               </label>
+              {thumbnailPreview && (
+                <div className="mb-3">
+                  <img 
+                    src={thumbnailPreview} 
+                    alt="Course thumbnail preview" 
+                    className="w-32 h-24 object-cover rounded-md border border-green-300"
+                  />
+                </div>
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleThumbnailChange}
                 className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              {thumbnailPreview && (
-                <div className="mt-2">
-                  <img
-                    src={thumbnailPreview}
-                    alt="Course thumbnail preview"
-                    className="w-32 h-20 object-cover rounded border"
-                  />
-                </div>
-              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Upload a new image to replace the current thumbnail
+              </p>
             </div>
 
-            {/* Status */}
+            {/* Course Status */}
             <div>
               <label className="block text-sm font-medium text-green-700 mb-2">
                 Course Status
@@ -290,7 +285,7 @@ const EditCourse = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={() => navigate('/educator/my-courses')}
@@ -301,7 +296,7 @@ const EditCourse = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Updating...' : 'Update Course'}
               </button>

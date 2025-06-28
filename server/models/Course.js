@@ -32,6 +32,8 @@ const courseSchema = new mongoose.Schema({
         rating: { type: Number, required: true, min: 1, max: 5 }
     }],
     price: { type: Number, default: 0 }, // Course price in dollars, 0 for free courses
+    discount: { type: Number, default: 0 }, // Discount percentage
+    category: { type: String, default: '' }, // Course category
     // Optionally add discount, ratings, students, etc. as needed
 }, { timestamps: true, minimize: false });
 

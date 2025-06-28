@@ -1,5 +1,5 @@
 import express from 'express'
-import { addChapter, addCourse, educatorDashboardData, getEducatorCourses, getEnrolledStudentsData, updateRoleToEducator, addLecture, publishCourse, editCourse, getCourseForEdit } from '../controllers/educatorController.js';
+import { addChapter, addCourse, educatorDashboardData, getEducatorCourses, getEnrolledStudentsData, updateRoleToEducator, addLecture, publishCourse, getCourseForEdit, editCourse } from '../controllers/educatorController.js';
 import upload, { videoUpload } from '../configs/multer.js';
 import { protectEducator } from '../middlewares/authMiddleware.js';
 import { jwtMiddleware } from '../middlewares/jwtMiddleware.js';
@@ -27,6 +27,12 @@ educatorRouter.post('/add-chapter', jwtMiddleware, protectEducator, addChapter);
 
 // Add Lecture (with video)
 educatorRouter.post('/add-lecture', jwtMiddleware, protectEducator, videoUpload.single('file'), addLecture);
+
+// Get course for editing
+educatorRouter.get('/course/:courseId', jwtMiddleware, protectEducator, getCourseForEdit);
+
+// Edit course
+educatorRouter.put('/edit-course/:courseId', jwtMiddleware, protectEducator, upload.single('image'), editCourse);
 
 // Update Lecture Duration
 educatorRouter.post('/update-lecture-duration', jwtMiddleware, protectEducator, async (req, res) => {
@@ -66,10 +72,5 @@ educatorRouter.get('/course', jwtMiddleware, protectEducator, async (req, res) =
   return getCourseById(req, res);
 });
 
-// Edit Course
-educatorRouter.put('/edit-course/:courseId', jwtMiddleware, protectEducator, upload.single('image'), editCourse);
-
-// Get Course for Edit
-educatorRouter.get('/course/:courseId', jwtMiddleware, protectEducator, getCourseForEdit);
 
 export default educatorRouter;
