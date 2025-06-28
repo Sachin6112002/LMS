@@ -292,15 +292,6 @@ export const addLecture = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Video file is required' });
         }
         
-        // Check file size and provide helpful message for large files
-        if (videoFile.size && videoFile.size > 25 * 1024 * 1024) { // 25MB warning
-            console.warn(`Large file upload attempt: ${videoFile.size} bytes`);
-            return res.status(413).json({ 
-                success: false, 
-                message: 'Video file is too large for this hosting platform. Please compress your video to under 25MB or consider uploading to a video hosting service like YouTube or Vimeo and embedding the link instead.' 
-            });
-        }
-        
         // Find the course
         const course = await Course.findById(courseId);
         if (!course) {
@@ -321,25 +312,42 @@ export const addLecture = async (req, res) => {
         // Upload video to Cloudinary
         let videoUpload;
         try {
+            console.log('Starting Cloudinary upload for file:', videoFile.originalname, 'Size:', videoFile.size);
+            
             if (videoFile.buffer) {
                 // Convert buffer to base64 for cloudinary upload
                 const base64String = `data:${videoFile.mimetype};base64,${videoFile.buffer.toString('base64')}`;
                 videoUpload = await cloudinary.uploader.upload(base64String, {
-                    resource_type: 'video'
+                    resource_type: 'video',
+                    timeout: 120000, // 2 minutes timeout
+                    chunk_size: 6000000, // 6MB chunks for large files
+                    eager: [
+                        { quality: "auto", fetch_format: "auto" }
+                    ]
                 });
             } else if (videoFile.path) {
                 // If using disk storage
                 videoUpload = await cloudinary.uploader.upload(videoFile.path, {
-                    resource_type: 'video'
+                    resource_type: 'video',
+                    timeout: 120000, // 2 minutes timeout
+                    chunk_size: 6000000, // 6MB chunks for large files
+                    eager: [
+                        { quality: "auto", fetch_format: "auto" }
+                    ]
                 });
             }
             
             if (!videoUpload || !videoUpload.secure_url) {
                 throw new Error('Failed to get video URL from upload');
             }
+            
+            console.log('Cloudinary upload successful:', videoUpload.secure_url);
         } catch (uploadError) {
             console.error('Video upload error:', uploadError);
-            return res.status(500).json({ success: false, message: 'Failed to upload video' });
+            return res.status(500).json({ 
+                success: false, 
+                message: `Failed to upload video: ${uploadError.message}` 
+            });
         }
         
         // Create new lecture

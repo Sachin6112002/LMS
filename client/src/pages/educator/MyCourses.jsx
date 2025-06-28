@@ -194,7 +194,7 @@ const MyCourses = () => {
     } catch (error) {
       console.error('Add lecture error:', error);
       if (error.response?.status === 413 || error.code === 'ERR_BAD_REQUEST') {
-        toast.error('Video file is too large for this hosting platform. Please compress your video to under 50MB or consider using a video hosting service like YouTube/Vimeo and embedding the link.');
+        toast.error('Video file upload failed due to hosting platform limits. Try compressing the video or using a smaller file.');
       } else if (error.code === 'ECONNABORTED') {
         toast.error('Upload timeout. Please try again or check your internet connection.');
       } else {
@@ -209,18 +209,10 @@ const MyCourses = () => {
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Warn about large files (>25MB) that might hit hosting limits
       const fileSizeMB = file.size / (1024 * 1024);
-      if (fileSizeMB > 25) {
-        toast.warn(`Large file detected (${fileSizeMB.toFixed(1)}MB). This may exceed hosting platform limits (~25MB). Consider compressing the video or using a video hosting service like YouTube/Vimeo.`);
-      }
       
-      // Block very large files (>50MB) that will definitely fail
-      if (fileSizeMB > 50) {
-        toast.error(`File too large (${fileSizeMB.toFixed(1)}MB). This hosting platform cannot handle files over 50MB. Please compress your video or use an external video hosting service.`);
-        e.target.value = ''; // Clear the input
-        return;
-      }
+      // Just show file size info, no restrictions
+      console.log(`Selected video: ${file.name}, Size: ${fileSizeMB.toFixed(1)}MB`);
       
       // Update the video file in form
       setLectureForm(prev => ({ ...prev, videoFile: file }));
@@ -516,7 +508,7 @@ const MyCourses = () => {
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file. Duration will be detected automatically. Recommended: Keep files under 25MB for best compatibility.
+                  Upload a video file. Duration will be detected automatically.
                 </p>
                 {lectureForm.videoFile && (
                   <p className="text-xs text-green-600 mt-1">
