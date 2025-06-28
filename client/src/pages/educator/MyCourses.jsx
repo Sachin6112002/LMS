@@ -184,6 +184,39 @@ const MyCourses = () => {
     }
   };
 
+  // Handle video file selection and auto-extract duration
+  const handleVideoFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Update the video file in form
+      setLectureForm(prev => ({ ...prev, videoFile: file }));
+      
+      // Create a video element to extract duration
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      
+      video.onloadedmetadata = () => {
+        const durationInMinutes = Math.ceil(video.duration / 60); // Convert seconds to minutes and round up
+        setLectureForm(prev => ({ 
+          ...prev, 
+          duration: durationInMinutes.toString() 
+        }));
+        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes`);
+        
+        // Clean up
+        window.URL.revokeObjectURL(video.src);
+      };
+      
+      video.onerror = () => {
+        toast.warn('Could not extract video duration. Please enter manually.');
+        window.URL.revokeObjectURL(video.src);
+      };
+      
+      // Set video source to the file
+      video.src = URL.createObjectURL(file);
+    }
+  };
+
   // ...existing code...
 
   // Show loading while waiting for courses to load
@@ -431,8 +464,12 @@ const MyCourses = () => {
                   value={lectureForm.duration}
                   onChange={(e) => setLectureForm(prev => ({ ...prev, duration: e.target.value }))}
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Enter duration in minutes"
+                  placeholder="Auto-detected from video"
+                  readOnly={!!lectureForm.videoFile} // Make readonly when video is selected
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Duration will be automatically detected when you upload a video
+                </p>
               </div>
               
               <div>
@@ -440,9 +477,12 @@ const MyCourses = () => {
                 <input
                   type="file"
                   accept="video/*"
-                  onChange={(e) => setLectureForm(prev => ({ ...prev, videoFile: e.target.files[0] }))}
+                  onChange={handleVideoFileChange}
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Upload a video file. Duration will be detected automatically.
+                </p>
               </div>
             </div>
             
