@@ -193,10 +193,8 @@ const MyCourses = () => {
       }
     } catch (error) {
       console.error('Add lecture error:', error);
-      if (error.code === 'ERR_BAD_REQUEST' && error.response?.status === 413) {
-        toast.error('Video file is too large. Please compress the video or use a smaller file (max 100MB).');
-      } else if (error.code === 'ECONNABORTED') {
-        toast.error('Upload timeout. Please try with a smaller video file.');
+      if (error.code === 'ECONNABORTED') {
+        toast.error('Upload timeout. Please try again or check your internet connection.');
       } else {
         toast.error(error.response?.data?.message || 'Failed to add lecture');
       }
@@ -209,14 +207,6 @@ const MyCourses = () => {
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (100MB limit)
-      const maxSize = 100 * 1024 * 1024; // 100MB in bytes
-      if (file.size > maxSize) {
-        toast.error('Video file is too large. Maximum size allowed is 100MB.');
-        e.target.value = ''; // Clear the input
-        return;
-      }
-      
       // Update the video file in form
       setLectureForm(prev => ({ ...prev, videoFile: file }));
       
@@ -511,7 +501,7 @@ const MyCourses = () => {
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file (max 100MB). Duration will be detected automatically.
+                  Upload a video file. Duration will be detected automatically.
                 </p>
                 {lectureForm.videoFile && (
                   <p className="text-xs text-green-600 mt-1">
