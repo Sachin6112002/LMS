@@ -293,11 +293,11 @@ export const addLecture = async (req, res) => {
         }
         
         // Check file size and provide helpful message for large files
-        if (videoFile.size && videoFile.size > 90 * 1024 * 1024) { // 90MB warning
+        if (videoFile.size && videoFile.size > 50 * 1024 * 1024) { // 50MB warning
             console.warn(`Large file upload attempt: ${videoFile.size} bytes`);
             return res.status(413).json({ 
                 success: false, 
-                message: 'Video file is too large for this hosting platform. Please use a video compression tool to reduce the file size, or consider uploading to a video hosting service like YouTube or Vimeo and embedding the link instead.' 
+                message: 'Video file is too large for this hosting platform. Please compress your video to under 50MB or consider uploading to a video hosting service like YouTube or Vimeo and embedding the link instead.' 
             });
         }
         

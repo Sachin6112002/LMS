@@ -193,7 +193,9 @@ const MyCourses = () => {
       }
     } catch (error) {
       console.error('Add lecture error:', error);
-      if (error.code === 'ECONNABORTED') {
+      if (error.response?.status === 413 || error.code === 'ERR_BAD_REQUEST') {
+        toast.error('Video file is too large for this hosting platform. Please compress your video to under 90MB or consider using a video hosting service like YouTube/Vimeo and embedding the link.');
+      } else if (error.code === 'ECONNABORTED') {
         toast.error('Upload timeout. Please try again or check your internet connection.');
       } else {
         toast.error(error.response?.data?.message || 'Failed to add lecture');
@@ -207,10 +209,17 @@ const MyCourses = () => {
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Warn about large files (>90MB) that might hit hosting limits
+      // Warn about large files (>50MB) that might hit hosting limits
       const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > 50) {
+        toast.warn(`Large file detected (${fileSizeMB.toFixed(1)}MB). This may exceed hosting platform limits (~50MB). Consider compressing the video or using a video hosting service like YouTube/Vimeo.`);
+      }
+      
+      // Block very large files (>90MB) that will definitely fail
       if (fileSizeMB > 90) {
-        toast.warn(`Large file detected (${fileSizeMB.toFixed(1)}MB). This may exceed hosting platform limits. Consider compressing the video or using a video hosting service like YouTube/Vimeo.`);
+        toast.error(`File too large (${fileSizeMB.toFixed(1)}MB). This hosting platform cannot handle files over 90MB. Please compress your video or use an external video hosting service.`);
+        e.target.value = ''; // Clear the input
+        return;
       }
       
       // Update the video file in form
@@ -507,7 +516,7 @@ const MyCourses = () => {
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file. Duration will be detected automatically. Note: Large files (&gt;90MB) may hit hosting platform limits.
+                  Upload a video file. Duration will be detected automatically. Recommended: Keep files under 50MB for best compatibility.
                 </p>
                 {lectureForm.videoFile && (
                   <p className="text-xs text-green-600 mt-1">
