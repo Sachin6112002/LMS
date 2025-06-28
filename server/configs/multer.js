@@ -18,9 +18,7 @@ const upload = multer({
 // Multer config for video uploads (use memory storage for serverless compatibility)
 export const videoUpload = multer({
   storage: multer.memoryStorage(), // Use memory storage for serverless compatibility
-  limits: {
-    fileSize: 100 * 1024 * 1024, // 100MB limit for video files
-  },
+  // No fileSize limit for video files
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('video/')) {
       cb(null, true);
