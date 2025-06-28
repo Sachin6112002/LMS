@@ -22,6 +22,7 @@ const MyCourses = () => {
     duration: '', 
     chapterId: '' 
   })
+  const [isUploadingLecture, setIsUploadingLecture] = useState(false)
 
   const fetchEducatorCourses = async () => {
     try {
@@ -148,6 +149,13 @@ const MyCourses = () => {
       return;
     }
 
+    if (!lectureForm.videoFile) {
+      toast.error('Please select a video file');
+      return;
+    }
+
+    setIsUploadingLecture(true);
+    
     try {
       const token = await getToken();
       const formData = new FormData();
@@ -156,9 +164,9 @@ const MyCourses = () => {
       formData.append('duration', lectureForm.duration || '0');
       formData.append('courseId', selectedCourse._id);
       formData.append('chapterId', lectureForm.chapterId);
-      if (lectureForm.videoFile) {
-        formData.append('file', lectureForm.videoFile);
-      }
+      formData.append('file', lectureForm.videoFile);
+
+      toast.info('Uploading video... This may take a while for large files.');
 
       const { data } = await axios.post(
         `${backendUrl}/api/educator/add-lecture`,
@@ -167,7 +175,12 @@ const MyCourses = () => {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
-          } 
+          },
+          timeout: 300000, // 5 minute timeout for large uploads
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload Progress: ${percentCompleted}%`);
+          }
         }
       );
 
@@ -180,7 +193,15 @@ const MyCourses = () => {
       }
     } catch (error) {
       console.error('Add lecture error:', error);
-      toast.error(error.response?.data?.message || 'Failed to add lecture');
+      if (error.code === 'ERR_BAD_REQUEST' && error.response?.status === 413) {
+        toast.error('Video file is too large. Please compress the video or use a smaller file (max 100MB).');
+      } else if (error.code === 'ECONNABORTED') {
+        toast.error('Upload timeout. Please try with a smaller video file.');
+      } else {
+        toast.error(error.response?.data?.message || 'Failed to add lecture');
+      }
+    } finally {
+      setIsUploadingLecture(false);
     }
   };
 
@@ -188,6 +209,14 @@ const MyCourses = () => {
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (100MB limit)
+      const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+      if (file.size > maxSize) {
+        toast.error('Video file is too large. Maximum size allowed is 100MB.');
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
       // Update the video file in form
       setLectureForm(prev => ({ ...prev, videoFile: file }));
       
@@ -201,7 +230,7 @@ const MyCourses = () => {
           ...prev, 
           duration: durationInMinutes.toString() 
         }));
-        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes`);
+        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes (File size: ${(file.size / (1024 * 1024)).toFixed(1)}MB)`);
         
         // Clean up
         window.URL.revokeObjectURL(video.src);
@@ -478,26 +507,34 @@ const MyCourses = () => {
                   type="file"
                   accept="video/*"
                   onChange={handleVideoFileChange}
-                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  disabled={isUploadingLecture}
+                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file. Duration will be detected automatically.
+                  Upload a video file (max 100MB). Duration will be detected automatically.
                 </p>
+                {lectureForm.videoFile && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Selected: {lectureForm.videoFile.name} ({(lectureForm.videoFile.size / (1024 * 1024)).toFixed(1)}MB)
+                  </p>
+                )}
               </div>
             </div>
             
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowContentModal(false)}
-                className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+                disabled={isUploadingLecture}
+                className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={addLectureToChapter}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                disabled={isUploadingLecture}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add Lecture
+                {isUploadingLecture ? 'Uploading...' : 'Add Lecture'}
               </button>
             </div>
           </div>
