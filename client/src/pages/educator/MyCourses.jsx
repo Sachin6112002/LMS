@@ -207,6 +207,12 @@ const MyCourses = () => {
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Warn about large files (>90MB) that might hit hosting limits
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > 90) {
+        toast.warn(`Large file detected (${fileSizeMB.toFixed(1)}MB). This may exceed hosting platform limits. Consider compressing the video or using a video hosting service like YouTube/Vimeo.`);
+      }
+      
       // Update the video file in form
       setLectureForm(prev => ({ ...prev, videoFile: file }));
       
@@ -220,7 +226,7 @@ const MyCourses = () => {
           ...prev, 
           duration: durationInMinutes.toString() 
         }));
-        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes (File size: ${(file.size / (1024 * 1024)).toFixed(1)}MB)`);
+        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes (File size: ${fileSizeMB.toFixed(1)}MB)`);
         
         // Clean up
         window.URL.revokeObjectURL(video.src);
@@ -501,7 +507,7 @@ const MyCourses = () => {
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file. Duration will be detected automatically.
+                  Upload a video file. Duration will be detected automatically. Note: Large files (&gt;90MB) may hit hosting platform limits.
                 </p>
                 {lectureForm.videoFile && (
                   <p className="text-xs text-green-600 mt-1">

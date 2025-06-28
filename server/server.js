@@ -72,6 +72,17 @@ app.use('/videos', express.static(path.join(__dirname, 'videos')));
 // Serve favicon.ico statically if present
 app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
 
+// Global error handler for payload too large
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large' || err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({
+      success: false,
+      message: 'File is too large for this hosting platform. Please compress your video or consider using a video hosting service.'
+    });
+  }
+  next(err);
+});
+
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
 
