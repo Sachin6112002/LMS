@@ -383,11 +383,32 @@ export const editCourse = async (req, res) => {
         // Update thumbnail if new image is provided
         if (imageFile) {
             try {
-                // Upload new image to cloudinary
-                const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-                    resource_type: 'image'
-                });
-                course.thumbnail = imageUpload.secure_url;
+                // If using memory storage, upload from buffer
+                let imageUpload;
+                if (imageFile.buffer) {
+                    imageUpload = await cloudinary.uploader.upload_stream(
+                        { resource_type: 'image' },
+                        (error, result) => {
+                            if (error) throw error;
+                            return result;
+                        }
+                    );
+                    // cloudinary.uploader.upload_stream returns a stream, so we need to pipe the buffer
+                    const stream = cloudinary.uploader.upload_stream(
+                        { resource_type: 'image' },
+                        (error, result) => {
+                            if (error) throw error;
+                            course.thumbnail = result.secure_url;
+                        }
+                    );
+                    stream.end(imageFile.buffer);
+                } else if (imageFile.path) {
+                    // If using disk storage
+                    imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+                        resource_type: 'image'
+                    });
+                    course.thumbnail = imageUpload.secure_url;
+                }
             } catch (uploadError) {
                 console.error('Image upload error:', uploadError);
                 return res.status(500).json({ success: false, message: 'Failed to upload thumbnail' });
