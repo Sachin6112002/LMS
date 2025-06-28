@@ -225,48 +225,133 @@ export const getEnrolledStudentsData = async (req, res) => {
 
 // Add Chapter to Course
 export const addChapter = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
     try {
-        const { courseId, title } = req.body;
+        const { courseId, title, description } = req.body;
+        const educatorId = req.auth.userId;
+        
         if (!courseId || !title) {
-            return res.status(400).json({ success: false, message: 'Missing required fields' });
+            return res.status(400).json({ success: false, message: 'Missing required fields: courseId and title are required' });
         }
+        
         const course = await Course.findById(courseId);
-        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        
+        // Check if educator owns this course
+        if (course.createdBy !== educatorId) {
+            return res.status(403).json({ success: false, message: 'Unauthorized: You can only add chapters to your own courses' });
+        }
 
         const newChapter = {
             title,
+            description: description || '',
             lectures: []
         };
+        
         course.chapters.push(newChapter);
         await course.save();
-        res.json({ success: true, chapter: newChapter, course });
+        
+        res.json({ 
+            success: true, 
+            message: 'Chapter added successfully',
+            chapter: newChapter, 
+            course 
+        });
     } catch (err) {
+        console.error('addChapter error:', err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
 
 // Add Lecture to Chapter
 export const addLecture = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
     try {
         // Debug log incoming fields and file
         console.log('addLecture fields:', req.body);
         console.log('addLecture file:', req.file);
-        const { courseId, chapterIndex, title, duration, videoUrl, isPreviewFree } = req.body;
-        if (courseId === undefined || chapterIndex === undefined || !title || !duration || !videoUrl) {
-            return res.status(400).json({ success: false, message: 'Missing required fields' });
+        
+        const { courseId, chapterId, title, description, duration } = req.body;
+        const videoFile = req.file;
+        const educatorId = req.auth.userId;
+        
+        // Validate required fields
+        if (!courseId || !chapterId || !title) {
+            return res.status(400).json({ success: false, message: 'Missing required fields: courseId, chapterId, and title are required' });
         }
+        
+        if (!videoFile) {
+            return res.status(400).json({ success: false, message: 'Video file is required' });
+        }
+        
+        // Find the course
         const course = await Course.findById(courseId);
-        if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
-        if (!course.chapters[chapterIndex]) return res.status(404).json({ success: false, message: 'Chapter not found' });
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        
+        // Check if educator owns this course
+        if (course.createdBy !== educatorId) {
+            return res.status(403).json({ success: false, message: 'Unauthorized: You can only add lectures to your own courses' });
+        }
+        
+        // Find the chapter by ID
+        const chapterIndex = course.chapters.findIndex(chapter => chapter._id.toString() === chapterId);
+        if (chapterIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Chapter not found' });
+        }
+        
+        // Upload video to Cloudinary
+        let videoUpload;
+        try {
+            if (videoFile.buffer) {
+                // Convert buffer to base64 for cloudinary upload
+                const base64String = `data:${videoFile.mimetype};base64,${videoFile.buffer.toString('base64')}`;
+                videoUpload = await cloudinary.uploader.upload(base64String, {
+                    resource_type: 'video'
+                });
+            } else if (videoFile.path) {
+                // If using disk storage
+                videoUpload = await cloudinary.uploader.upload(videoFile.path, {
+                    resource_type: 'video'
+                });
+            }
+            
+            if (!videoUpload || !videoUpload.secure_url) {
+                throw new Error('Failed to get video URL from upload');
+            }
+        } catch (uploadError) {
+            console.error('Video upload error:', uploadError);
+            return res.status(500).json({ success: false, message: 'Failed to upload video' });
+        }
+        
+        // Create new lecture
         const newLecture = {
             title,
-            duration,
-            videoUrl,
-            isPreviewFree: !!isPreviewFree
+            description: description || '',
+            videoUrl: videoUpload.secure_url,
+            duration: parseInt(duration) || 0,
+            isPreviewFree: false // Default to false, can be updated later
         };
+        
+        // Add lecture to chapter
         course.chapters[chapterIndex].lectures.push(newLecture);
         await course.save();
-        res.json({ success: true, lecture: newLecture, course });
+        
+        res.json({ 
+            success: true, 
+            message: 'Lecture added successfully',
+            lecture: newLecture, 
+            course 
+        });
     } catch (err) {
         console.log('addLecture error:', err);
         res.status(500).json({ success: false, message: err.message });

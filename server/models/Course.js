@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const lectureSchema = new mongoose.Schema({
     title: { type: String, required: true },
+    description: { type: String, default: '' },
     videoUrl: { type: String, required: true },
     duration: { type: Number, required: true },
     isPreviewFree: { type: Boolean, default: false }
@@ -9,8 +10,9 @@ const lectureSchema = new mongoose.Schema({
 
 const chapterSchema = new mongoose.Schema({
     title: { type: String, required: true },
+    description: { type: String, default: '' },
     lectures: [lectureSchema]
-});
+}, { _id: true });
 
 const courseSchema = new mongoose.Schema({
     title: { type: String, required: true },

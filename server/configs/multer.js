@@ -12,18 +12,9 @@ const upload = multer({
   }
 });
 
-// Multer config for video uploads (no file size limit, only video files)
+// Multer config for video uploads (use memory storage for serverless compatibility)
 export const videoUpload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'videos/'); // Store in /videos (make sure this folder exists and is not public)
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, uniqueSuffix + '-' + file.originalname);
-    }
-  }),
-  // No fileSize limit
+  storage: multer.memoryStorage(), // Use memory storage for serverless compatibility
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('video/')) {
       cb(null, true);
