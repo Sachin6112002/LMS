@@ -98,19 +98,16 @@ const EditCourse = () => {
     try {
       const token = await getToken();
       const formData = new FormData();
-      
-      // Append all course data to FormData
-      formData.append('courseTitle', courseData.courseTitle);
+      // Use backend field names
+      formData.append('title', courseData.courseTitle); // Backend expects 'title'
       formData.append('description', courseData.description);
-      formData.append('coursePrice', courseData.coursePrice);
+      formData.append('price', courseData.coursePrice); // Backend expects 'price'
       formData.append('discount', courseData.discount);
       formData.append('category', courseData.category);
       formData.append('status', courseData.status);
-      
       if (courseData.courseThumbnail) {
-        formData.append('image', courseData.courseThumbnail);
+        formData.append('image', courseData.courseThumbnail); // Backend expects 'image' for thumbnail
       }
-
       const { data } = await axios.put(`${backendUrl}/api/educator/edit-course/${courseId}`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
