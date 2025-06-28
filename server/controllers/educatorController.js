@@ -48,17 +48,28 @@ export const addCourse = async (req, res) => {
             chapters: Array.isArray(req.body.chapters) ? req.body.chapters : []
         };
         const newCourse = await Course.create(courseData);
+        
         // Upload image to cloudinary
-        const imageUpload = await cloudinary.uploader.upload_stream({ resource_type: 'image' }, async (error, result) => {
-            if (error) {
-                console.log('Cloudinary upload error:', error);
-                return res.json({ success: false, message: 'Image upload failed' });
-            }
-            newCourse.thumbnail = result.secure_url;
+        let imageUpload;
+        if (imageFile.buffer) {
+            // Convert buffer to base64 for cloudinary upload
+            const base64String = `data:${imageFile.mimetype};base64,${imageFile.buffer.toString('base64')}`;
+            imageUpload = await cloudinary.uploader.upload(base64String, {
+                resource_type: 'image'
+            });
+        } else if (imageFile.path) {
+            // If using disk storage
+            imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+                resource_type: 'image'
+            });
+        }
+        
+        if (imageUpload && imageUpload.secure_url) {
+            newCourse.thumbnail = imageUpload.secure_url;
             await newCourse.save();
-            res.json({ success: true, message: 'Course Added', course: newCourse });
-        });
-        imageUpload.end(imageFile.buffer);
+        }
+        
+        res.json({ success: true, message: 'Course Added', course: newCourse });
     } catch (error) {
         console.log('addCourse error:', error);
         res.json({ success: false, message: error.message });
@@ -383,30 +394,21 @@ export const editCourse = async (req, res) => {
         // Update thumbnail if new image is provided
         if (imageFile) {
             try {
-                // If using memory storage, upload from buffer
                 let imageUpload;
                 if (imageFile.buffer) {
-                    imageUpload = await cloudinary.uploader.upload_stream(
-                        { resource_type: 'image' },
-                        (error, result) => {
-                            if (error) throw error;
-                            return result;
-                        }
-                    );
-                    // cloudinary.uploader.upload_stream returns a stream, so we need to pipe the buffer
-                    const stream = cloudinary.uploader.upload_stream(
-                        { resource_type: 'image' },
-                        (error, result) => {
-                            if (error) throw error;
-                            course.thumbnail = result.secure_url;
-                        }
-                    );
-                    stream.end(imageFile.buffer);
+                    // Convert buffer to base64 for cloudinary upload
+                    const base64String = `data:${imageFile.mimetype};base64,${imageFile.buffer.toString('base64')}`;
+                    imageUpload = await cloudinary.uploader.upload(base64String, {
+                        resource_type: 'image'
+                    });
                 } else if (imageFile.path) {
                     // If using disk storage
                     imageUpload = await cloudinary.uploader.upload(imageFile.path, {
                         resource_type: 'image'
                     });
+                }
+                
+                if (imageUpload && imageUpload.secure_url) {
                     course.thumbnail = imageUpload.secure_url;
                 }
             } catch (uploadError) {
