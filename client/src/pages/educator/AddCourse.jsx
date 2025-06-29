@@ -136,64 +136,82 @@ const AddCourse = () => {
       toast.error('Lecture video file is required.');
       return;
     }
-    
-    // Check file size before uploading (100MB limit for Cloudinary)
-    const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+    // Check file size (100MB limit for Cloudinary)
+    const maxSize = 100 * 1024 * 1024; // 100MB
     if (lectureVideo.size > maxSize) {
-      toast.error(`Video file is too large! Your file is ${(lectureVideo.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 100MB. Please compress your video.`);
+      toast.error(`Video file is too large! Maximum size allowed is 100MB. Please compress your video.`);
       return;
     }
-    
-    if (!lectureVideoDuration) {
-      toast.error('Lecture video duration is required.');
-      return;
-    }
-    if (!createdCourse || currentChapterId === null) {
-      toast.error('Course and chapter must be created before adding a lecture.');
-      return;
-    }
-    setShowPopup(false);
-    setLectureDetails({
-      lectureTitle: '',
-      lectureDuration: '',
-      isPreviewFree: false,
-    });
-    setLectureVideo(null);
-    setLectureVideoDuration('');
+    setIsSubmitting(true);
     try {
-      // Upload video to Cloudinary
-      const videoRes = await uploadToCloudinary(lectureVideo, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
-      const videoUrl = videoRes.secure_url;
+      toast.info('Uploading video to cloud... This may take a while for large files.');
+      // Step 1: Upload video directly to Cloudinary
+      const formData = new FormData();
+      formData.append('file', lectureVideo);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('resource_type', 'video');
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
+      const cloudinaryResponse = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            // Optionally, set a progress state here
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status} - ${xhr.responseText}`));
+          }
+        };
+        xhr.onerror = () => {
+          reject(new Error('Network error'));
+        };
+        xhr.open('POST', cloudinaryUrl);
+        xhr.send(formData);
+      });
+      // Step 2: Create lecture with Cloudinary URL
       const token = await getToken();
-      // Ensure chapters is an array before calling findIndex
-      if (!Array.isArray(chapters)) {
-        toast.error('Invalid chapters data. Please refresh and try again.');
-        return;
-      }
-      const chapterIndex = chapters.findIndex(ch => ch._id === currentChapterId || ch.chapterId === currentChapterId);
+      const durationInMinutes = Math.round(cloudinaryResponse.duration / 60) || 0;
+      const lectureData = {
+        courseId: createdCourse._id,
+        chapterId: currentChapterId,
+        title: lectureDetails.lectureTitle,
+        description: lectureDetails.lectureDescription || '',
+        videoUrl: cloudinaryResponse.secure_url,
+        duration: durationInMinutes,
+        isPreviewFree: lectureDetails.isPreviewFree
+      };
       const { data } = await axios.post(
-        `${backendUrl}/api/courses/${createdCourse._id}/chapters/${chapterIndex}/lectures`,
+        `${backendUrl}/api/educator/add-lecture-cloudinary`,
+        lectureData,
         {
-          title: lectureDetails.lectureTitle,
-          duration: lectureVideoDuration,
-          videoUrl: videoUrl,
-          isPreviewFree: lectureDetails.isPreviewFree
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
       );
-      if (data.success && data.course) {
-        setCreatedCourse(data.course);
-        setChapters(data.course.chapters || []);
+      if (data.success) {
         toast.success('Lecture and video uploaded!');
+        setShowPopup(false);
+        setLectureDetails({ lectureTitle: '', lectureDuration: '', isPreviewFree: false });
+        setLectureVideo(null);
+        setLectureVideoDuration('');
+        fetchCourseById(createdCourse._id); // Refresh course/chapters
       } else {
         toast.error(data.message || 'Failed to add lecture');
       }
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        toast.error('Failed to upload lecture and video: ' + err.response.data.message);
+      if (err.message && err.message.includes('Upload failed')) {
+        toast.error('Video upload failed. Please check your internet connection and try again.');
       } else {
-        toast.error('Failed to upload lecture and video');
+        toast.error(err.response?.data?.message || 'Failed to add lecture');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
