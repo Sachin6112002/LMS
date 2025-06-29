@@ -121,16 +121,38 @@ app.use((err, req, res, next) => {
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
 
-app.use('/api/educator', (req, res, next) => {
-  console.log(`>>>> /api/educator${req.url} route hit - Method: ${req.method}`);
-  if (req.url.startsWith('/add-course')) {
-    console.log('>>>> /api/educator/add-course route hit');
+// EMERGENCY DIRECT ROUTE - bypassing educatorRouter import issue
+app.post('/api/educator/add-lecture-cloudinary', async (req, res) => {
+  try {
+    console.log('EMERGENCY ROUTE HIT: /api/educator/add-lecture-cloudinary');
+    console.log('Request body:', req.body);
+    
+    // Import the controller function dynamically
+    const { addLectureWithCloudinaryUrl } = await import('./controllers/educatorController.js');
+    
+    // Apply middleware manually
+    const { jwtMiddleware } = await import('./middlewares/jwtMiddleware.js');
+    const { protectEducator } = await import('./middlewares/authMiddleware.js');
+    
+    // Run middleware
+    jwtMiddleware(req, res, (err) => {
+      if (err) return res.status(401).json({ success: false, message: 'JWT middleware failed' });
+      
+      protectEducator(req, res, (err) => {
+        if (err) return res.status(403).json({ success: false, message: 'Educator protection failed' });
+        
+        // Call the actual controller function
+        addLectureWithCloudinaryUrl(req, res);
+      });
+    });
+    
+  } catch (error) {
+    console.error('Emergency route error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
   }
-  if (req.url.startsWith('/add-lecture-cloudinary')) {
-    console.log('>>>> /api/educator/add-lecture-cloudinary route hit - this should work!');
-  }
-  next();
-}, educatorRouter)
+});
+
+app.use('/api/educator', educatorRouter)
 app.use('/api/user', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
