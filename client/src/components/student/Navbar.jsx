@@ -77,7 +77,7 @@ const Navbar = () => {
             href={import.meta.env.VITE_ADMIN_URL || "https://lms-admin-theta-two.vercel.app"}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full ml-2 font-semibold transition"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full transition ml-2"
           >
             Admin Panel
           </a>
@@ -112,7 +112,7 @@ const Navbar = () => {
             href={import.meta.env.VITE_ADMIN_URL || "https://lms-admin-theta-two.vercel.app"}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full ml-2 font-semibold transition"
+            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-full transition ml-2"
           >
             Admin Panel
           </a>
