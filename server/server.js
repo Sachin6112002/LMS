@@ -121,6 +121,11 @@ app.use((err, req, res, next) => {
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
 
+// SIMPLE TEST ROUTE - to verify deployment is working
+app.get('/api/test-deployment', (req, res) => {
+  res.json({ success: true, message: 'Deployment is working!', timestamp: new Date().toISOString() });
+});
+
 // EMERGENCY DIRECT ROUTE - bypassing educatorRouter import issue
 app.post('/api/educator/add-lecture-cloudinary', async (req, res) => {
   try {
