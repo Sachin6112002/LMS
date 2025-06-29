@@ -7,9 +7,9 @@ import { AppContext } from '../../context/AppContext';
 import CloudinaryVideoUpload from '../../components/educator/CloudinaryVideoUpload';
 import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
 
-// Set your actual Cloudinary values here
-const CLOUDINARY_CLOUD_NAME = 'denhmcs4e'; // your actual cloud name
-const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // use your unsigned upload preset
+// Use environment variables for Cloudinary config
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
 
 const AddCourse = () => {
 
