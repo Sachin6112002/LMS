@@ -130,8 +130,10 @@ const Player = ({ }) => {
 
   // Helper: force refresh course data (for educator after upload)
   const handleRefresh = () => {
-    fetchUserEnrolledCourses();
-    setTimeout(() => getCourseData(), 500); // Give time for backend to update
+    if (userData) {
+      fetchUserEnrolledCourses();
+      setTimeout(() => getCourseData(), 500); // Give time for backend to update
+    }
   };
 
   // Early return if no course data

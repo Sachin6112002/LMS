@@ -7,12 +7,14 @@ import { toast } from 'react-toastify';
 const PaymentResult = () => {
   const { redirectTo } = useParams();
   const navigate = useNavigate();
-  const { fetchUserEnrolledCourses } = useContext(AppContext);
+  const { fetchUserEnrolledCourses, isAuthenticated } = useContext(AppContext);
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
-    // Update enrolled courses when coming from a successful payment
-    fetchUserEnrolledCourses();
+    // Update enrolled courses when coming from a successful payment - only if user is authenticated
+    if (isAuthenticated()) {
+      fetchUserEnrolledCourses();
+    }
     
     // Countdown timer
     const timer = setInterval(() => {
@@ -32,7 +34,7 @@ const PaymentResult = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [navigate, redirectTo, fetchUserEnrolledCourses]);
+  }, [navigate, redirectTo, fetchUserEnrolledCourses, isAuthenticated]);
 
   const handleManualRedirect = () => {
     if (redirectTo === 'my-enrollments') {

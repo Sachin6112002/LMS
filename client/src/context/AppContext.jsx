@@ -23,8 +23,34 @@ export const AppContextProvider = (props) => {
     const [enrolledCourses, setEnrolledCourses] = useState([])
     const [users, setUsers] = useState([])
 
+    // Setup axios interceptor for handling 401 errors
+    useEffect(() => {
+        const interceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response?.status === 401 && jwt) {
+                    console.log('401 error detected, clearing invalid token');
+                    setJwt(null);
+                    setUserData(null);
+                    setIsEducator(false);
+                    setEnrolledCourses([]);
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('userData');
+                    toast.error('Session expired. Please login again.');
+                    navigate('/login');
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            axios.interceptors.response.eject(interceptor);
+        };
+    }, [jwt, navigate]);
+
     // Auth helpers
     const getToken = () => jwt
+    const isAuthenticated = () => !!jwt && !!userData
     const saveAuth = (token, user) => {
         setJwt(token)
         setUserData(user)
@@ -35,6 +61,7 @@ export const AppContextProvider = (props) => {
         setJwt(null)
         setUserData(null)
         setIsEducator(false)
+        setEnrolledCourses([])
         localStorage.removeItem('jwtToken')
         localStorage.removeItem('userData')
         toast.success('Logged out successfully')
@@ -119,14 +146,25 @@ export const AppContextProvider = (props) => {
                 console.log('User data fetched successfully:', data.user);
             } else {
                 console.error('Failed to fetch user data:', data.message);
-                toast.error(data.message)
+                // Don't show toast for user not found when not logged in
+                if (jwt) {
+                    toast.error(data.message)
+                }
             }
         } catch (error) {
             console.error('Error fetching user data:', error);
-            if (error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('Failed to fetch user data. Please try logging in again.');
+            // Only show error toast if we have a token (user should be logged in)
+            if (jwt && error.response?.status !== 401) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error('Failed to fetch user data. Please try logging in again.');
+                }
+            }
+            // If 401 error (unauthorized), clear invalid token
+            if (error.response?.status === 401) {
+                console.log('Token appears to be invalid, clearing auth data');
+                logout();
             }
         }
     }
@@ -146,14 +184,25 @@ export const AppContextProvider = (props) => {
                 console.log('Enrolled courses fetched successfully:', data.enrolledCourses.length, 'courses');
             } else {
                 console.error('Failed to fetch enrolled courses:', data.message);
-                toast.error(data.message || 'Failed to fetch enrolled courses')
+                // Don't show toast for enrolled courses when not logged in
+                if (jwt) {
+                    toast.error(data.message || 'Failed to fetch enrolled courses')
+                }
             }
         } catch (error) {
             console.error('Error fetching enrolled courses:', error);
-            if (error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('Failed to fetch enrolled courses. Please try logging in again.');
+            // Only show error toast if we have a token (user should be logged in)
+            if (jwt && error.response?.status !== 401) {
+                if (error.response && error.response.data && error.response.data.message) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error('Failed to fetch enrolled courses. Please try logging in again.');
+                }
+            }
+            // If 401 error (unauthorized), clear invalid token
+            if (error.response?.status === 401) {
+                console.log('Token appears to be invalid, clearing auth data');
+                logout();
             }
         }
     }
@@ -376,16 +425,16 @@ export const AppContextProvider = (props) => {
         }
     }, [userData]);
 
-    // Defensive: If JWT is removed or invalid, clear all sensitive state and redirect to login
+    // Defensive: If JWT is removed or invalid, clear all sensitive state
     useEffect(() => {
         if (!jwt) {
+            console.log('JWT cleared, cleaning up user state');
             setUserData(null);
             setIsEducator(false);
+            setEnrolledCourses([]);
             localStorage.removeItem('userData');
             localStorage.removeItem('jwtToken');
-            if (window.location.pathname !== '/login') {
-                navigate('/login');
-            }
+            // Don't force redirect to login - let individual pages handle this
         }
         // eslint-disable-next-line
     }, [jwt]);
@@ -394,24 +443,38 @@ export const AppContextProvider = (props) => {
     useEffect(() => {
         const checkAuth = async () => {
             if (!jwt) {
+                console.log('No JWT token found on mount, clearing any stored user data');
                 setUserData(null);
+                setIsEducator(false);
                 localStorage.removeItem('userData');
                 return;
             }
             try {
+                console.log('Validating JWT token on mount...');
                 const { data } = await axios.get(
                     backendUrl + '/api/user/data',
                     { headers: { Authorization: `Bearer ${jwt}` } }
                 );
-                if (!data.success) {
+                if (data.success) {
+                    console.log('JWT is valid, user data loaded');
+                    setUserData(data.user);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                    // Check role from publicMetadata or direct role field
+                    const userRole = data.user.publicMetadata?.role || data.user.role;
+                    if (userRole === 'educator') setIsEducator(true);
+                } else {
+                    console.log('JWT validation failed, clearing auth data');
                     setUserData(null);
                     setJwt(null);
+                    setIsEducator(false);
                     localStorage.removeItem('userData');
                     localStorage.removeItem('jwtToken');
                 }
             } catch (error) {
+                console.log('JWT validation error, clearing auth data:', error.response?.status);
                 setUserData(null);
                 setJwt(null);
+                setIsEducator(false);
                 localStorage.removeItem('userData');
                 localStorage.removeItem('jwtToken');
             }
@@ -423,7 +486,7 @@ export const AppContextProvider = (props) => {
     const value = {
         showLogin, setShowLogin,
         backendUrl, currency, navigate,
-        userData, setUserData, getToken,
+        userData, setUserData, getToken, isAuthenticated,
         courses,
         fetchCourses,
         enrolledCourses, fetchUserEnrolledCourses,
