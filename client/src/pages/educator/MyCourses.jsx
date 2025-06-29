@@ -24,8 +24,19 @@ const MyCourses = () => {
   const [isUploadingLecture, setIsUploadingLecture] = useState(false)
 
   // Cloudinary configuration - UPDATE THESE WITH YOUR VALUES
-  const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'your-cloud-name';
-  const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'your-upload-preset';
+  const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'denhmcs4e';
+  const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'ml_default';
+
+  // Debug: Check if environment variables are loaded
+  React.useEffect(() => {
+    console.log('Cloudinary Config Check:');
+    console.log('Cloud Name:', CLOUDINARY_CLOUD_NAME);
+    console.log('Upload Preset:', CLOUDINARY_UPLOAD_PRESET);
+    console.log('Environment variables loaded:', {
+      cloud: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME,
+      preset: process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+    });
+  }, []);
 
   const fetchEducatorCourses = async () => {
     try {
@@ -174,9 +185,13 @@ const MyCourses = () => {
       formData.append('file', videoFile);
       formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
       formData.append('resource_type', 'video');
-      formData.append('folder', 'lms_lectures');
-
+      // Remove folder specification as it might cause 400 error
+      
       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
+      
+      console.log('Uploading to:', cloudinaryUrl);
+      console.log('Upload preset:', CLOUDINARY_UPLOAD_PRESET);
+      console.log('Cloud name:', CLOUDINARY_CLOUD_NAME);
       
       const cloudinaryResponse = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -189,14 +204,23 @@ const MyCourses = () => {
         };
 
         xhr.onload = () => {
+          console.log('Cloudinary response status:', xhr.status);
+          console.log('Cloudinary response:', xhr.responseText);
+          
           if (xhr.status === 200) {
             resolve(JSON.parse(xhr.responseText));
           } else {
-            reject(new Error(`Upload failed: ${xhr.status}`));
+            console.error('Upload failed with status:', xhr.status);
+            console.error('Response:', xhr.responseText);
+            reject(new Error(`Upload failed: ${xhr.status} - ${xhr.responseText}`));
           }
         };
 
-        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.onerror = () => {
+          console.error('Network error during upload');
+          reject(new Error('Network error'));
+        };
+        
         xhr.open('POST', cloudinaryUrl);
         xhr.send(formData);
       });
