@@ -69,6 +69,16 @@ export default async function handler(req, res) {
     return;
   }
 
+  // GET support for deployment verification
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      success: true,
+      message: 'add-lecture-cloudinary endpoint is working!',
+      method: 'GET',
+      time: new Date().toISOString()
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
