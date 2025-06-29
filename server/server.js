@@ -54,13 +54,6 @@ app.use((req, res, next) => {
 });
 
 // Middlewares
-app.use((req, res, next) => {
-  console.log('CORS DEBUG: Incoming origin:', req.headers.origin);
-  console.log('CORS DEBUG: Request method:', req.method);
-  console.log('CORS DEBUG: Request path:', req.path);
-  next();
-});
-
 // Simplified CORS configuration
 app.use(cors({
   origin: true, // Allow all origins for debugging
@@ -98,67 +91,6 @@ app.use((err, req, res, next) => {
 
 // Routes
 app.get('/', (req, res) => res.send("API Working"))
-
-// CORS test endpoint
-app.get('/api/cors-test', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'CORS is working!', 
-    origin: req.headers.origin,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Test endpoint for OPTIONS specifically
-app.all('/api/options-test', (req, res) => {
-  res.json({
-    success: true,
-    method: req.method,
-    message: `${req.method} request handled successfully`,
-    headers: req.headers,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Debug endpoint for admin login
-app.post('/api/admin/debug-login', async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.json({
-        success: false,
-        message: 'Email is required for debug'
-      });
-    }
-
-    const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
-    res.json({
-      success: true,
-      adminExists: !!admin,
-      hasPassword: !!(admin && admin.password),
-      adminData: admin ? {
-        name: admin.name,
-        email: admin.email,
-        role: admin.publicMetadata?.role,
-        createdAt: admin.createdAt
-      } : null,
-      debugInfo: {
-        searchQuery: { email, 'publicMetadata.role': 'admin' },
-        timestamp: new Date().toISOString()
-      }
-    });
-  } catch (error) {
-    console.error('Debug login error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-      debugInfo: {
-        error: error.toString(),
-        timestamp: new Date().toISOString()
-      }
-    });
-  }
-});
 
 app.use('/api/educator', (req, res, next) => {
   if (req.url.startsWith('/add-course')) {

@@ -24,7 +24,6 @@ import Contact from "./pages/student/Contact";
 import Privacy from "./pages/student/Privacy";
 import Testimonials from "./pages/student/Testimonials";
 import Profile from "./pages/Profile";
-import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
 import PaymentResult from "./pages/student/PaymentResult";
@@ -123,7 +122,6 @@ const App = () => {
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/testimonials" element={<Testimonials />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/verify-otp" element={<VerifyOtp />} />
 
@@ -135,15 +133,6 @@ const App = () => {
                   <Route path="my-courses" element={<MyCourses />} />
                   <Route path="student-enrolled" element={<StudentsEnrolled />} />
                 </Route>
-
-                {/* Admin Routes */}
-                {/* <Route path="/admin/*" element={<Admin />}>
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="manage-users" element={<ManageUsers />} />
-                  <Route path="manage-courses" element={<ManageCourses />} />
-                  <Route path="settings" element={<AdminSettings />} />
-                  <Route index element={<AdminDashboard />} />
-                </Route> */}
               </Routes>
             </Suspense>
           </div>
