@@ -34,11 +34,12 @@ app.use((req, res, next) => {
     'http://localhost:3000', 
     'http://localhost:5174',
     'https://lms-admin-theta-two.vercel.app',
-    'https://lms-client-coral-rho.vercel.app'
+    'https://lms-client-coral-rho.vercel.app',
+    'https://lms-client-one-lemon.vercel.app' // <-- ADD YOUR FRONTEND HERE
   ];
   
-  if (allowedOrigins.includes(origin) || !origin) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Max-Age', '86400');
   
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} from origin: ${req.headers.origin}`);
+  console.log('CORS allowed for:', allowedOrigins.includes(origin) ? origin : 'NOT ALLOWED');
   
   // Handle OPTIONS requests immediately - CRITICAL FIX
   if (req.method === 'OPTIONS') {
@@ -60,7 +62,21 @@ app.use((req, res, next) => {
 // Middlewares
 // Simplified CORS configuration
 app.use(cors({
-  origin: true, // Allow all origins for debugging
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:5174',
+      'https://lms-admin-theta-two.vercel.app',
+      'https://lms-client-coral-rho.vercel.app',
+      'https://lms-client-one-lemon.vercel.app'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
