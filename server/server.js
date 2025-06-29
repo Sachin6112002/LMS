@@ -124,6 +124,13 @@ app.all('/api/options-test', (req, res) => {
 app.post('/api/admin/debug-login', async (req, res) => {
   try {
     const { email } = req.body;
+    if (!email) {
+      return res.json({
+        success: false,
+        message: 'Email is required for debug'
+      });
+    }
+
     const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
     res.json({
       success: true,
@@ -132,13 +139,23 @@ app.post('/api/admin/debug-login', async (req, res) => {
       adminData: admin ? {
         name: admin.name,
         email: admin.email,
-        role: admin.publicMetadata?.role
-      } : null
+        role: admin.publicMetadata?.role,
+        createdAt: admin.createdAt
+      } : null,
+      debugInfo: {
+        searchQuery: { email, 'publicMetadata.role': 'admin' },
+        timestamp: new Date().toISOString()
+      }
     });
   } catch (error) {
+    console.error('Debug login error:', error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
+      debugInfo: {
+        error: error.toString(),
+        timestamp: new Date().toISOString()
+      }
     });
   }
 });

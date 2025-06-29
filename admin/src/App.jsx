@@ -15,6 +15,7 @@ import ManageCourses from './pages/ManageCourses';
 import Profile from './pages/Profile';
 import AdminForgotPassword from './pages/AdminForgotPassword';
 import AdminVerifyOtp from './pages/AdminVerifyOtp';
+import AdminDebug from './pages/AdminDebug';
 import { isAdminAuthenticated } from './context/AppContext';
 
 const HeroSection = () => {
@@ -111,6 +112,7 @@ const App = () => {
             <Route path="/verify-otp" element={<AdminVerifyOtp />} />
             <Route path="/admin-forgot-password" element={<AdminForgotPassword />} />
             <Route path="/admin-verify-otp" element={<AdminVerifyOtp />} />
+            <Route path="/debug" element={<AdminDebug />} />
             {/* Add more admin-only routes here */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>

@@ -79,12 +79,14 @@ const Login = () => {
         checkAdminExists();
       }
     } catch (err) {
+      console.error('Registration error:', err);
       if (err.response && err.response.status === 409) {
         setAdminExists(true); // Show login form immediately
         setError('Admin already exists. Please log in.');
         return;
       }
-      setError(err.response?.data?.message || err.message);
+      const errorMessage = err.response?.data?.message || err.message || 'Registration failed';
+      setError(errorMessage);
       checkAdminExists();
     } finally {
       setLoading(false);
@@ -119,7 +121,15 @@ const Login = () => {
         setError(data.message || 'Login failed.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Login failed';
+      setError(errorMessage);
+      
+      // If 401, check if it's because admin doesn't exist
+      if (err.response?.status === 401) {
+        console.log('401 error during login, checking admin existence...');
+        checkAdminExists();
+      }
     } finally {
       setLoading(false);
     }
@@ -167,6 +177,15 @@ const Login = () => {
         )}
         {error && <p className="text-red-500 mt-4">{error}</p>}
         {success && <p className="text-green-600 mt-4">{success}</p>}
+        
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate('/debug')}
+            className="text-gray-500 hover:text-gray-700 text-xs underline"
+          >
+            Having trouble? Run Debug Diagnostics
+          </button>
+        </div>
       </div>
     </div>
   );
