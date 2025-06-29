@@ -14,8 +14,8 @@ const CloudinaryVideoUpload = ({
   const [videoFile, setVideoFile] = useState(null);
 
   // Cloudinary configuration - Replace with your actual values
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'lms_video_uploads';
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'denhmcs4e';
+  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'lms_video_uploads';
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
