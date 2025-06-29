@@ -122,8 +122,12 @@ app.use((err, req, res, next) => {
 app.get('/', (req, res) => res.send("API Working"))
 
 app.use('/api/educator', (req, res, next) => {
+  console.log(`>>>> /api/educator${req.url} route hit - Method: ${req.method}`);
   if (req.url.startsWith('/add-course')) {
     console.log('>>>> /api/educator/add-course route hit');
+  }
+  if (req.url.startsWith('/add-lecture-cloudinary')) {
+    console.log('>>>> /api/educator/add-lecture-cloudinary route hit - this should work!');
   }
   next();
 }, educatorRouter)

@@ -36,6 +36,11 @@ console.log('Registering /add-lecture-cloudinary route');
 educatorRouter.post('/add-lecture-cloudinary', jwtMiddleware, protectEducator, addLectureWithCloudinaryUrl);
 console.log('Route /add-lecture-cloudinary registered successfully');
 
+// Test route to verify educator routes are working
+educatorRouter.get('/test-route', (req, res) => {
+    res.json({ success: true, message: 'Educator routes are working!' });
+});
+
 // Get course for editing
 educatorRouter.get('/course/:courseId', jwtMiddleware, protectEducator, getCourseForEdit);
 
