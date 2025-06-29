@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import multer from 'multer'
 import 'dotenv/config'
 import connectDB from './configs/mongodb.js'
 import cloudinary from './configs/cloudinary.js' // updated import, no function call
@@ -66,9 +67,21 @@ app.use(cors({
 // Register webhook route FIRST, before any body parser
 app.use('/api/webhook', webhookRoutes);
 
-// Now add body parsers for the rest of the app with increased limits
-app.use(express.json({ limit: 'Infinity' })); // Remove JSON payload limit
-app.use(express.urlencoded({ extended: true, limit: 'Infinity' })); // Remove URL-encoded payload limit
+// Add early 413 error handling middleware 
+app.use((err, req, res, next) => {
+  if (err.status === 413 || err.type === 'entity.too.large') {
+    return res.status(413).json({
+      success: false,
+      message: 'Request entity too large. Maximum file size is 15MB for videos.',
+      maxSize: '15MB'
+    });
+  }
+  next(err);
+});
+
+// Now add body parsers for the rest of the app with limits suitable for Vercel
+app.use(express.json({ limit: '15mb' })); // 15MB JSON payload limit (Vercel compatible)
+app.use(express.urlencoded({ extended: true, limit: '15mb' })); // 15MB URL-encoded payload limit
 
 // Serve uploaded videos statically
 const __filename = fileURLToPath(import.meta.url);
@@ -78,14 +91,30 @@ app.use('/videos', express.static(path.join(__dirname, 'videos')));
 // Serve favicon.ico statically if present
 app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
 
-// Global error handler for payload too large
+// Global error handler for payload too large and multer errors
 app.use((err, req, res, next) => {
   if (err.type === 'entity.too.large' || err.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({
       success: false,
-      message: 'File is too large for this hosting platform. Please compress your video or consider using a video hosting service.'
+      message: 'File is too large. Maximum size allowed is 15MB for videos. Please compress your video or use a smaller file.',
+      maxSize: '15MB'
     });
   }
+  
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({
+        success: false,
+        message: 'Video file is too large. Maximum size allowed is 15MB. Please compress your video.',
+        maxSize: '15MB'
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'File upload error: ' + err.message
+    });
+  }
+  
   next(err);
 });
 

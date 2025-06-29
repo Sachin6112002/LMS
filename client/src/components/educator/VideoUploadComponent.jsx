@@ -8,6 +8,14 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
 
   const handleUpload = async () => {
     if (!videoFile) return;
+    
+    // Check file size before uploading (15MB limit)
+    const maxSize = 15 * 1024 * 1024; // 15MB in bytes
+    if (videoFile.size > maxSize) {
+      alert(`File is too large! Your file is ${(videoFile.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 15MB. Please compress your video.`);
+      return;
+    }
+    
     setUploading(true);
     setProgress(0);
     setUploaded(false);
@@ -57,12 +65,23 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
             onUploadSuccess && onUploadSuccess(JSON.parse(xhr.responseText).filename);
           }
         } else {
-          alert('Upload failed: ' + xhr.status + ' ' + xhr.responseText);
+          if (xhr.status === 413) {
+            alert('File is too large! Maximum size allowed is 15MB. Please compress your video or use a smaller file.');
+          } else if (xhr.status === 500) {
+            const response = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+            if (response.message && response.message.includes('too large')) {
+              alert('File size error: ' + response.message);
+            } else {
+              alert('Server error. Please try again with a smaller file.');
+            }
+          } else {
+            alert('Upload failed: ' + xhr.status + ' ' + (xhr.responseText || 'Unknown error'));
+          }
         }
       };
       xhr.onerror = () => {
         setUploading(false);
-        alert('Upload error: ' + xhr.status + ' ' + xhr.responseText);
+        alert('Upload error: Network connection failed or file may be too large. Please check your internet connection and file size (max 15MB).');
       };
       xhr.send(formData);
     } catch (err) {
@@ -73,7 +92,10 @@ const VideoUploadComponent = ({ backendUrl, token, courseId, chapterId, lectureI
 
   return (
     <div>
-      <input type="file" accept="video/*" onChange={e => setVideoFile(e.target.files[0])} disabled={uploading || uploaded} />
+      <div className="mb-2">
+        <input type="file" accept="video/*" onChange={e => setVideoFile(e.target.files[0])} disabled={uploading || uploaded} />
+        <p className="text-sm text-gray-500 mt-1">Maximum file size: 15MB</p>
+      </div>
       <button onClick={handleUpload} disabled={uploading || !videoFile || uploaded}>
         {uploading ? `Uploading... ${progress}%` : uploaded ? 'Uploaded' : 'Upload Video'}
       </button>

@@ -277,11 +277,34 @@ export const addLecture = async (req, res) => {
     try {
         // Debug log incoming fields and file
         console.log('addLecture fields:', req.body);
-        console.log('addLecture file:', req.file);
+        console.log('addLecture file info:', req.file ? {
+            name: req.file.originalname,
+            size: req.file.size,
+            mimetype: req.file.mimetype
+        } : 'No file');
         
         const { courseId, chapterId, title, description, duration } = req.body;
         const videoFile = req.file;
         const educatorId = req.auth.userId;
+        
+        // Validate required fields
+        if (!courseId || !chapterId || !title) {
+            return res.status(400).json({ success: false, message: 'Missing required fields: courseId, chapterId, and title are required' });
+        }
+        
+        if (!videoFile) {
+            return res.status(400).json({ success: false, message: 'Video file is required' });
+        }
+        
+        // Additional file size check (should be caught by multer, but double-check)
+        const maxFileSize = 15 * 1024 * 1024; // 15MB
+        if (videoFile.size > maxFileSize) {
+            return res.status(413).json({ 
+                success: false, 
+                message: `Video file is too large. File size: ${(videoFile.size / 1024 / 1024).toFixed(1)}MB. Maximum allowed: 15MB.`,
+                maxSize: '15MB'
+            });
+        }
         
         // Validate required fields
         if (!courseId || !chapterId || !title) {

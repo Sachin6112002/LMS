@@ -14,7 +14,8 @@
     ],
     "functions": {
         "server.js": {
-            "maxDuration": 60
+            "maxDuration": 60,
+            "memory": 1024
         }
     },
     "routes": [
@@ -28,5 +29,9 @@
                 "Access-Control-Allow-Credentials": "true"
             }
         }
-    ]
+    ],
+    "limits": {
+        "duration": 60000,
+        "maxBodySize": "16mb"
+    }
 }
