@@ -30,7 +30,14 @@ export default async function handler(req, res) {
 
   try {
     console.log('SERVERLESS FUNCTION: add-lecture-cloudinary called');
-    console.log('Request body:', req.body);
+    
+    // Parse JSON body if it's a string
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    
+    console.log('Request body:', body);
 
     // Connect to database
     await connectToDatabase();
@@ -67,7 +74,7 @@ export default async function handler(req, res) {
     console.log('User verified as educator:', user.name);
 
     // Extract request data
-    const { courseId, chapterId, title, description, videoUrl, duration } = req.body;
+    const { courseId, chapterId, title, description, videoUrl, duration } = body;
 
     // Validate required fields
     if (!courseId || !chapterId || !title || !videoUrl) {
@@ -133,6 +140,21 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Error in add-lecture-cloudinary:', err);
-    res.status(500).json({ success: false, message: err.message });
+    console.error('Error stack:', err.stack);
+    
+    // Return more specific error information
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: 'Validation error: ' + err.message });
+    }
+    
+    if (err.name === 'CastError') {
+      return res.status(400).json({ success: false, message: 'Invalid ID format: ' + err.message });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error: ' + err.message,
+      error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 }
