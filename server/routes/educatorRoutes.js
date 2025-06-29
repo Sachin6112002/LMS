@@ -7,6 +7,9 @@ import { jwtMiddleware } from '../middlewares/jwtMiddleware.js';
 
 const educatorRouter = express.Router()
 
+// Debug log for troubleshooting
+console.log('Educator routes loaded successfully');
+
 // Add Educator Role 
 educatorRouter.get('/update-role', jwtMiddleware, updateRoleToEducator)
 
@@ -29,7 +32,9 @@ educatorRouter.post('/add-chapter', jwtMiddleware, protectEducator, addChapter);
 educatorRouter.post('/add-lecture', jwtMiddleware, protectEducator, videoUpload.single('file'), addLecture);
 
 // Add Lecture with Direct Cloudinary URL (no file upload, bypasses 413 errors)
+console.log('Registering /add-lecture-cloudinary route');
 educatorRouter.post('/add-lecture-cloudinary', jwtMiddleware, protectEducator, addLectureWithCloudinaryUrl);
+console.log('Route /add-lecture-cloudinary registered successfully');
 
 // Get course for editing
 educatorRouter.get('/course/:courseId', jwtMiddleware, protectEducator, getCourseForEdit);
