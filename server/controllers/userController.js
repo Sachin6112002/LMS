@@ -105,16 +105,20 @@ export const purchaseCourse = async (req, res) => {
         // Stripe Gateway Initialize
         const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
 
-        const currency = process.env.CURRENCY.toLocaleLowerCase()
+        // Force currency to INR for Stripe
+        const currency = 'inr';
+        if (process.env.CURRENCY && process.env.CURRENCY.toLowerCase() !== 'inr') {
+            console.warn('CURRENCY in .env is not INR. For rupees, set CURRENCY=INR');
+        }
 
-        // Creating line items to for Stripe
+        // Creating line items for Stripe (amount in paise)
         const line_items = [{
             price_data: {
                 currency,
                 product_data: {
                     name: courseData.title // Use new model's title field
                 },
-                unit_amount: Math.max(Math.floor(newPurchase.amount) * 100, 100) // Minimum $1 for Stripe
+                unit_amount: Math.max(Math.floor(newPurchase.amount) * 100, 100) // Minimum ₹1 for Stripe
             },
             quantity: 1
         }]
