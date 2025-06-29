@@ -15,6 +15,9 @@ import courseRoutes from './routes/courseRoutes.js';
 import courseRouter from './routes/courseRoute.js';
 import User from './models/User.js';
 
+// Test: Add a direct route to verify routing is working
+console.log('Adding direct educator test route...');
+
 // Initialize Express
 const app = express()
 
@@ -141,6 +144,11 @@ app.use('/api/admin', adminRouter)
 app.use('/api/testimonials', testimonialRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/course', courseRouter)
+
+// DIRECT TEST ROUTE - to verify if ANY educator routes work
+app.get('/api/educator/direct-test', (req, res) => {
+  res.json({ success: true, message: 'Direct educator route works!', timestamp: new Date().toISOString() });
+});
 
 // Handle favicon.ico requests gracefully to avoid 500 errors
 app.get('/favicon.ico', (req, res) => res.status(204).end());
