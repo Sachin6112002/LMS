@@ -229,13 +229,18 @@ const MyCourses = () => {
 
       // Step 2: Create lecture with Cloudinary URL
       const token = await getToken();
+      
+      // Convert duration from seconds to minutes and update form
+      const durationInMinutes = Math.round(cloudinaryResponse.duration / 60) || 0;
+      setLectureForm(prev => ({ ...prev, duration: durationInMinutes }));
+      
       const lectureData = {
         courseId: selectedCourse._id,
         chapterId: lectureForm.chapterId,
         title: lectureForm.title,
         description: lectureForm.description || '',
         videoUrl: cloudinaryResponse.secure_url,
-        duration: Math.round(cloudinaryResponse.duration) || 0
+        duration: durationInMinutes
       };
 
       const { data } = await axios.post(
@@ -539,12 +544,14 @@ const MyCourses = () => {
                   type="number"
                   value={lectureForm.duration}
                   onChange={(e) => setLectureForm(prev => ({ ...prev, duration: e.target.value }))}
-                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50"
                   placeholder="Auto-detected from video upload"
-                  readOnly
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Duration will be automatically detected during upload to cloud
+                  {lectureForm.duration ? 
+                    `✅ Auto-detected: ${lectureForm.duration} minutes` : 
+                    'Duration will be automatically detected during video upload'
+                  }
                 </p>
               </div>
               
