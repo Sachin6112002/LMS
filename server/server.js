@@ -12,6 +12,7 @@ import testimonialRoutes from './routes/testimonialRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import courseRouter from './routes/courseRoute.js';
+import User from './models/User.js';
 
 // Initialize Express
 const app = express()
@@ -23,7 +24,19 @@ await connectDB()
 // EMERGENCY CORS FIX - Handle ALL requests first
 app.use((req, res, next) => {
   // Set CORS headers for ALL requests
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'http://localhost:5174',
+    'https://lms-admin-theta-two.vercel.app',
+    'https://lms-client-coral-rho.vercel.app'
+  ];
+  
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -105,6 +118,29 @@ app.all('/api/options-test', (req, res) => {
     headers: req.headers,
     timestamp: new Date().toISOString()
   });
+});
+
+// Debug endpoint for admin login
+app.post('/api/admin/debug-login', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
+    res.json({
+      success: true,
+      adminExists: !!admin,
+      hasPassword: !!(admin && admin.password),
+      adminData: admin ? {
+        name: admin.name,
+        email: admin.email,
+        role: admin.publicMetadata?.role
+      } : null
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 });
 
 app.use('/api/educator', (req, res, next) => {

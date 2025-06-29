@@ -66,7 +66,7 @@ export const registerAdmin = async (req, res) => {
   try {
     // Only allow if no admin exists
     const admin = await User.findOne({ 'publicMetadata.role': 'admin' });
-    if (admin) return res.status(403).json({ success: false, message: 'Admin already exists' });
+    if (admin) return res.status(409).json({ success: false, message: 'Admin already exists' });
 
     let imageUrl = req.body.imageUrl;
     if (req.file) {
@@ -84,7 +84,7 @@ export const registerAdmin = async (req, res) => {
       _id: new mongoose.Types.ObjectId().toString(),
       name,
       email,
-      password, // In production, hash the password!
+      password, // Password will be hashed by the pre-save middleware
       imageUrl: imageUrl || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name),
       publicMetadata: { role: 'admin' },
     });
@@ -93,6 +93,7 @@ export const registerAdmin = async (req, res) => {
     const token = jwt.sign({ id: newAdmin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
     res.json({ success: true, token, admin: { name: newAdmin.name, email: newAdmin.email, imageUrl: newAdmin.imageUrl } });
   } catch (error) {
+    console.error('Admin registration error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -101,22 +102,39 @@ export const registerAdmin = async (req, res) => {
 export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    try {
-      const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
-      if (!admin) {
-        return res.status(401).json({ success: false, message: 'Admin not found' });
-      }
-      // Use bcrypt to compare hashed password
-      const isMatch = await bcrypt.compare(password, admin.password);
-      if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
-      }
-      const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
-      res.json({ success: true, token, admin: { name: admin.name, email: admin.email } });
-    } catch (err) {
-      res.status(500).json({ success: false, message: err.message });
+    
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
     }
+
+    const admin = await User.findOne({ email, 'publicMetadata.role': 'admin' });
+    if (!admin) {
+      return res.status(401).json({ success: false, message: 'Admin not found' });
+    }
+
+    // Check if admin has a password (some might be OAuth only)
+    if (!admin.password) {
+      return res.status(401).json({ success: false, message: 'Please use the original registration method to set a password' });
+    }
+
+    // Use bcrypt to compare hashed password
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
+    res.json({ 
+      success: true, 
+      token, 
+      admin: { 
+        name: admin.name, 
+        email: admin.email,
+        imageUrl: admin.imageUrl 
+      } 
+    });
   } catch (error) {
+    console.error('Admin login error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { backendUrl } from '../context/AppContext';
 
 const AdminForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ const AdminForgotPassword = () => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await axios.post('/api/admin/send-otp', { email });
+      const res = await axios.post(`${backendUrl}/api/admin/send-otp`, { email });
       if (res.data.success) {
         setMessage('OTP sent! Check your email.');
         setTimeout(() => {

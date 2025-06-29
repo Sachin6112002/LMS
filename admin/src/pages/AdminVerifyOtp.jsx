@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { backendUrl } from '../context/AppContext';
 
 const AdminVerifyOtp = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ const AdminVerifyOtp = () => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await axios.post('/api/admin/verify-otp', { email, otp, newPassword });
+      const res = await axios.post(`${backendUrl}/api/admin/verify-otp`, { email, otp, newPassword });
       if (res.data.success) {
         setMessage('Password changed successfully!');
         setTimeout(() => {
