@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-import Course from '../../server/models/Course.js';
-import User from '../../server/models/User.js';
 import jwt from 'jsonwebtoken';
 
 // Database connection for serverless
@@ -11,6 +9,53 @@ const connectToDatabase = async () => {
   
   await mongoose.connect(process.env.MONGODB_URI + '/lms');
 };
+
+// User Schema (inline to avoid import issues)
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  imageUrl: { type: String, default: '' },
+  enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  publicMetadata: {
+    role: { type: String, enum: ['student', 'educator'], default: 'student' }
+  }
+}, { timestamps: true });
+
+// Lecture Schema (inline)
+const lectureSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, default: '' },
+  videoUrl: { type: String, required: true },
+  duration: { type: Number, default: 0 },
+  isPreviewFree: { type: Boolean, default: false }
+}, { _id: true });
+
+// Chapter Schema (inline)
+const chapterSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, default: '' },
+  lectures: [lectureSchema]
+}, { _id: true });
+
+// Course Schema (inline)
+const courseSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  thumbnail: { type: String },
+  createdBy: { type: String, ref: 'User', required: true },
+  chapters: [chapterSchema],
+  status: { type: String, enum: ['draft', 'published'], default: 'draft' },
+  enrolledStudents: { type: [{ type: String, ref: 'User' }], default: [] },
+  courseRatings: [{
+    userId: { type: String, ref: 'User', required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 }
+  }]
+}, { timestamps: true });
+
+// Models
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
 
 export default async function handler(req, res) {
   // Enable CORS
