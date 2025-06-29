@@ -109,6 +109,8 @@ const App = () => {
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="/forgot-password" element={<AdminForgotPassword />} />
             <Route path="/verify-otp" element={<AdminVerifyOtp />} />
+            <Route path="/admin-forgot-password" element={<AdminForgotPassword />} />
+            <Route path="/admin-verify-otp" element={<AdminVerifyOtp />} />
             {/* Add more admin-only routes here */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
