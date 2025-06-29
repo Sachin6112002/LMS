@@ -18,11 +18,14 @@ const MyCourses = () => {
   const [lectureForm, setLectureForm] = useState({ 
     title: '', 
     description: '', 
-    videoFile: null, 
     duration: '', 
     chapterId: '' 
   })
   const [isUploadingLecture, setIsUploadingLecture] = useState(false)
+
+  // Cloudinary configuration - UPDATE THESE WITH YOUR VALUES
+  const CLOUDINARY_CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'your-cloud-name';
+  const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'your-upload-preset';
 
   const fetchEducatorCourses = async () => {
     try {
@@ -142,51 +145,82 @@ const MyCourses = () => {
     }
   };
 
-  // Add new lecture to chapter
-  const addLectureToChapter = async () => {
+  // Add new lecture to chapter with Cloudinary direct upload
+  const addLectureToChapter = async (videoFile) => {
     if (!selectedCourse || !lectureForm.title.trim() || !lectureForm.chapterId) {
       toast.error('Please fill all required fields');
       return;
     }
 
-    if (!lectureForm.videoFile) {
+    if (!videoFile) {
       toast.error('Please select a video file');
       return;
     }
 
-    // Check file size before upload (15MB limit)
-    const maxSize = 15 * 1024 * 1024; // 15MB in bytes
-    if (lectureForm.videoFile.size > maxSize) {
-      toast.error(`Video file is too large! Your file is ${(lectureForm.videoFile.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 15MB. Please compress your video.`);
+    // Check file size (now supports up to 100MB with Cloudinary)
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (videoFile.size > maxSize) {
+      toast.error(`Video file is too large! Maximum size allowed is 100MB. Please compress your video.`);
       return;
     }
 
     setIsUploadingLecture(true);
     
     try {
-      const token = await getToken();
-      const formData = new FormData();
-      formData.append('title', lectureForm.title);
-      formData.append('description', lectureForm.description);
-      formData.append('duration', lectureForm.duration || '0');
-      formData.append('courseId', selectedCourse._id);
-      formData.append('chapterId', lectureForm.chapterId);
-      formData.append('file', lectureForm.videoFile);
+      toast.info('Uploading video to cloud... This may take a while for large files.');
 
-      toast.info('Uploading video... This may take a while for large files.');
+      // Step 1: Upload video directly to Cloudinary
+      const formData = new FormData();
+      formData.append('file', videoFile);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('resource_type', 'video');
+      formData.append('folder', 'lms_lectures');
+
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
+      
+      const cloudinaryResponse = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            console.log(`Upload Progress: ${percentComplete}%`);
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.open('POST', cloudinaryUrl);
+        xhr.send(formData);
+      });
+
+      console.log('Cloudinary upload successful:', cloudinaryResponse);
+
+      // Step 2: Create lecture with Cloudinary URL
+      const token = await getToken();
+      const lectureData = {
+        courseId: selectedCourse._id,
+        chapterId: lectureForm.chapterId,
+        title: lectureForm.title,
+        description: lectureForm.description || '',
+        videoUrl: cloudinaryResponse.secure_url,
+        duration: Math.round(cloudinaryResponse.duration) || 0
+      };
 
       const { data } = await axios.post(
-        `${backendUrl}/api/educator/add-lecture`,
-        formData,
+        `${backendUrl}/api/educator/add-lecture-cloudinary`,
+        lectureData,
         { 
           headers: { 
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
-          timeout: 300000, // 5 minute timeout for large uploads
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload Progress: ${percentCompleted}%`);
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -194,18 +228,15 @@ const MyCourses = () => {
       if (data.success) {
         toast.success('Lecture added successfully!');
         setShowContentModal(false);
+        setLectureForm({ title: '', description: '', duration: '', chapterId: '' });
         fetchEducatorCourses(); // Refresh courses
       } else {
-        toast.error(data.message || 'Failed to add lecture');
+        toast.error(data.message || 'Failed to create lecture');
       }
     } catch (error) {
       console.error('Add lecture error:', error);
-      if (error.response?.status === 413) {
-        toast.error('Video file is too large! Maximum size allowed is 15MB. Please compress your video and try again.');
-      } else if (error.code === 'ERR_BAD_REQUEST' && error.response?.status === 413) {
-        toast.error('File size limit exceeded. Please use a video file smaller than 15MB.');
-      } else if (error.code === 'ECONNABORTED') {
-        toast.error('Upload timeout. Please try again or check your internet connection.');
+      if (error.message.includes('Upload failed')) {
+        toast.error('Video upload failed. Please check your internet connection and try again.');
       } else {
         toast.error(error.response?.data?.message || 'Failed to add lecture');
       }
@@ -214,45 +245,31 @@ const MyCourses = () => {
     }
   };
 
-  // Handle video file selection and auto-extract duration
+  // Handle video file selection for Cloudinary upload
   const handleVideoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const fileSizeMB = file.size / (1024 * 1024);
       
-      // Just show file size info, no restrictions
+      // Check file size (100MB limit for Cloudinary)
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error(`File too large! Your file is ${fileSizeMB.toFixed(1)}MB. Maximum size allowed is 100MB.`);
+        return;
+      }
+
+      // Check if it's a video file
+      if (!file.type.startsWith('video/')) {
+        toast.error('Please select a video file.');
+        return;
+      }
+      
       console.log(`Selected video: ${file.name}, Size: ${fileSizeMB.toFixed(1)}MB`);
+      toast.success(`Video selected: ${file.name} (${fileSizeMB.toFixed(1)}MB)`);
       
-      // Update the video file in form
-      setLectureForm(prev => ({ ...prev, videoFile: file }));
-      
-      // Create a video element to extract duration
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-      
-      video.onloadedmetadata = () => {
-        const durationInMinutes = Math.ceil(video.duration / 60); // Convert seconds to minutes and round up
-        setLectureForm(prev => ({ 
-          ...prev, 
-          duration: durationInMinutes.toString() 
-        }));
-        toast.success(`Video duration automatically detected: ${durationInMinutes} minutes (File size: ${fileSizeMB.toFixed(1)}MB)`);
-        
-        // Clean up
-        window.URL.revokeObjectURL(video.src);
-      };
-      
-      video.onerror = () => {
-        toast.warn('Could not extract video duration. Please enter manually.');
-        window.URL.revokeObjectURL(video.src);
-      };
-      
-      // Set video source to the file
-      video.src = URL.createObjectURL(file);
+      // Store the file for upload when user clicks the upload button
+      setLectureForm(prev => ({ ...prev, selectedVideoFile: file }));
     }
   };
-
-  // ...existing code...
 
   // Show loading while waiting for courses to load
   if (!courses) {
@@ -499,16 +516,18 @@ const MyCourses = () => {
                   value={lectureForm.duration}
                   onChange={(e) => setLectureForm(prev => ({ ...prev, duration: e.target.value }))}
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Auto-detected from video"
-                  readOnly={!!lectureForm.videoFile} // Make readonly when video is selected
+                  placeholder="Auto-detected from video upload"
+                  readOnly
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Duration will be automatically detected when you upload a video
+                  Duration will be automatically detected during upload to cloud
                 </p>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-green-700 mb-1">Video File</label>
+              <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg p-4">
+                <label className="block text-sm font-medium text-green-700 mb-2">
+                  🚀 Video File (Direct Cloud Upload)
+                </label>
                 <input
                   type="file"
                   accept="video/*"
@@ -516,13 +535,36 @@ const MyCourses = () => {
                   disabled={isUploadingLecture}
                   className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Upload a video file. Maximum size: 15MB. Duration will be detected automatically.
-                </p>
-                {lectureForm.videoFile && (
-                  <p className="text-xs text-green-600 mt-1">
-                    Selected: {lectureForm.videoFile.name} ({(lectureForm.videoFile.size / (1024 * 1024)).toFixed(1)}MB)
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-green-600">
+                    ✅ Maximum size: 100MB (12x larger than server upload!)
                   </p>
+                  <p className="text-xs text-green-600">
+                    ✅ Direct upload to cloud - no 413 errors
+                  </p>
+                  <p className="text-xs text-green-600">
+                    ✅ Duration automatically detected
+                  </p>
+                </div>
+                {lectureForm.selectedVideoFile && (
+                  <div className="mt-2 p-2 bg-green-100 rounded">
+                    <p className="text-sm text-green-800">
+                      📹 Selected: {lectureForm.selectedVideoFile.name} 
+                      <br />
+                      📊 Size: {(lectureForm.selectedVideoFile.size / (1024 * 1024)).toFixed(1)}MB
+                    </p>
+                  </div>
+                )}
+                
+                {/* Cloudinary Setup Warning */}
+                {(CLOUDINARY_CLOUD_NAME === 'your-cloud-name' || CLOUDINARY_UPLOAD_PRESET === 'your-upload-preset') && (
+                  <div className="mt-2 p-2 bg-yellow-100 border border-yellow-400 rounded">
+                    <p className="text-xs text-yellow-800">
+                      ⚠️ <strong>Setup Required:</strong> Please configure your Cloudinary credentials.
+                      <br />
+                      See CLOUDINARY_SETUP_GUIDE.md for instructions.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -536,11 +578,11 @@ const MyCourses = () => {
                 Cancel
               </button>
               <button
-                onClick={addLectureToChapter}
-                disabled={isUploadingLecture}
+                onClick={() => addLectureToChapter(lectureForm.selectedVideoFile)}
+                disabled={isUploadingLecture || !lectureForm.selectedVideoFile}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isUploadingLecture ? 'Uploading...' : 'Add Lecture'}
+                {isUploadingLecture ? 'Uploading to Cloud...' : 'Upload & Add Lecture'}
               </button>
             </div>
           </div>

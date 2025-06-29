@@ -32,6 +32,6 @@
     ],
     "limits": {
         "duration": 60000,
-        "maxBodySize": "16mb"
+        "maxBodySize": "10mb"
     }
 }

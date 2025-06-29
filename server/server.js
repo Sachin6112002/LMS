@@ -72,16 +72,16 @@ app.use((err, req, res, next) => {
   if (err.status === 413 || err.type === 'entity.too.large') {
     return res.status(413).json({
       success: false,
-      message: 'Request entity too large. Maximum file size is 15MB for videos.',
-      maxSize: '15MB'
+      message: 'Request entity too large. Maximum file size is 8MB for videos.',
+      maxSize: '8MB'
     });
   }
   next(err);
 });
 
 // Now add body parsers for the rest of the app with limits suitable for Vercel
-app.use(express.json({ limit: '15mb' })); // 15MB JSON payload limit (Vercel compatible)
-app.use(express.urlencoded({ extended: true, limit: '15mb' })); // 15MB URL-encoded payload limit
+app.use(express.json({ limit: '8mb' })); // 8MB JSON payload limit (Vercel compatible)
+app.use(express.urlencoded({ extended: true, limit: '8mb' })); // 8MB URL-encoded payload limit
 
 // Serve uploaded videos statically
 const __filename = fileURLToPath(import.meta.url);
@@ -96,8 +96,8 @@ app.use((err, req, res, next) => {
   if (err.type === 'entity.too.large' || err.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({
       success: false,
-      message: 'File is too large. Maximum size allowed is 15MB for videos. Please compress your video or use a smaller file.',
-      maxSize: '15MB'
+      message: 'File is too large. Maximum size allowed is 8MB for videos. Please compress your video or use a smaller file.',
+      maxSize: '8MB'
     });
   }
   
@@ -105,8 +105,8 @@ app.use((err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({
         success: false,
-        message: 'Video file is too large. Maximum size allowed is 15MB. Please compress your video.',
-        maxSize: '15MB'
+        message: 'Video file is too large. Maximum size allowed is 8MB. Please compress your video.',
+        maxSize: '8MB'
       });
     }
     return res.status(400).json({

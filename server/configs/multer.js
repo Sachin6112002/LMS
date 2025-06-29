@@ -19,7 +19,7 @@ const upload = multer({
 export const videoUpload = multer({
   storage: multer.memoryStorage(), // Use memory storage for serverless compatibility
   limits: {
-    fileSize: 15 * 1024 * 1024, // 15MB limit for video files (Vercel serverless limits)
+    fileSize: 8 * 1024 * 1024, // 8MB limit for video files (Vercel serverless limits)
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('video/')) {

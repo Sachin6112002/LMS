@@ -137,10 +137,10 @@ const AddCourse = () => {
       return;
     }
     
-    // Check file size before uploading (15MB limit)
-    const maxSize = 15 * 1024 * 1024; // 15MB in bytes
+    // Check file size before uploading (8MB limit)
+    const maxSize = 8 * 1024 * 1024; // 8MB in bytes
     if (lectureVideo.size > maxSize) {
-      toast.error(`Video file is too large! Your file is ${(lectureVideo.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 15MB. Please compress your video.`);
+      toast.error(`Video file is too large! Your file is ${(lectureVideo.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 8MB. Please compress your video.`);
       return;
     }
     
@@ -396,7 +396,7 @@ const AddCourse = () => {
                       }
                     }}
                   />
-                  <p className="text-sm text-gray-500 mt-1">Maximum file size: 15MB</p>
+                  <p className="text-sm text-gray-500 mt-1">Maximum file size: 8MB</p>
                   {lectureVideo && lectureVideoDuration && (
                     <div className="text-green-700 text-sm mt-1">Duration: {lectureVideoDuration} min</div>
                   )}

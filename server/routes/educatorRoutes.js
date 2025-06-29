@@ -1,5 +1,5 @@
 import express from 'express'
-import { addChapter, addCourse, educatorDashboardData, getEducatorCourses, getEnrolledStudentsData, updateRoleToEducator, addLecture, publishCourse, getCourseForEdit, editCourse } from '../controllers/educatorController.js';
+import { addChapter, addCourse, educatorDashboardData, getEducatorCourses, getEnrolledStudentsData, updateRoleToEducator, addLecture, publishCourse, getCourseForEdit, editCourse, addLectureWithCloudinaryUrl } from '../controllers/educatorController.js';
 import upload, { videoUpload } from '../configs/multer.js';
 import { protectEducator } from '../middlewares/authMiddleware.js';
 import { jwtMiddleware } from '../middlewares/jwtMiddleware.js';
@@ -27,6 +27,9 @@ educatorRouter.post('/add-chapter', jwtMiddleware, protectEducator, addChapter);
 
 // Add Lecture (with video)
 educatorRouter.post('/add-lecture', jwtMiddleware, protectEducator, videoUpload.single('file'), addLecture);
+
+// Add Lecture with Direct Cloudinary URL (no file upload, bypasses 413 errors)
+educatorRouter.post('/add-lecture-cloudinary', jwtMiddleware, protectEducator, addLectureWithCloudinaryUrl);
 
 // Get course for editing
 educatorRouter.get('/course/:courseId', jwtMiddleware, protectEducator, getCourseForEdit);

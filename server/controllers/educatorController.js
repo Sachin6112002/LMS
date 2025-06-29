@@ -554,3 +554,73 @@ export const editCourse = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to update course' });
     }
 };
+
+// Add Lecture with Direct Cloudinary URL (bypasses file upload limits)
+export const addLectureWithCloudinaryUrl = async (req, res) => {
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    
+    try {
+        console.log('addLectureWithCloudinaryUrl fields:', req.body);
+        
+        const { courseId, chapterId, title, description, duration, videoUrl } = req.body;
+        const educatorId = req.auth.userId;
+        
+        // Validate required fields
+        if (!courseId || !chapterId || !title || !videoUrl) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Missing required fields: courseId, chapterId, title, and videoUrl are required' 
+            });
+        }
+        
+        // Validate that videoUrl is from Cloudinary
+        if (!videoUrl.includes('cloudinary.com') && !videoUrl.includes('res.cloudinary.com')) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid video URL. Must be a Cloudinary URL.' 
+            });
+        }
+        
+        // Find the course
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+        
+        // Check if educator owns this course
+        if (course.createdBy !== educatorId) {
+            return res.status(403).json({ success: false, message: 'Unauthorized: You can only add lectures to your own courses' });
+        }
+        
+        // Find the chapter by ID
+        const chapterIndex = course.chapters.findIndex(chapter => chapter._id.toString() === chapterId);
+        if (chapterIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Chapter not found' });
+        }
+        
+        // Create new lecture with provided Cloudinary URL
+        const newLecture = {
+            title,
+            description: description || '',
+            videoUrl: videoUrl, // Direct Cloudinary URL
+            duration: parseInt(duration) || 0,
+            isPreviewFree: false
+        };
+        
+        // Add lecture to chapter
+        course.chapters[chapterIndex].lectures.push(newLecture);
+        await course.save();
+        
+        res.json({ 
+            success: true, 
+            message: 'Lecture added successfully',
+            lecture: newLecture, 
+            course 
+        });
+    } catch (err) {
+        console.log('addLectureWithCloudinaryUrl error:', err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
