@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import Quill from 'quill';
 import axios from 'axios'
 import { AppContext } from '../../context/AppContext';
-import VideoUploadComponent from '../../components/educator/VideoUploadComponent';
+import CloudinaryVideoUpload from '../../components/educator/CloudinaryVideoUpload';
 import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
 
 // Set your actual Cloudinary values here
@@ -137,10 +137,10 @@ const AddCourse = () => {
       return;
     }
     
-    // Check file size before uploading (8MB limit)
-    const maxSize = 8 * 1024 * 1024; // 8MB in bytes
+    // Check file size before uploading (100MB limit for Cloudinary)
+    const maxSize = 100 * 1024 * 1024; // 100MB in bytes
     if (lectureVideo.size > maxSize) {
-      toast.error(`Video file is too large! Your file is ${(lectureVideo.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 8MB. Please compress your video.`);
+      toast.error(`Video file is too large! Your file is ${(lectureVideo.size / 1024 / 1024).toFixed(1)}MB. Maximum size allowed is 100MB. Please compress your video.`);
       return;
     }
     
@@ -373,34 +373,19 @@ const AddCourse = () => {
                     onChange={(e) => setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
                   />
                 </div>
-                <div className="mb-2">
-                  <label className="text-green-900">Lecture Video</label>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={async (e) => {
-                      const file = e.target.files[0];
-                      setLectureVideo(file);
-                      if (file) {
-                        const videoUrl = URL.createObjectURL(file);
-                        const tempVideo = document.createElement('video');
-                        tempVideo.preload = 'metadata';
-                        tempVideo.src = videoUrl;
-                        tempVideo.onloadedmetadata = () => {
-                          URL.revokeObjectURL(videoUrl);
-                          const duration = Math.round(tempVideo.duration / 60) || 1;
-                          setLectureVideoDuration(duration);
-                        };
-                      } else {
-                        setLectureVideoDuration('');
-                      }
-                    }}
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Maximum file size: 8MB</p>
-                  {lectureVideo && lectureVideoDuration && (
-                    <div className="text-green-700 text-sm mt-1">Duration: {lectureVideoDuration} min</div>
-                  )}
-                </div>
+                {/* Cloudinary Video Upload Component */}
+                <CloudinaryVideoUpload
+                  onUploadSuccess={(result) => {
+                    setShowPopup(false);
+                    fetchCourseById(createdCourse._id); // Refresh course/chapters
+                    toast.success('Lecture and video uploaded!');
+                  }}
+                  courseId={createdCourse._id}
+                  chapterId={currentChapterId}
+                  backendUrl={backendUrl}
+                  token={getToken && typeof getToken === 'function' ? getToken() : ''}
+                  lectureTitle={lectureDetails.lectureTitle}
+                />
                 <div className="flex gap-2 my-4 items-center">
                   <label className="text-green-900">Is Preview Free?</label>
                   <input
@@ -409,7 +394,6 @@ const AddCourse = () => {
                     onChange={(e) => setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })}
                   />
                 </div>
-                <button type="button" className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onClick={addLecture} disabled={!lectureDetails.lectureTitle || !lectureVideo || !lectureVideoDuration}>Add</button>
                 <img onClick={() => setShowPopup(false)} src={assets.cross_icon} className="absolute top-4 right-4 w-4 cursor-pointer" alt="" />
               </div>
             </div>
