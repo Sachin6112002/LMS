@@ -144,6 +144,8 @@ const AddCourse = () => {
     }
     setIsSubmitting(true);
     try {
+      // Debug log for Cloudinary config
+      console.log('Cloudinary:', CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET);
       toast.info('Uploading video to cloud... This may take a while for large files.');
       // Step 1: Upload video directly to Cloudinary
       const formData = new FormData();
