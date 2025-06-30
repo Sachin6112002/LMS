@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AppContext } from '../../context/AppContext';
+import { formatDuration } from '../../utils/formatDuration';
 
 const CourseCard = ({ course }) => {
+  const { currency } = useContext(AppContext);
   // Defensive: ensure course is valid
   if (!course || typeof course !== 'object' || !course._id) {
     return null;
@@ -12,6 +15,21 @@ const CourseCard = ({ course }) => {
   const lecturesCount = Array.isArray(course.chapters) 
     ? course.chapters.reduce((acc, ch) => acc + (Array.isArray(ch?.lectures) ? ch.lectures.length : 0), 0)
     : 0;
+  // Price logic
+  const price = course.price || course.coursePrice || 0;
+  const discount = course.discount || 0;
+  const discountedPrice = price - (price * discount / 100);
+  // Calculate total duration in seconds
+  let totalSeconds = 0;
+  if (Array.isArray(course.chapters)) {
+    course.chapters.forEach(ch => {
+      if (Array.isArray(ch.lectures)) {
+        ch.lectures.forEach(lec => {
+          if (lec && typeof lec.duration === 'number') totalSeconds += lec.duration;
+        });
+      }
+    });
+  }
   return (
     <Link
       onClick={() => scrollTo(0, 0)}
@@ -31,10 +49,22 @@ const CourseCard = ({ course }) => {
         <div className="flex items-center space-x-2">
           <span className="text-green-600">Chapters: {chaptersCount}</span>
           <span className="text-green-600">Lectures: {lecturesCount}</span>
+          <span className="text-green-600">Duration: {formatDuration(totalSeconds)}</span>
         </div>
         <p className="text-green-800 text-sm mt-2">
           {course.description ? course.description.replace(/<[^>]+>/g, '') : 'No description available'}
         </p>
+        <div className="mt-2">
+          {discount > 0 && discountedPrice < price ? (
+            <>
+              <span className="text-lg font-bold text-green-700">{currency} {discountedPrice}</span>
+              <span className="text-sm text-gray-500 line-through ml-2">{currency} {price}</span>
+              <span className="ml-2 text-xs text-red-600 font-semibold">{discount}% OFF</span>
+            </>
+          ) : (
+            <span className="text-lg font-bold text-green-700">{currency} {price}</span>
+          )}
+        </div>
       </div>
     </Link>
   );

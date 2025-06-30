@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState, Suspense } from 'react'
 import { AppContext } from '../../context/AppContext'
 import { assets } from '../../assets/assets';
 import { useParams } from 'react-router-dom';
-import humanizeDuration from 'humanize-duration';
+import { formatDuration } from '../../utils/formatDuration';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Rating from '../../components/student/Rating';
@@ -216,7 +216,7 @@ const Player = ({ }) => {
                                 Watch
                               </button>
                             )}
-                            {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
+                            {lecture.duration && <p>{formatDuration(lecture.duration)}</p>}
                           </div>
                         </div>
                       </li>

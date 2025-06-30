@@ -33,7 +33,6 @@ app.use((req, res, next) => {
     'http://localhost:5173',
     'http://localhost:3000', 
     'http://localhost:5174',
-    'https://lms-admin-theta-two.vercel.app',
     'https://lms-client-coral-rho.vercel.app',
     'https://lms-client-one-lemon.vercel.app',
     'https://lms-admin-blond.vercel.app' // <-- Added new admin panel
@@ -68,7 +67,6 @@ app.use(cors({
       'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:5174',
-      'https://lms-admin-theta-two.vercel.app',
       'https://lms-client-coral-rho.vercel.app',
       'https://lms-client-one-lemon.vercel.app',
       'https://lms-admin-blond.vercel.app' // <-- Added new admin panel

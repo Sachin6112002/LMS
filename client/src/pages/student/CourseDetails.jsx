@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
-import humanizeDuration from 'humanize-duration'
+import { formatDuration } from '../../utils/formatDuration';
 import Loading from '../../components/student/Loading';
 
 const CourseDetails = () => {
@@ -189,7 +189,7 @@ const CourseDetails = () => {
                                     {typeof lecture.duration === 'string'
                                       ? lecture.duration
                                       : typeof lecture.duration === 'number'
-                                        ? humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })
+                                        ? formatDuration(lecture.duration)
                                         : String(lecture.duration)}
                                   </p>
                                 )}
@@ -198,7 +198,7 @@ const CourseDetails = () => {
                                   disabled={!canWatch}
                                   onClick={() => {
                                     if (canWatch) {
-                                      setPlayerData(lecture);
+                                      navigate(`/player/${courseData._id}/${lecture._id || lecture.lectureId}`);
                                     }
                                   }}
                                 >
