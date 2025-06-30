@@ -25,7 +25,7 @@ const CourseCard = ({ course }) => {
           {typeof course.createdBy === 'object' && course.createdBy?.name
             ? course.createdBy.name
             : (typeof course.createdBy === 'string' && course.createdBy.length > 0
-                ? 'Educator'
+                ? course.createdBy
                 : 'Unknown Educator')}
         </p>
         <div className="flex items-center space-x-2">
