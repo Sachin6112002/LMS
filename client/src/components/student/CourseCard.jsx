@@ -52,7 +52,11 @@ const CourseCard = ({ course }) => {
           <span className="text-green-600">Duration: {formatDuration(totalSeconds)}</span>
         </div>
         <p className="text-green-800 text-sm mt-2">
-          {course.description ? course.description.replace(/<[^>]+>/g, '') : 'No description available'}
+          {course.description
+            ? (course.description.replace(/<[^>]+>/g, '').length > 80
+                ? course.description.replace(/<[^>]+>/g, '').slice(0, 80) + '...'
+                : course.description.replace(/<[^>]+>/g, ''))
+            : 'No description available'}
         </p>
         <div className="mt-2">
           {discount > 0 && discountedPrice < price ? (
