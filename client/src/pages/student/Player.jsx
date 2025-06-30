@@ -192,19 +192,29 @@ const Player = ({ }) => {
                     // Create a unique ID for each lecture
                     const lectureId = lecture._id || `${courseId}-${index}-${i}`;
                     const isCompleted = progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(lectureId);
-                    const isAlreadyEnrolled = enrolledCourses.some(course => course._id === courseId);
+                    // Determine if this is the first lecture of the first chapter
+                    const isFirstLecture = index === 0 && i === 0;
+                    const canWatch = isFirstLecture || enrolledCourses.some(course => course._id === courseId);
                     
                     return (
                       <li key={i} className="flex items-start gap-2 py-1">
                         <img src={isCompleted ? assets.blue_tick_icon : assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
                         <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                           <p>{lecture.title || lecture.lectureTitle}</p>
-                          <div className='flex gap-2'>
+                          <div className='flex gap-2 items-center'>
                             {/* Only show 'Watch' for first lecture or if enrolled */}
-                            {lecture.videoUrl && ((i === 0) || isAlreadyEnrolled) && (
-                              <p onClick={() => {
-                                setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
-                              }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>
+                            {lecture.videoUrl && (
+                              <button
+                                className={`ml-2 px-3 py-1 rounded text-white text-xs font-semibold ${canWatch ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
+                                disabled={!canWatch}
+                                onClick={() => {
+                                  if (canWatch) {
+                                    setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
+                                  }
+                                }}
+                              >
+                                Watch
+                              </button>
                             )}
                             {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                           </div>

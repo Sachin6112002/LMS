@@ -150,41 +150,57 @@ const CourseDetails = () => {
           <div className="pt-8 text-green-900">
             <h2 className="text-xl font-semibold">Course Structure</h2>
             <div className="pt-5">
-              {Array.isArray(courseData.chapters) && courseData.chapters.length > 0 ? courseData.chapters.map((chapter, index) => (
-                <div key={index} className="border border-green-200 bg-green-50 mb-2 rounded">
+              {Array.isArray(courseData.chapters) && courseData.chapters.length > 0 ? courseData.chapters.map((chapter, chapterIdx) => (
+                <div key={chapterIdx} className="border border-green-200 bg-green-50 mb-2 rounded">
                   <div
                     className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
-                    onClick={() => toggleSection(index)}
+                    onClick={() => toggleSection(chapterIdx)}
                   >
                     <div className="flex items-center gap-2">
-                      <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
+                      <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[chapterIdx] ? "rotate-180" : ""}`} />
                       <p className="font-medium md:text-base text-sm">{chapter.title || chapter.chapterTitle}</p>
                     </div>
                     <p className="text-sm md:text-default">{(chapter.lectures?.length || 0)} lectures</p>
                   </div>
 
-                  <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
+                  <div className={`overflow-hidden transition-all duration-300 ${openSections[chapterIdx] ? "max-h-96" : "max-h-0"}`} >
                     <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
-                      {(chapter.lectures || []).map((lecture, i) => (
-                        <li key={i} className="flex items-start gap-2 py-1">
-                          <img src={assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
-                          <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
-                            <p>{lecture.title || lecture.lectureTitle}</p>
-                            <div className='flex gap-2'>
-                              {/* Duration if available */}
-                              {lecture.duration && (
-                                <p>
-                                  {typeof lecture.duration === 'string'
-                                    ? lecture.duration
-                                    : typeof lecture.duration === 'number'
-                                      ? humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })
-                                      : String(lecture.duration)}
-                                </p>
-                              )}
+                      {(chapter.lectures || []).map((lecture, lectureIdx) => {
+                        // Determine if this is the first lecture of the first chapter
+                        const isFirstLecture = chapterIdx === 0 && lectureIdx === 0;
+                        const canWatch = isFirstLecture || isAlreadyEnrolled;
+                        return (
+                          <li key={lectureIdx} className="flex items-start gap-2 py-1">
+                            <img src={assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />
+                            <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
+                              <p>{lecture.title || lecture.lectureTitle}</p>
+                              <div className='flex gap-2 items-center'>
+                                {/* Duration if available */}
+                                {lecture.duration && (
+                                  <p>
+                                    {typeof lecture.duration === 'string'
+                                      ? lecture.duration
+                                      : typeof lecture.duration === 'number'
+                                        ? humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })
+                                        : String(lecture.duration)}
+                                  </p>
+                                )}
+                                <button
+                                  className={`ml-2 px-3 py-1 rounded text-white text-xs font-semibold ${canWatch ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
+                                  disabled={!canWatch}
+                                  onClick={() => {
+                                    if (canWatch) {
+                                      setPlayerData(lecture);
+                                    }
+                                  }}
+                                >
+                                  Watch
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>
@@ -248,28 +264,7 @@ const CourseDetails = () => {
               )
               : <img src={courseData.thumbnail} alt="" />
           }
-          {/* Watch Button */}
-          <Suspense fallback={<Loading />}>
-            <button
-              className={`w-full py-3 rounded mt-3 mb-2 font-semibold transition text-white ${isAlreadyEnrolled ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-green-200 cursor-not-allowed'}`}
-              disabled={
-                !isAlreadyEnrolled ||
-                safeChapters.length === 0 ||
-                safeChapters[0].lectures.length === 0
-              }
-              onClick={() => {
-                if (
-                  isAlreadyEnrolled &&
-                  safeChapters.length > 0 &&
-                  safeChapters[0].lectures.length > 0
-                ) {
-                  navigate('/player/' + courseData._id);
-                }
-              }}
-            >
-              Watch
-            </button>
-          </Suspense>
+          {/* Watch Button removed from here */}
           <div className="p-5">
             {/* Price/discount/rating removed as not in new model */}
             <div className="flex items-center text-sm md:text-default gap-4 pt-2 md:pt-4 text-green-700">

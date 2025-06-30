@@ -69,10 +69,15 @@ export const purchaseCourse = async (req, res) => {
             return res.json({ success: false, message: 'A pending purchase already exists for this course. Please complete the payment or wait for it to finish processing.' });
         }
 
+        // Calculate final price after discount
+        const basePrice = courseData.price || 0;
+        const discount = courseData.discount || 0;
+        const finalPrice = Math.max(Math.round(basePrice * (1 - discount / 100)), 0);
+
         const purchaseData = {
             courseId: courseData._id,
             userId,
-            amount: courseData.price || 0, // Use course price if available, otherwise 0 for free courses
+            amount: finalPrice, // Use discounted price for payment and free/paid check
         }
 
         const newPurchase = await Purchase.create(purchaseData)
