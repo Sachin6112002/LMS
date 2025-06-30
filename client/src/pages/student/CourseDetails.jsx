@@ -135,7 +135,17 @@ const CourseDetails = () => {
             {/* <p>{(courseData.enrolledStudents?.length || 0)} students</p> */}
           </div>
 
-          <p className='text-sm'>Course by <span className='text-green-600 underline'>{typeof courseData.createdBy === 'object' && courseData.createdBy?.name ? courseData.createdBy.name : (typeof courseData.createdBy === 'string' && courseData.createdBy.length > 0 ? courseData.createdBy : 'Unknown Educator')}</span></p>
+          <p className='text-sm'>Course by <span className='text-green-600 underline'>
+            {typeof courseData.createdBy === 'object'
+              ? (typeof courseData.createdBy.name === 'string'
+                  ? courseData.createdBy.name
+                  : typeof courseData.createdBy.name === 'object'
+                    ? Object.values(courseData.createdBy.name).join(' ')
+                    : 'Unknown Educator')
+              : (typeof courseData.createdBy === 'string' && courseData.createdBy.length > 0
+                  ? courseData.createdBy
+                  : 'Unknown Educator')}
+          </span></p>
 
           <div className="pt-8 text-green-900">
             <h2 className="text-xl font-semibold">Course Structure</h2>
@@ -175,7 +185,15 @@ const CourseDetails = () => {
                                 </p>
                               )}
                               {/* Duration if available */}
-                              {lecture.duration && <p>{typeof lecture.duration === 'string' ? lecture.duration : humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
+                              {lecture.duration && (
+                                <p>
+                                  {typeof lecture.duration === 'string'
+                                    ? lecture.duration
+                                    : typeof lecture.duration === 'number'
+                                      ? humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })
+                                      : String(lecture.duration)}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </li>

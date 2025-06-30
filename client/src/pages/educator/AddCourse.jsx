@@ -385,7 +385,9 @@ const AddCourse = () => {
                   {chapter.lectures.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture below.</div>}
                   {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
-                      <span className="text-green-900">{lecture.title} - {lecture.duration}{lecture.isPreviewFree ? ' - Free Preview' : ' - Paid'}</span>
+                      <span className="text-green-900">
+                        {lecture.title} - {typeof lecture.duration === 'string' ? lecture.duration : typeof lecture.duration === 'number' ? `${lecture.duration} min` : String(lecture.duration)}{lecture.isPreviewFree ? ' - Free Preview' : ' - Paid'}
+                      </span>
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
