@@ -78,6 +78,14 @@ const AddCourse = () => {
       const thumbRes = await uploadToCloudinary(image, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
       const thumbnailUrl = thumbRes.secure_url;
       const token = await getToken();
+      // Debug log to check what is being sent
+      console.log('Submitting course:', {
+        title: courseTitle,
+        price: coursePrice,
+        discount: discount,
+        priceType: typeof coursePrice,
+        discountType: typeof discount
+      });
       const { data } = await axios.post(`${backendUrl}/api/courses`, {
         title: courseTitle,
         description: quillRef.current.root.innerHTML,
