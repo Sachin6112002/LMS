@@ -3,7 +3,7 @@ import Course from '../models/Course.js';
 // Create a course with metadata and thumbnail (thumbnail is now a URL)
 export const createCourse = async (req, res) => {
   try {
-    const { title, description, thumbnail } = req.body;
+    const { title, description, thumbnail, price = 0, discount = 0 } = req.body;
     // Defensive: check for required fields
     if (!title || !description || !thumbnail) {
       return res.status(400).json({ success: false, message: 'Title, description, and thumbnail are required' });
@@ -12,6 +12,8 @@ export const createCourse = async (req, res) => {
       title,
       description,
       thumbnail,
+      price: Number(price) || 0,
+      discount: Number(discount) || 0,
       createdBy: req.auth.userId,
       chapters: []
     });
