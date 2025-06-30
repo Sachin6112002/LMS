@@ -94,7 +94,7 @@ const MyEnrollments = () => {
                     {enrolledCourses.map((course, idx) => (
                         <div key={course._id} className="bg-white border border-green-200 rounded-lg shadow p-6 flex flex-col gap-4">
                             <h2 className="text-xl font-semibold text-green-900">{course.title}</h2>
-                            <p className="text-green-700">{course.createdBy || 'Unknown Educator'}</p>
+                            <p className="text-green-700">{course.createdBy?.name || course.createdBy || 'Unknown Educator'}</p>
                             <p className="text-green-700">{calculateCourseDuration(course)} | {calculateNoOfLectures(course)} lessons</p>
                             <div className="flex items-center gap-2">
                                 <Line percent={progressArray[idx]?.lectureCompleted / progressArray[idx]?.totalLectures * 100 || 0} strokeWidth={4} strokeColor="#22c55e" trailWidth={4} trailColor="#e5f9ed" />

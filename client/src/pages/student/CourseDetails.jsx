@@ -135,7 +135,7 @@ const CourseDetails = () => {
             {/* <p>{(courseData.enrolledStudents?.length || 0)} students</p> */}
           </div>
 
-          <p className='text-sm'>Course by <span className='text-green-600 underline'>{courseData.createdBy || 'Unknown Educator'}</span></p>
+          <p className='text-sm'>Course by <span className='text-green-600 underline'>{courseData.createdBy?.name || courseData.createdBy || 'Unknown Educator'}</span></p>
 
           <div className="pt-8 text-green-900">
             <h2 className="text-xl font-semibold">Course Structure</h2>
