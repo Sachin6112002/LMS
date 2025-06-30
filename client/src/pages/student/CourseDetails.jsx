@@ -169,6 +169,14 @@ const CourseDetails = () => {
                         // Determine if this is the first lecture of the first chapter
                         const isFirstLecture = chapterIdx === 0 && lectureIdx === 0;
                         const canWatch = isFirstLecture || isAlreadyEnrolled;
+                        // Debug logs
+                        console.log('Lecture Render:', {
+                          chapterIdx,
+                          lectureIdx,
+                          isFirstLecture,
+                          canWatch,
+                          lectureTitle: lecture.title || lecture.lectureTitle
+                        });
                         return (
                           <li key={lectureIdx} className="flex items-start gap-2 py-1">
                             <img src={assets.play_icon} alt="bullet icon" className="w-4 h-4 mt-1" />

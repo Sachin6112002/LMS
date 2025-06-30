@@ -81,7 +81,9 @@ const AddCourse = () => {
       const { data } = await axios.post(`${backendUrl}/api/courses`, {
         title: courseTitle,
         description: quillRef.current.root.innerHTML,
-        thumbnail: thumbnailUrl
+        thumbnail: thumbnailUrl,
+        price: Number(coursePrice), // Ensure number
+        discount: Number(discount), // Ensure number
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
