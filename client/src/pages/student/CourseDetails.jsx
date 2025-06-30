@@ -198,7 +198,7 @@ const CourseDetails = () => {
                                   disabled={!canWatch}
                                   onClick={() => {
                                     if (canWatch) {
-                                      navigate(`/player/${courseData._id}/${lecture._id || lecture.lectureId}`);
+                                      navigate(`/player/${courseData._id}`);
                                     }
                                   }}
                                 >
