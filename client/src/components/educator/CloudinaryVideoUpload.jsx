@@ -38,6 +38,22 @@ const CloudinaryVideoUpload = ({
     console.log(`Selected video: ${file.name}, Size: ${(file.size / 1024 / 1024).toFixed(1)}MB`);
   };
 
+  // Helper to get video duration from file
+  const getVideoFileDuration = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src);
+        resolve(video.duration);
+      };
+      video.onerror = function () {
+        resolve(0);
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
   const uploadToCloudinary = async () => {
     if (!videoFile) {
       alert('Please select a video file first.');
@@ -51,6 +67,11 @@ const CloudinaryVideoUpload = ({
 
     setUploading(true);
     setProgress(0);
+
+    let fileDuration = 0;
+    try {
+      fileDuration = await getVideoFileDuration(videoFile);
+    } catch (e) { fileDuration = 0; }
 
     try {
       // Step 1: Upload video directly to Cloudinary
@@ -75,7 +96,8 @@ const CloudinaryVideoUpload = ({
         if (xhr.status === 200) {
           try {
             const cloudinaryResponse = JSON.parse(xhr.responseText);
-            console.log('Cloudinary upload successful:', cloudinaryResponse);
+            // Use Cloudinary duration if available, else fallback to file duration
+            const durationSec = cloudinaryResponse.duration ? Math.ceil(cloudinaryResponse.duration) : Math.ceil(fileDuration);
 
             // Step 2: Send video URL to your backend to create the lecture
             const lectureData = {
@@ -84,7 +106,7 @@ const CloudinaryVideoUpload = ({
               title: lectureTitle,
               description: lectureDescription || '',
               videoUrl: cloudinaryResponse.secure_url,
-              duration: Math.round(cloudinaryResponse.duration) || 0
+              duration: durationSec || 1 // never 0
             };
 
             const response = await fetch(`${backendUrl}/api/educator/add-lecture-cloudinary`, {
