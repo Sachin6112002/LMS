@@ -192,6 +192,7 @@ const Player = ({ }) => {
                     // Create a unique ID for each lecture
                     const lectureId = lecture._id || `${courseId}-${index}-${i}`;
                     const isCompleted = progressData && Array.isArray(progressData.lectureCompleted) && progressData.lectureCompleted.includes(lectureId);
+                    const isAlreadyEnrolled = enrolledCourses.some(course => course._id === courseId);
                     
                     return (
                       <li key={i} className="flex items-start gap-2 py-1">
@@ -199,22 +200,11 @@ const Player = ({ }) => {
                         <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                           <p>{lecture.title || lecture.lectureTitle}</p>
                           <div className='flex gap-2'>
-                            {lecture.videoUrl && <p onClick={() => {
-                              setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
-                            }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>}
-                            {lecture.isPreviewFree && lecture.videoUrl && (
+                            {/* Only show 'Watch' for first lecture or if enrolled */}
+                            {lecture.videoUrl && ((i === 0) || isAlreadyEnrolled) && (
                               <p onClick={() => {
-                                setPlayerData({ 
-                                  ...lecture, 
-                                  lectureUrl: lecture.videoUrl, 
-                                  lectureTitle: lecture.title || lecture.lectureTitle,
-                                  isPreview: true,
-                                  chapter: index + 1,
-                                  lecture: i + 1
-                                });
-                              }} className='text-orange-600 hover:underline cursor-pointer font-semibold bg-orange-100 px-2 py-1 rounded'>
-                                🎬 Free Preview
-                              </p>
+                                setPlayerData({ ...lecture, lectureUrl: lecture.videoUrl, lectureId: lectureId, lectureTitle: lecture.title || lecture.lectureTitle, chapter: index + 1, lecture: i + 1 });
+                              }} className='text-green-600 hover:underline cursor-pointer'>Watch</p>
                             )}
                             {lecture.duration && <p>{humanizeDuration(lecture.duration * 60 * 1000, { units: ['h', 'm'] })}</p>}
                           </div>

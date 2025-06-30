@@ -171,19 +171,6 @@ const CourseDetails = () => {
                           <div className="flex items-center justify-between w-full text-green-900 text-xs md:text-default">
                             <p>{lecture.title || lecture.lectureTitle}</p>
                             <div className='flex gap-2'>
-                              {/* Preview logic if available */}
-                              {lecture.isPreviewFree && lecture.videoUrl && (
-                                <p 
-                                  onClick={() => setPlayerData({ 
-                                    videoUrl: lecture.videoUrl,
-                                    title: lecture.title,
-                                    isPreview: true
-                                  })} 
-                                  className='text-green-600 hover:underline cursor-pointer font-semibold'
-                                >
-                                  🎬 Free Preview
-                                </p>
-                              )}
                               {/* Duration if available */}
                               {lecture.duration && (
                                 <p>

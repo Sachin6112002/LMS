@@ -28,7 +28,6 @@ const AddCourse = () => {
   const [lectureDetails, setLectureDetails] = useState({
     lectureTitle: '',
     lectureDuration: '',
-    isPreviewFree: false,
   });
   const [lectureVideo, setLectureVideo] = useState(null);
   const [lectureVideoDuration, setLectureVideoDuration] = useState('');
@@ -201,7 +200,6 @@ const AddCourse = () => {
         description: lectureDetails.lectureDescription || '',
         videoUrl: cloudinaryResponse.secure_url,
         duration: formattedDuration, // e.g. '1 hr 23 mins'
-        isPreviewFree: lectureDetails.isPreviewFree
       };
       const { data } = await axios.post(
         `${backendUrl}/api/educator/add-lecture-cloudinary`,
@@ -216,7 +214,7 @@ const AddCourse = () => {
       if (data.success) {
         toast.success('Lecture and video uploaded!');
         setShowPopup(false);
-        setLectureDetails({ lectureTitle: '', lectureDuration: '', isPreviewFree: false });
+        setLectureDetails({ lectureTitle: '', lectureDuration: '' });
         setLectureVideo(null);
         setLectureVideoDuration('');
         fetchCourseById(createdCourse._id); // Refresh course/chapters
@@ -425,14 +423,6 @@ const AddCourse = () => {
                   token={getToken && typeof getToken === 'function' ? getToken() : ''}
                   lectureTitle={lectureDetails.lectureTitle}
                 />
-                <div className="flex gap-2 my-4 items-center">
-                  <label className="text-green-900">Is Preview Free?</label>
-                  <input
-                    type="checkbox" className="mt-1 scale-125"
-                    checked={lectureDetails.isPreviewFree}
-                    onChange={(e) => setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })}
-                  />
-                </div>
                 <img onClick={() => setShowPopup(false)} src={assets.cross_icon} className="absolute top-4 right-4 w-4 cursor-pointer" alt="" />
               </div>
             </div>

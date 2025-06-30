@@ -34,18 +34,18 @@ router.get('/:courseId/chapters/:chapterId/lectures/:lectureId', jwtMiddleware, 
     if (!chapter) return res.status(404).json({ success: false, message: 'Chapter not found' });
     const lecture = chapter.lectures.id(lectureId) || chapter.lectures.find(l => l._id.toString() === lectureId);
     if (!lecture) return res.status(404).json({ success: false, message: 'Lecture not found' });
-    // If preview, allow anyone
-    if (lecture.isPreviewFree) {
-      return res.json({ success: true, videoUrl: lecture.videoUrl, preview: true });
+    // Allow anyone to access the first lecture of the course
+    const isFirstLecture = course.chapters[0] && course.chapters[0].lectures[0] && (chapter._id.equals(course.chapters[0]._id) || chapter._id.toString() === course.chapters[0]._id.toString()) && (lecture._id.equals(course.chapters[0].lectures[0]._id) || lecture._id.toString() === course.chapters[0].lectures[0]._id.toString());
+    if (!isFirstLecture) {
+      // Otherwise, require enrollment
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Login required to access this lecture' });
+      }
+      if (!course.enrolledStudents.map(id => id.toString()).includes(userId)) {
+        return res.status(403).json({ success: false, message: 'Please enroll to access this lecture' });
+      }
     }
-    // Otherwise, require enrollment
-    if (!userId) {
-      return res.status(401).json({ success: false, message: 'Login required to access this lecture' });
-    }
-    if (!course.enrolledStudents.map(id => id.toString()).includes(userId)) {
-      return res.status(403).json({ success: false, message: 'Please enroll to access this lecture' });
-    }
-    return res.json({ success: true, videoUrl: lecture.videoUrl, preview: false });
+    return res.json({ success: true, videoUrl: lecture.videoUrl });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

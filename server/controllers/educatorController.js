@@ -378,8 +378,7 @@ export const addLecture = async (req, res) => {
             title,
             description: description || '',
             videoUrl: videoUpload.secure_url,
-            duration: parseInt(duration) || 0,
-            isPreviewFree: false // Default to false, can be updated later
+            duration: parseInt(duration) || 0
         };
         
         // Add lecture to chapter
@@ -605,8 +604,7 @@ export const addLectureWithCloudinaryUrl = async (req, res) => {
             title,
             description: description || '',
             videoUrl: videoUrl, // Direct Cloudinary URL
-            duration: parseInt(duration) || 0,
-            isPreviewFree: false
+            duration: parseInt(duration) || 0
         };
         
         // Add lecture to chapter

@@ -5,7 +5,6 @@ const lectureSchema = new mongoose.Schema({
     description: { type: String, default: '' },
     videoUrl: { type: String, required: true },
     duration: { type: Number, required: true },
-    isPreviewFree: { type: Boolean, default: false }
 }, { _id: true });
 
 const chapterSchema = new mongoose.Schema({
