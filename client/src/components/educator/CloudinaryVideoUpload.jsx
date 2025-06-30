@@ -179,24 +179,6 @@ const CloudinaryVideoUpload = ({
           </p>
         </div>
       )}
-
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-        <h4 className="text-sm font-medium text-blue-800 mb-2">🚀 Direct Cloud Upload Benefits:</h4>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>✅ No 8MB server limits - upload up to 100MB videos</li>
-          <li>✅ Faster uploads directly to Cloudinary</li>
-          <li>✅ Automatic video optimization and streaming</li>
-          <li>✅ No 413 payload errors</li>
-        </ul>
-      </div>
-
-      <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-        <p className="text-sm text-yellow-800">
-          <strong>Setup Required:</strong> You need to configure Cloudinary upload presets. 
-          <br />
-          Update <code>CLOUDINARY_UPLOAD_PRESET</code> and <code>CLOUDINARY_CLOUD_NAME</code> in this component.
-        </p>
-      </div>
     </div>
   );
 };
