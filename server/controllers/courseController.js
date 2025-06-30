@@ -83,7 +83,8 @@ export const getAllCourses = async (req, res) => {
 export const getCourseId = async (req, res) => {
   try {
     const { id } = req.params;
-    const courseData = await Course.findById(id);
+    // Populate createdBy with educator's name
+    const courseData = await Course.findById(id).populate('createdBy', 'name');
     if (!courseData || courseData.status !== 'published') {
       return res.status(404).json({ success: false, message: 'Course not found or not published' });
     }

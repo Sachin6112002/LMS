@@ -176,14 +176,31 @@ const AddCourse = () => {
       });
       // Step 2: Create lecture with Cloudinary URL
       const token = await getToken();
-      const durationInMinutes = Math.round(cloudinaryResponse.duration / 60) || 0;
+      // Calculate duration in hours and minutes
+      let durationInHours = 0, durationInMinutes = 0;
+      if (cloudinaryResponse.duration) {
+        durationInHours = Math.floor(cloudinaryResponse.duration / 3600);
+        durationInMinutes = Math.round((cloudinaryResponse.duration % 3600) / 60);
+      }
+      // Format duration string cleanly (omit 0 hr/min)
+      let formattedDuration = '';
+      if (durationInHours > 0) {
+        formattedDuration += `${durationInHours} hr${durationInHours !== 1 ? 's' : ''}`;
+      }
+      if (durationInMinutes > 0) {
+        if (formattedDuration) formattedDuration += ' ';
+        formattedDuration += `${durationInMinutes} min${durationInMinutes !== 1 ? 's' : ''}`;
+      }
+      if (!formattedDuration) {
+        formattedDuration = '0 min';
+      }
       const lectureData = {
         courseId: createdCourse._id,
         chapterId: currentChapterId,
         title: lectureDetails.lectureTitle,
         description: lectureDetails.lectureDescription || '',
         videoUrl: cloudinaryResponse.secure_url,
-        duration: durationInMinutes,
+        duration: formattedDuration, // e.g. '1 hr 23 mins'
         isPreviewFree: lectureDetails.isPreviewFree
       };
       const { data } = await axios.post(
@@ -335,7 +352,7 @@ const AddCourse = () => {
                   {chapter.lectures.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture in Step 3.</div>}
                   {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
-                      <span className="text-green-900">{lecture.title} - {lecture.duration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                      <span className="text-green-900">{lecture.title} - {lecture.duration}{lecture.isPreviewFree ? ' - Free Preview' : ' - Paid'}</span>
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
@@ -368,7 +385,7 @@ const AddCourse = () => {
                   {chapter.lectures.length === 0 && <div className="text-yellow-700 mb-2">No lectures yet. Add your first lecture below.</div>}
                   {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
-                      <span className="text-green-900">{lecture.title} - {lecture.duration} mins - {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}</span>
+                      <span className="text-green-900">{lecture.title} - {lecture.duration}{lecture.isPreviewFree ? ' - Free Preview' : ' - Paid'}</span>
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
