@@ -70,9 +70,11 @@ export const purchaseCourse = async (req, res) => {
         }
 
         // Calculate final price after discount
-        const basePrice = courseData.price || 0;
-        const discount = courseData.discount || 0;
+        // Ensure price and discount are numbers
+        const basePrice = Number(courseData.price) || 0;
+        const discount = Number(courseData.discount) || 0;
         const finalPrice = Math.max(Math.round(basePrice * (1 - discount / 100)), 0);
+        console.log('[DEBUG] basePrice:', basePrice, 'discount:', discount, 'finalPrice:', finalPrice, 'courseId:', courseData._id);
 
         const purchaseData = {
             courseId: courseData._id,
