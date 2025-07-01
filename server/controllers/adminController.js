@@ -41,11 +41,29 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
-// Get all purchases
+// Get all purchases (improved: always return course name, never N/A)
 export const getAllPurchases = async (req, res) => {
   try {
-    const purchases = await Purchase.find().populate('courseId', 'title').populate('userId', 'name email imageUrl');
-    res.json({ success: true, purchases });
+    const purchases = await Purchase.find()
+      .populate({
+        path: 'courseId',
+        select: 'title',
+        model: 'Course'
+      })
+      .populate({
+        path: 'userId',
+        select: 'name email imageUrl',
+        model: 'User'
+      });
+    // Always provide course name fallback
+    const formatted = purchases.map(p => {
+      let courseName = p.courseId?.title || p.courseId?.courseTitle || 'Unknown Course';
+      return {
+        ...p.toObject(),
+        courseName
+      };
+    });
+    res.json({ success: true, purchases: formatted });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

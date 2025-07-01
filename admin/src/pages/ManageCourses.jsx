@@ -77,10 +77,9 @@ const ManageCourses = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ['Title', 'Description', 'Price', 'Published'];
+    const headers = ['Title', 'Price', 'Published'];
     const rows = courses.map((c) => [
       c.title || 'N/A',
-      (c.description || '').replace(/<[^>]+>/g, '') || 'N/A',
       c.price || 'Free',
       c.status === 'published' ? 'Yes' : 'No',
     ]);
@@ -136,7 +135,6 @@ const ManageCourses = () => {
             <tr>
               <th className="px-4 py-2">#</th>
               <th className="px-4 py-2">Title</th>
-              <th className="px-4 py-2">Description</th>
               <th className="px-4 py-2">Price</th>
               <th className="px-4 py-2">Published</th>
               <th className="px-4 py-2">Educator</th>
@@ -146,14 +144,12 @@ const ManageCourses = () => {
             {courses.length > 0 ? (
               courses
                 .filter(course =>
-                  (course.title || '').toLowerCase().includes(search.toLowerCase()) ||
-                  (course.description || '').toLowerCase().includes(search.toLowerCase())
+                  (course.title || '').toLowerCase().includes(search.toLowerCase())
                 )
                 .map((course, idx) => (
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
                     <td className="px-4 py-2">{course.title || 'N/A'}</td>
-                    <td className="px-4 py-2">{(course.description || '').replace(/<[^>]+>/g, '') || 'N/A'}</td>
                     <td className="px-4 py-2">{course.price || 'Free'}</td>
                     <td className="px-4 py-2 flex items-center gap-2">
                       <button
@@ -183,7 +179,7 @@ const ManageCourses = () => {
                 ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-4 py-2 text-center text-gray-500">
+                <td colSpan="5" className="px-4 py-2 text-center text-gray-500">
                   No courses found.
                 </td>
               </tr>
