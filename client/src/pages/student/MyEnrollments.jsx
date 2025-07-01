@@ -96,9 +96,9 @@ const MyEnrollments = () => {
                         <div key={course._id} className="bg-white border border-green-200 rounded-lg shadow p-6 flex flex-col gap-4">
                             <h2 className="text-xl font-semibold text-green-900">{course.title}</h2>
                             <p className="text-green-700">{
-                                typeof course.createdBy === 'object' && course.createdBy?.name && course.createdBy.name.length < 30 && isNaN(Number(course.createdBy.name))
+                                typeof course.createdBy === 'object' && course.createdBy?.name
                                     ? course.createdBy.name
-                                    : (typeof course.createdBy === 'string' && course.createdBy.length < 30 && isNaN(Number(course.createdBy))
+                                    : (typeof course.createdBy === 'string' && course.createdBy.length > 0
                                         ? course.createdBy
                                         : 'Unknown Educator')
                             }</p>
