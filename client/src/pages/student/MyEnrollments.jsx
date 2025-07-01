@@ -96,14 +96,19 @@ const MyEnrollments = () => {
                         <div key={course._id} className="bg-white border border-green-200 rounded-lg shadow p-6 flex flex-col gap-4">
                             <h2 className="text-xl font-semibold text-green-900">{course.title}</h2>
                             <p className="text-green-700">{
-                                typeof course.createdBy === 'object' && course.createdBy?.name &&
-                                    course.createdBy.name.length > 0 &&
-                                    !/^[a-f0-9]{24}$/i.test(course.createdBy.name) &&
-                                    isNaN(Number(course.createdBy.name))
-                                    ? course.createdBy.name
-                                    : (typeof course.createdBy === 'string' && course.createdBy.length > 0 && !/^[a-f0-9]{24}$/i.test(course.createdBy) && isNaN(Number(course.createdBy))
+                                typeof course.createdBy === 'object' && course.createdBy !== null ? (
+                                    course.createdBy.name && course.createdBy.name.length > 0 && !/^[a-f0-9]{24}$/i.test(course.createdBy.name) && isNaN(Number(course.createdBy.name))
+                                        ? course.createdBy.name
+                                        : course.createdBy.email && course.createdBy.email.length > 0
+                                            ? course.createdBy.email
+                                            : course.createdBy.username && course.createdBy.username.length > 0
+                                                ? course.createdBy.username
+                                                : 'Educator'
+                                ) : (
+                                    typeof course.createdBy === 'string' && course.createdBy.length > 0 && !/^[a-f0-9]{24}$/i.test(course.createdBy) && isNaN(Number(course.createdBy))
                                         ? course.createdBy
-                                        : 'Unknown Educator')
+                                        : 'Educator'
+                                )
                             }</p>
                             <p className="text-green-700">{
                                 typeof course.chapters === 'object' && Array.isArray(course.chapters)
