@@ -5,6 +5,7 @@ import { Line } from 'rc-progress';
 import Footer from '../../components/student/Footer';
 import Loading from '../../components/student/Loading'; // Adjust the import based on your project structure
 import PendingPurchases from '../../components/student/PendingPurchases';
+import { formatDuration } from '../../utils/formatDuration';
 
 const MyEnrollments = () => {
 
@@ -112,7 +113,6 @@ const MyEnrollments = () => {
                                                 });
                                             }
                                         });
-                                        const { formatDuration } = require('../../utils/formatDuration');
                                         return formatDuration(totalSeconds);
                                     })()
                                     : calculateCourseDuration(course)
