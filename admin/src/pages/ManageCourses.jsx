@@ -24,6 +24,7 @@ const ManageCourses = () => {
           headers: { Authorization: `Bearer ${aToken}` },
         });
         const data = await res.json();
+        console.log('Fetched courses:', data); // DEBUG LOG
         if (Array.isArray(data.courses)) setCourses(data.courses);
       } catch (err) {
         setCourses([]);
