@@ -37,7 +37,7 @@ const CourseCard = ({ course }) => {
       className="border border-green-200 pb-6 overflow-hidden rounded-lg bg-white shadow-sm transition-transform duration-200 hover:scale-[1.02] flex flex-col h-full"
     >
       <img
-        className="w-full h-40 object-cover md:h-48 lg:h-56 xl:h-64"
+        className="w-full h-40 object-cover md:h-48 lg:h-56 xl:h-64 object-top rounded-t-lg"
         src={course.thumbnail || course.courseThumbnail}
         alt={course.title || course.courseTitle || 'Course Thumbnail'}
       />
