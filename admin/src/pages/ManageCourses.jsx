@@ -143,18 +143,19 @@ const ManageCourses = () => {
           <tbody>
             {courses.length > 0 ? (
               courses
-                .filter(course =>
-                  (course.title || '').toLowerCase().includes(search.toLowerCase())
-                )
+                .filter(course => {
+                  const title = (typeof course.courseName === 'string' && course.courseName.trim().length > 0)
+                    ? course.courseName
+                    : (course.title || '');
+                  return title.toLowerCase().includes(search.toLowerCase());
+                })
                 .map((course, idx) => (
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
                     <td className="px-4 py-2">{
-                      (course.title && typeof course.title === 'string' && course.title.trim().length > 0)
-                        ? course.title
-                        : (course.courseName && typeof course.courseName === 'string' && course.courseName.trim().length > 0)
-                          ? course.courseName
-                          : 'Unknown Course'
+                      (typeof course.courseName === 'string' && course.courseName.trim().length > 0)
+                        ? course.courseName
+                        : (course.title || 'Unknown Course')
                     }</td>
                     <td className="px-4 py-2">{course.price || 'Free'}</td>
                     <td className="px-4 py-2 flex items-center gap-2">
