@@ -436,6 +436,46 @@ export const getPublishedCourseById = async (req, res) => {
   }
 };
 
+// Get all courses for admin manage view (no description, include discounted price, educator name, course name)
+export const getAdminManageCourses = async (req, res) => {
+  try {
+    // Only allow if requester is admin
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized' });
+    }
+    // Populate educator name, select only relevant fields
+    const courses = await Course.find()
+      .select('title price discount createdBy status')
+      .populate({
+        path: 'createdBy',
+        select: 'name email username',
+        model: 'User'
+      });
+    // Format response: no description, include discounted price, educator name, course name
+    const formatted = courses.map(course => {
+      // Calculate discounted price
+      let discountedPrice = course.price;
+      if (course.discount && course.discount > 0 && course.discount < 100) {
+        discountedPrice = Math.round(course.price * (1 - course.discount / 100));
+      }
+      // Educator name fallback
+      let educatorName = course.createdBy?.name || course.createdBy?.email || course.createdBy?.username || 'Educator';
+      return {
+        _id: course._id,
+        courseName: course.title || 'N/A',
+        educatorName,
+        price: course.price,
+        discount: course.discount,
+        discountedPrice,
+        status: course.status
+      };
+    });
+    res.json({ success: true, courses: formatted });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Fix pending purchases (admin utility)
 export const fixPendingPurchases = async (req, res) => {
     try {

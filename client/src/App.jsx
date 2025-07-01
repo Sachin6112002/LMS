@@ -27,6 +27,7 @@ import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOtp from "./pages/VerifyOtp";
 import PaymentResult from "./pages/student/PaymentResult";
+import AdminManageCourses from "./pages/AdminManageCourses";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -133,6 +134,9 @@ const App = () => {
                   <Route path="my-courses" element={<MyCourses />} />
                   <Route path="student-enrolled" element={<StudentsEnrolled />} />
                 </Route>
+
+                {/* Admin Routes */}
+                <Route path="/admin/manage-courses" element={<AdminManageCourses />} />
               </Routes>
             </Suspense>
           </div>

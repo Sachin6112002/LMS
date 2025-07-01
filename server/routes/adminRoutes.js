@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, getAllCourses, getAllPurchases, fixPendingPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin, deleteAdmin, getAllStudents, getAllEducators, getAllAdmins, getAdminDashboard, updateStudentByAdmin, updateStudentStatusByAdmin, resetStudentPasswordByAdmin, deleteStudentByAdmin, updateAdminProfile, updateAdminRole, getAuditLogs, getAdminProfile, updateUserRole, deleteUser } from '../controllers/adminController.js';
+import { getAllUsers, getAllCourses, getAllPurchases, fixPendingPurchases, checkAdminExists, registerAdmin, toggleCoursePublish, deleteCourseByAdmin, loginAdmin, addAdmin, deleteAdmin, getAllStudents, getAllEducators, getAllAdmins, getAdminDashboard, updateStudentByAdmin, updateStudentStatusByAdmin, resetStudentPasswordByAdmin, deleteStudentByAdmin, updateAdminProfile, updateAdminRole, getAuditLogs, getAdminProfile, updateUserRole, deleteUser, getAdminManageCourses } from '../controllers/adminController.js';
 import { adminAuth } from '../middlewares/adminAuth.js';
 import upload from '../configs/multer.js';
 import { sendAdminOtp, verifyAdminOtpAndChangePassword } from '../controllers/adminOtpController.js';
@@ -34,5 +34,6 @@ adminRouter.patch('/users/:id/role', adminAuth, updateUserRole);
 adminRouter.delete('/users/:id', adminAuth, deleteUser);
 adminRouter.post('/fix-pending-purchases', adminAuth, fixPendingPurchases);
 adminRouter.get('/all-purchases', adminAuth, getAllPurchases);
+adminRouter.get('/manage-courses', adminAuth, getAdminManageCourses);
 
 export default adminRouter;
