@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatDuration } from '../../utils/formatDuration';
 
 const CloudinaryVideoUpload = ({ 
   onUploadSuccess, 
@@ -12,6 +13,7 @@ const CloudinaryVideoUpload = ({
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [videoFile, setVideoFile] = useState(null);
+  const [fileDuration, setFileDuration] = useState(0);
 
   // Cloudinary configuration - Replace with your actual values
   const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'denhmcs4e';
@@ -35,6 +37,7 @@ const CloudinaryVideoUpload = ({
     }
 
     setVideoFile(file);
+    getVideoFileDuration(file).then(dur => setFileDuration(dur));
     console.log(`Selected video: ${file.name}, Size: ${(file.size / 1024 / 1024).toFixed(1)}MB`);
   };
 
@@ -68,10 +71,10 @@ const CloudinaryVideoUpload = ({
     setUploading(true);
     setProgress(0);
 
-    let fileDuration = 0;
+    let durationToSend = 0;
     try {
-      fileDuration = await getVideoFileDuration(videoFile);
-    } catch (e) { fileDuration = 0; }
+      durationToSend = fileDuration;
+    } catch (e) { durationToSend = 0; }
 
     try {
       // Step 1: Upload video directly to Cloudinary
@@ -96,8 +99,8 @@ const CloudinaryVideoUpload = ({
         if (xhr.status === 200) {
           try {
             const cloudinaryResponse = JSON.parse(xhr.responseText);
-            // Use Cloudinary duration if available, else fallback to file duration
-            const durationSec = cloudinaryResponse.duration ? Math.ceil(cloudinaryResponse.duration) : Math.ceil(fileDuration);
+            // Use Cloudinary duration if available, else fallback to fileDuration
+            const durationSec = cloudinaryResponse.duration ? Math.ceil(cloudinaryResponse.duration) : Math.ceil(durationToSend);
 
             // Step 2: Send video URL to your backend to create the lecture
             const lectureData = {
@@ -176,6 +179,9 @@ const CloudinaryVideoUpload = ({
         {videoFile && (
           <p className="text-sm text-green-600 mt-1">
             Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(1)}MB)
+            {typeof fileDuration === 'number' && fileDuration > 0 && (
+              <span className="ml-2 text-blue-700">Duration: {formatDuration(Math.round(fileDuration))}</span>
+            )}
           </p>
         )}
       </div>
