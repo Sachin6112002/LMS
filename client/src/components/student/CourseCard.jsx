@@ -34,31 +34,33 @@ const CourseCard = ({ course }) => {
     <Link
       onClick={() => scrollTo(0, 0)}
       to={'/course/' + course._id}
-      className="border border-green-200 pb-6 overflow-hidden rounded-lg bg-white"
+      className="border border-green-200 pb-6 overflow-hidden rounded-lg bg-white shadow-sm transition-transform duration-200 hover:scale-[1.02] flex flex-col h-full"
     >
-      <img className="w-full" src={course.thumbnail} alt={course.title || 'Course Thumbnail'} />
-      <div className="p-3 text-left">
-        <h3 className="text-base font-semibold text-green-900">{course.title}</h3>
-        <p className="text-green-700">
-          {"Educator : "}{typeof course.createdBy === 'object' && course.createdBy?.name
-            ? course.createdBy.name
-            : (typeof course.createdBy === 'string' && course.createdBy.length > 0
-                ? course.createdBy
-                : 'Unknown Educator')}
-        </p>
-        <div className="flex items-center space-x-2">
+      <img
+        className="w-full h-40 object-cover md:h-48 lg:h-56 xl:h-64"
+        src={course.thumbnail || course.courseThumbnail}
+        alt={course.title || course.courseTitle || 'Course Thumbnail'}
+      />
+      <div className="p-3 text-left flex flex-col flex-1">
+        <h3 className="text-base font-semibold text-green-900 line-clamp-2">{course.title || course.courseTitle}</h3>
+        <p className="text-green-700 text-sm truncate">Educator: {typeof course.createdBy === 'object' && course.createdBy?.name
+          ? course.createdBy.name
+          : (typeof course.createdBy === 'string' && course.createdBy.length > 0
+              ? course.createdBy
+              : 'Unknown Educator')}</p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs">
           <span className="text-green-600">Chapters: {chaptersCount}</span>
           <span className="text-green-600">Lectures: {lecturesCount}</span>
           <span className="text-green-600">Duration: {formatDuration(totalSeconds)}</span>
         </div>
-        <p className="text-green-800 text-sm mt-2">
+        <p className="text-green-800 text-xs mt-2 line-clamp-3">
           {course.description
             ? (course.description.replace(/<[^>]+>/g, '').length > 80
                 ? course.description.replace(/<[^>]+>/g, '').slice(0, 80) + '...'
                 : course.description.replace(/<[^>]+>/g, ''))
             : 'No description available'}
         </p>
-        <div className="mt-2">
+        <div className="mt-2 flex items-end flex-1">
           {discount > 0 && discountedPrice < price ? (
             <>
               <span className="text-lg font-bold text-green-700">{currency} {discountedPrice}</span>
