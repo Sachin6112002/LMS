@@ -40,7 +40,7 @@ const CourseCard = ({ course }) => {
       <div className="p-3 text-left">
         <h3 className="text-base font-semibold text-green-900">{course.title}</h3>
         <p className="text-green-700">
-          {typeof course.createdBy === 'object' && course.createdBy?.name
+          {"Educator : "}{typeof course.createdBy === 'object' && course.createdBy?.name
             ? course.createdBy.name
             : (typeof course.createdBy === 'string' && course.createdBy.length > 0
                 ? course.createdBy
