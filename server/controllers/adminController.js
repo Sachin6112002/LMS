@@ -41,7 +41,7 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
-// Get all purchases (improved: always return course name, never N/A)
+// Get all purchases (improved: always return course name, never N/A, robust fallback)
 export const getAllPurchases = async (req, res) => {
   try {
     const purchases = await Purchase.find()
@@ -57,7 +57,16 @@ export const getAllPurchases = async (req, res) => {
       });
     // Always provide course name fallback
     const formatted = purchases.map(p => {
-      let courseName = p.courseId?.title || p.courseId?.courseTitle || 'Unknown Course';
+      let courseName = '';
+      if (p.courseId && typeof p.courseId.title === 'string' && p.courseId.title.trim().length > 0) {
+        courseName = p.courseId.title;
+      } else if (p.courseId && typeof p.courseId.courseTitle === 'string' && p.courseId.courseTitle.trim().length > 0) {
+        courseName = p.courseId.courseTitle;
+      } else if (typeof p.courseName === 'string' && p.courseName.trim().length > 0) {
+        courseName = p.courseName;
+      } else {
+        courseName = 'Unknown Course';
+      }
       return {
         ...p.toObject(),
         courseName

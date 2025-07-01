@@ -105,9 +105,13 @@ const ManagePurchases = () => {
                     <td className="px-2 sm:px-4 py-2">{p.userId?.name || 'N/A'}</td>
                     <td className="px-2 sm:px-4 py-2">{p.userId?.email || 'N/A'}</td>
                     <td className="px-2 sm:px-4 py-2">{
-                      (p.courseId && (p.courseId.title || p.courseId.courseTitle))
-                        ? (p.courseId.title || p.courseId.courseTitle)
-                        : (p.courseName || 'Unknown Course')
+                      (p.courseId && (p.courseId.title && typeof p.courseId.title === 'string' && p.courseId.title.trim().length > 0))
+                        ? p.courseId.title
+                        : (p.courseId && p.courseId.courseTitle && typeof p.courseId.courseTitle === 'string' && p.courseId.courseTitle.trim().length > 0)
+                          ? p.courseId.courseTitle
+                          : (p.courseName && typeof p.courseName === 'string' && p.courseName.trim().length > 0)
+                            ? p.courseName
+                            : 'Unknown Course'
                     }</td>
                     <td className="px-2 sm:px-4 py-2">${p.amount?.toFixed(2) || 'N/A'}</td>
                     <td className="px-2 sm:px-4 py-2 capitalize">

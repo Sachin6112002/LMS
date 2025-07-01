@@ -150,9 +150,11 @@ const ManageCourses = () => {
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
                     <td className="px-4 py-2">{
-                      course.title && typeof course.title === 'string' && course.title.trim().length > 0
+                      (course.title && typeof course.title === 'string' && course.title.trim().length > 0)
                         ? course.title
-                        : (course.courseName || 'Unknown Course')
+                        : (course.courseName && typeof course.courseName === 'string' && course.courseName.trim().length > 0)
+                          ? course.courseName
+                          : 'Unknown Course'
                     }</td>
                     <td className="px-4 py-2">{course.price || 'Free'}</td>
                     <td className="px-4 py-2 flex items-center gap-2">
