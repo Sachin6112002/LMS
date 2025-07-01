@@ -20,7 +20,7 @@ const ManageCourses = () => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${backendUrl}/api/admin/courses`, {
+        const res = await fetch(`${backendUrl}/api/admin/manage-courses`, {
           headers: { Authorization: `Bearer ${aToken}` },
         });
         const data = await res.json();
@@ -182,9 +182,7 @@ const ManageCourses = () => {
                       </button>
                     </td>
                     <td className="px-4 py-2">{
-                      course.educator && typeof course.educator === 'object'
-                        ? (course.educator.name || course.educator.email || course.educator.username || 'Educator')
-                        : (course.educatorName || 'Educator')
+                      course.educatorName || 'Educator'
                     }</td>
                   </tr>
                 ))

@@ -476,7 +476,8 @@ export const getAdminManageCourses = async (req, res) => {
       .populate({
         path: 'createdBy',
         select: 'name email username',
-        model: 'User'
+        model: 'User',
+        strictPopulate: false // <-- add this line for mongoose v7+ if needed
       });
     // Format response: no description, include discounted price, educator name, course name
     const formatted = courses.map(course => {
