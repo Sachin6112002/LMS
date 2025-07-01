@@ -382,7 +382,13 @@ const AddCourse = () => {
                   {chapter.lectures.map((lecture) => (
                     <div key={lecture._id || lecture.lectureId} className="flex justify-between items-center mb-2">
                       <span className="text-green-900">
-                        {lecture.title} - {typeof lecture.duration === 'string' ? lecture.duration : typeof lecture.duration === 'number' ? `${lecture.duration} min` : String(lecture.duration)}
+                        {lecture.title} - {
+                          typeof lecture.duration === 'number'
+                            ? formatDuration(Math.round(lecture.duration))
+                            : typeof lecture.duration === 'string' && /^\d+$/.test(lecture.duration)
+                              ? formatDuration(Number(lecture.duration))
+                              : lecture.duration
+                        }
                       </span>
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
