@@ -157,7 +157,11 @@ const ManageCourses = () => {
                         ? course.courseName
                         : (course.title || 'Unknown Course')
                     }</td>
-                    <td className="px-4 py-2">{course.price || 'Free'}</td>
+                    <td className="px-4 py-2">{
+                      course.discount && course.discount > 0 && course.price
+                        ? `₹${Math.round(course.price * (1 - course.discount / 100))} (₹${course.price}, ${course.discount}% off)`
+                        : (course.price ? `₹${course.price}` : 'Free')
+                    }</td>
                     <td className="px-4 py-2 flex items-center gap-2">
                       <button
                         onClick={() => togglePublish(course._id, course.status)}
@@ -177,11 +181,11 @@ const ManageCourses = () => {
                         <FaTrash /> Delete
                       </button>
                     </td>
-                    <td className="px-4 py-2">
-                      {course.educator && typeof course.educator === 'object'
-                        ? course.educator.name || 'N/A'
-                        : 'N/A'}
-                    </td>
+                    <td className="px-4 py-2">{
+                      course.educator && typeof course.educator === 'object'
+                        ? (course.educator.name || course.educator.email || course.educator.username || 'Educator')
+                        : (course.educatorName || 'Educator')
+                    }</td>
                   </tr>
                 ))
             ) : (
