@@ -104,7 +104,11 @@ const ManagePurchases = () => {
                   <tr key={p._id || idx} className="border-t hover:bg-cyan-50 transition">
                     <td className="px-2 sm:px-4 py-2">{p.userId?.name || 'N/A'}</td>
                     <td className="px-2 sm:px-4 py-2">{p.userId?.email || 'N/A'}</td>
-                    <td className="px-2 sm:px-4 py-2">{p.courseId?.courseTitle || 'N/A'}</td>
+                    <td className="px-2 sm:px-4 py-2">{
+                      (p.courseId && (p.courseId.title || p.courseId.courseTitle))
+                        ? (p.courseId.title || p.courseId.courseTitle)
+                        : (p.courseName || 'Unknown Course')
+                    }</td>
                     <td className="px-2 sm:px-4 py-2">${p.amount?.toFixed(2) || 'N/A'}</td>
                     <td className="px-2 sm:px-4 py-2 capitalize">
                       <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' ? 'bg-green-100 text-green-700' : p.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>{p.status}</span>
