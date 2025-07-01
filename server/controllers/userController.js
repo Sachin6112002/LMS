@@ -158,7 +158,10 @@ export const userEnrolledCourses = async (req, res) => {
         const userId = req.auth.userId
 
         const userData = await User.findById(userId)
-            .populate('enrolledCourses')
+            .populate({
+                path: 'enrolledCourses',
+                populate: { path: 'createdBy', select: 'name' }
+            })
 
         if (!userData) {
             return res.status(404).json({ success: false, message: 'User data not found' });
