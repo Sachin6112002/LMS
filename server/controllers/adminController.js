@@ -44,7 +44,7 @@ export const getAllCourses = async (req, res) => {
 // Get all purchases
 export const getAllPurchases = async (req, res) => {
   try {
-    const purchases = await Purchase.find().populate('courseId', 'courseTitle').populate('userId', 'name email imageUrl');
+    const purchases = await Purchase.find().populate('courseId', 'title').populate('userId', 'name email imageUrl');
     res.json({ success: true, purchases });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
