@@ -182,7 +182,13 @@ const ManageCourses = () => {
                       </button>
                     </td>
                     <td className="px-4 py-2">{
-                      course.educatorName || 'Educator'
+                      (typeof course.educatorName === 'string' && course.educatorName.trim().length > 0)
+                        ? course.educatorName.trim()
+                        : (course.educator && typeof course.educator.name === 'string' && course.educator.name.trim().length > 0)
+                          ? course.educator.name.trim()
+                          : (course.educator && typeof course.educator.fullName === 'string' && course.educator.fullName.trim().length > 0)
+                            ? course.educator.fullName.trim()
+                            : ''
                     }</td>
                   </tr>
                 ))
