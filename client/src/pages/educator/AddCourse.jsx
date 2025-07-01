@@ -6,6 +6,7 @@ import axios from 'axios'
 import { AppContext } from '../../context/AppContext';
 import CloudinaryVideoUpload from '../../components/educator/CloudinaryVideoUpload';
 import { uploadToCloudinary } from '../../utils/cloudinaryUpload';
+import { formatDuration } from '../../utils/formatDuration';
 
 // Use environment variables for Cloudinary config
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'denhmcs4e';
@@ -185,23 +186,10 @@ const AddCourse = () => {
       });
       // Step 2: Create lecture with Cloudinary URL
       const token = await getToken();
-      // Calculate duration in hours and minutes
-      let durationInHours = 0, durationInMinutes = 0;
+      // Use formatDuration helper for accurate duration string
+      let formattedDuration = '0 min';
       if (cloudinaryResponse.duration) {
-        durationInHours = Math.floor(cloudinaryResponse.duration / 3600);
-        durationInMinutes = Math.round((cloudinaryResponse.duration % 3600) / 60);
-      }
-      // Format duration string cleanly (omit 0 hr/min)
-      let formattedDuration = '';
-      if (durationInHours > 0) {
-        formattedDuration += `${durationInHours} hr${durationInHours !== 1 ? 's' : ''}`;
-      }
-      if (durationInMinutes > 0) {
-        if (formattedDuration) formattedDuration += ' ';
-        formattedDuration += `${durationInMinutes} min${durationInMinutes !== 1 ? 's' : ''}`;
-      }
-      if (!formattedDuration) {
-        formattedDuration = '0 min';
+        formattedDuration = formatDuration(Math.round(cloudinaryResponse.duration));
       }
       const lectureData = {
         courseId: createdCourse._id,
@@ -209,7 +197,7 @@ const AddCourse = () => {
         title: lectureDetails.lectureTitle,
         description: lectureDetails.lectureDescription || '',
         videoUrl: cloudinaryResponse.secure_url,
-        duration: formattedDuration, // e.g. '1 hr 23 mins'
+        duration: formattedDuration, // e.g. '1 hr 23 min'
       };
       const { data } = await axios.post(
         `${backendUrl}/api/educator/add-lecture-cloudinary`,
