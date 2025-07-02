@@ -18,18 +18,18 @@ const courseSchema = new mongoose.Schema({
     description: { type: String, required: true },
     thumbnail: { type: String },
     createdBy: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     chapters: [chapterSchema],
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     enrolledStudents: {
-        type: [{ type: String, ref: 'User' }],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         default: []
     },
     courseRatings: [{
-        userId: { type: String, ref: 'User', required: true },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         rating: { type: Number, required: true, min: 1, max: 5 }
     }],
     price: { type: Number, default: 0 }, // Course price in rupees (INR), 0 for free courses
