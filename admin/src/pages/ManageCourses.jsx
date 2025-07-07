@@ -145,24 +145,21 @@ const ManageCourses = () => {
             {courses.length > 0 ? (
               courses
                 .filter(course => {
-                  const title = (typeof course.courseName === 'string' && course.courseName.trim().length > 0)
-                    ? course.courseName
-                    : (course.title || '');
+                  const title = (typeof course.title === 'string' && course.title.trim().length > 0)
+                    ? course.title
+                    : '';
                   return title.toLowerCase().includes(search.toLowerCase());
                 })
                 .map((course, idx) => (
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
-                    <td className="px-4 py-2">{
-                      (typeof course.courseName === 'string' && course.courseName.trim().length > 0)
-                        ? course.courseName
-                        : (course.title || 'Unknown Course')
-                    }</td>
-                    <td className="px-4 py-2">{
-                      course.discount && course.discount > 0 && course.price
+                    <td className="px-4 py-2">{course.title || 'Unknown Course'}</td>
+                    <td className="px-4 py-2">
+                      {course.discount && course.discount > 0 && course.price
                         ? `₹${Math.round(course.price * (1 - course.discount / 100))} (₹${course.price}, ${course.discount}% off)`
                         : (course.price ? `₹${course.price}` : 'Free')
-                    }</td>
+                      }
+                    </td>
                     <td className="px-4 py-2 flex items-center gap-2">
                       <button
                         onClick={() => togglePublish(course._id, course.status)}
@@ -182,15 +179,14 @@ const ManageCourses = () => {
                         <FaTrash /> Delete
                       </button>
                     </td>
-                    <td className="px-4 py-2">{
-                      (typeof course.educatorName === 'string' && course.educatorName.trim().length > 0)
-                        ? course.educatorName.trim()
-                        : (course.educator && typeof course.educator.name === 'string' && course.educator.name.trim().length > 0)
-                          ? course.educator.name.trim()
-                          : (course.educator && typeof course.educator.fullName === 'string' && course.educator.fullName.trim().length > 0)
-                            ? course.educator.fullName.trim()
-                            : ''
-                    }</td>
+                    <td className="px-4 py-2">
+                      {(course.createdBy && typeof course.createdBy.name === 'string' && course.createdBy.name.trim().length > 0)
+                        ? course.createdBy.name.trim()
+                        : (course.createdBy && typeof course.createdBy.email === 'string' && course.createdBy.email.trim().length > 0)
+                          ? course.createdBy.email.trim()
+                          : ''
+                      }
+                    </td>
                   </tr>
                 ))
             ) : (
