@@ -47,8 +47,8 @@ const AdminManageCourses = () => {
           <tbody>
             {courses.map((course) => (
               <tr key={course._id} className="hover:bg-green-50">
-                <td className="py-2 px-4 border-b font-medium text-green-900">{course.courseName}</td>
-                <td className="py-2 px-4 border-b">{course.educatorName}</td>
+                <td className="py-2 px-4 border-b font-medium text-green-900">{course.title || 'Unknown Course'}</td>
+                <td className="py-2 px-4 border-b">{course.createdBy?.name || course.createdBy?.email || course.educatorName || ''}</td>
                 <td className="py-2 px-4 border-b">₹{course.price}</td>
                 <td className="py-2 px-4 border-b">{course.discount ? `${course.discount}%` : '-'}</td>
                 <td className="py-2 px-4 border-b font-semibold text-green-700">₹{course.discountedPrice}</td>
