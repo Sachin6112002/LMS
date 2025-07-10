@@ -589,7 +589,7 @@ export const addLectureWithCloudinaryUrl = async (req, res) => {
         }
         
         // Check if educator owns this course
-        if (course.createdBy !== educatorId) {
+        if (course.createdBy.toString() !== educatorId.toString()) {
             return res.status(403).json({ success: false, message: 'Unauthorized: You can only add lectures to your own courses' });
         }
         
