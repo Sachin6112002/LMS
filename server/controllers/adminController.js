@@ -34,7 +34,7 @@ export const getAllUsers = async (req, res) => {
 // Get all courses
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().select('-__v');
+    const courses = await Course.find().populate('createdBy', 'name email username').select('-__v');
     res.json({ success: true, courses });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
