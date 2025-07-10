@@ -75,27 +75,19 @@ const AddCourse = () => {
         setIsSubmitting(false);
         return;
       }
-      // Upload thumbnail to Cloudinary
-      const thumbRes = await uploadToCloudinary(image, CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_CLOUD_NAME);
-      const thumbnailUrl = thumbRes.secure_url;
+      // Use FormData and let backend handle image upload
+      const formData = new FormData();
+      formData.append('title', courseTitle);
+      formData.append('description', quillRef.current.root.innerHTML);
+      formData.append('price', coursePrice);
+      formData.append('discount', discount);
+      formData.append('image', image);
       const token = await getToken();
-      // Debug log to check what is being sent
-      console.log('Submitting course:', {
-        title: courseTitle,
-        price: coursePrice,
-        discount: discount,
-        priceType: typeof coursePrice,
-        discountType: typeof discount
-      });
-      const { data } = await axios.post(`${backendUrl}/api/courses`, {
-        title: courseTitle,
-        description: quillRef.current.root.innerHTML,
-        thumbnail: thumbnailUrl,
-        price: Number(coursePrice), // Ensure number
-        discount: Number(discount), // Ensure number
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const { data } = await axios.post(
+        `${backendUrl}/api/educator/add-course`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       if (data.success && data.course) {
         setCreatedCourse(data.course);
         setChapters(data.course.chapters || []);
