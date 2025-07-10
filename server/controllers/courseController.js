@@ -1,4 +1,5 @@
 import Course from '../models/Course.js';
+import mongoose from 'mongoose';
 
 // Create a course with metadata and thumbnail (thumbnail is now a URL)
 export const createCourse = async (req, res) => {
@@ -14,7 +15,7 @@ export const createCourse = async (req, res) => {
       thumbnail,
       price: Number(price) || 0,
       discount: Number(discount) || 0,
-      createdBy: req.auth.userId,
+      createdBy: mongoose.Types.ObjectId(req.auth.userId), // Ensure ObjectId
       chapters: []
     });
     res.json({ success: true, course });
