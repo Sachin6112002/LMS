@@ -138,6 +138,14 @@ const AddCourse = () => {
 
   // Add a new lecture to the backend and update state with real lectureId
   const addLecture = async () => {
+    if (!createdCourse || !createdCourse._id) {
+      toast.error('Course not created yet. Please create the course first.');
+      return;
+    }
+    if (!currentChapterId) {
+      toast.error('Chapter not selected or created yet. Please add a chapter first.');
+      return;
+    }
     if (!lectureDetails.lectureTitle) {
       toast.error('Lecture title is required.');
       return;
@@ -393,7 +401,11 @@ const AddCourse = () => {
                       <img onClick={() => handleLecture('remove', chapter._id || chapter.chapterId, chapter.lectures.indexOf(lecture))} src={assets.cross_icon} alt="" className="cursor-pointer" />
                     </div>
                   ))}
-                  <button className="inline-flex bg-green-100 p-2 rounded cursor-pointer mt-2 text-green-700 hover:bg-green-200" onClick={() => handleLecture('add', chapter._id || chapter.chapterId)}>
+                  <button
+                    className={`inline-flex bg-green-100 p-2 rounded mt-2 text-green-700 hover:bg-green-200 ${!(createdCourse && (chapter._id || chapter.chapterId)) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    onClick={() => handleLecture('add', chapter._id || chapter.chapterId)}
+                    disabled={!(createdCourse && (chapter._id || chapter.chapterId))}
+                  >
                     + Add Lecture
                   </button>
                 </div>
