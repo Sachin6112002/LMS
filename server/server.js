@@ -35,7 +35,8 @@ app.use((req, res, next) => {
     'http://localhost:5174',
     'https://lms-client-coral-rho.vercel.app',
     'https://lms-client-one-lemon.vercel.app',
-    'https://lms-admin-blond.vercel.app' // <-- Added new admin panel
+    'https://lms-admin-blond.vercel.app',
+    'https://your-frontend.vercel.app' // <-- Add your actual frontend deployment URL here
   ];
   
   if (allowedOrigins.includes(origin)) {
