@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { assets } from '../../assets/assets';
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+// Use Vite backend URL for production, fallback to localhost for development
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 const TestimonialsSection = () => {
 	const [selected, setSelected] = useState(null);
 	const [testimonials, setTestimonials] = useState([]);
