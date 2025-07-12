@@ -79,8 +79,8 @@ const AddCourse = () => {
       const formData = new FormData();
       formData.append('title', courseTitle);
       formData.append('description', quillRef.current.root.innerHTML);
-      formData.append('price', coursePrice);
-      formData.append('discount', discount);
+      formData.append('price', Number(coursePrice));
+      formData.append('discount', Number(discount));
       formData.append('image', image);
       const token = await getToken();
       const { data } = await axios.post(
