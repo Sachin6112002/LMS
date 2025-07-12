@@ -9,6 +9,7 @@ const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!isAdminAuthenticated()) {
@@ -19,14 +20,31 @@ const ManageCourses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
+      setError('');
       try {
         const res = await fetch(`${backendUrl}/api/admin/manage-courses`, {
           headers: { Authorization: `Bearer ${aToken}` },
         });
-        const data = await res.json();
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          setError('Failed to parse response.');
+          setCourses([]);
+          return;
+        }
         console.log('Fetched courses:', data); // DEBUG LOG
-        if (Array.isArray(data.courses)) setCourses(data.courses);
+        if (!res.ok) {
+          setError(data.message || `Error: ${res.status} ${res.statusText}`);
+          setCourses([]);
+        } else if (Array.isArray(data.courses)) {
+          setCourses(data.courses);
+        } else {
+          setError('No courses found or invalid response.');
+          setCourses([]);
+        }
       } catch (err) {
+        setError(err.message || 'Unknown error occurred.');
         setCourses([]);
       } finally {
         setLoading(false);
@@ -97,6 +115,15 @@ const ManageCourses = () => {
   };
 
   if (loading) return <div>Loading...</div>;
+  if (error) {
+    return (
+      <div className="p-8 text-center text-red-600">
+        <h2 className="text-xl font-bold mb-2">Error loading courses</h2>
+        <div>{error}</div>
+        <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-gray-200 rounded">Reload</button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-8 bg-green-50 min-h-screen">
