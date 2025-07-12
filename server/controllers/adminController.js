@@ -467,7 +467,13 @@ export const getPublishedCourseById = async (req, res) => {
 export const getAdminManageCourses = async (req, res) => {
   try {
     // Only allow if requester is admin
-    if (!req.user || req.user.role !== 'admin') {
+    if (
+      !req.user ||
+      (
+        req.user.role !== 'admin' &&
+        (!req.user.publicMetadata || req.user.publicMetadata.role !== 'admin')
+      )
+    ) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
     // Populate educator name, select only relevant fields
