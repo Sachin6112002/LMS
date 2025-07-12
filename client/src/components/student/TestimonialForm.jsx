@@ -24,8 +24,8 @@ const initialState = {
   permission: false
 };
 
-// Use deployed backend URL for production, fallback to localhost for development
-const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+// Use Vite backend URL for production, fallback to localhost for development
+const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const TestimonialForm = () => {
   const [form, setForm] = useState(initialState);
