@@ -27,30 +27,7 @@ await connectDB()
 
 // EMERGENCY CORS FIX - Handle ALL requests first
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (req.path === '/favicon.ico' || req.path === '/') {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
-    return next();
-  }
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000', 
-    'http://localhost:5174',
-    'https://lms-client-coral-rho.vercel.app',
-    'https://lms-client-one-lemon.vercel.app',
-    'https://lms-admin-blond.vercel.app',
-    'https://your-frontend.vercel.app'
-  ];
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.header('Access-Control-Allow-Credentials', 'true');
