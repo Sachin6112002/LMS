@@ -3,7 +3,19 @@ import Testimonial from '../models/Testimonial.js';
 // POST /api/testimonials
 export const createTestimonial = async (req, res) => {
   try {
-    const testimonial = new Testimonial(req.body);
+    const data = req.body;
+    // Parse JSON fields if sent as string (from FormData)
+    if (typeof data.feedback === 'string') {
+      data.feedback = JSON.parse(data.feedback);
+    }
+    if (typeof data.rating === 'string') {
+      data.rating = JSON.parse(data.rating);
+    }
+    // Handle photo upload
+    if (req.file) {
+      data.profilePhoto = req.file.path; // Or upload to cloudinary and use the URL
+    }
+    const testimonial = new Testimonial(data);
     await testimonial.save();
     res.status(201).json({ success: true, testimonial });
   } catch (error) {
