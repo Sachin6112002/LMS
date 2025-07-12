@@ -7,16 +7,18 @@ export const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:
 export const AppContext = createContext({ backendUrl })
 
 const AppContextProvider = (props) => {
-    const currency = import.meta.env.VITE_CURRENCY
+    const currency = import.meta.env.VITE_CURRENCY;
+    const aToken = localStorage.getItem('adminToken') || '';
     const value = {
         backendUrl,
         currency,
-    }
+        aToken,
+    };
     return (
         <AppContext.Provider value={value}>
             {props.children}
         </AppContext.Provider>
-    )
+    );
 }
 
 export default AppContextProvider
