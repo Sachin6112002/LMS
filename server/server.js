@@ -27,20 +27,7 @@ await connectDB()
 
 // EMERGENCY CORS FIX - Handle ALL requests first
 app.use((req, res, next) => {
-  // Set CORS headers for ALL requests
   const origin = req.headers.origin;
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000', 
-    'http://localhost:5174',
-    'https://lms-client-coral-rho.vercel.app',
-    'https://lms-client-one-lemon.vercel.app',
-    'https://lms-admin-blond.vercel.app',
-    'https://your-frontend.vercel.app' // <-- Add your actual frontend deployment URL here
-  ];
-  
-  if (allowedOrigins.includes(origin)) {
-    // Allow all origins for favicon.ico and root requests
   if (req.path === '/favicon.ico' || req.path === '/') {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -52,32 +39,25 @@ app.use((req, res, next) => {
     }
     return next();
   }
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000', 
+    'http://localhost:5174',
+    'https://lms-client-coral-rho.vercel.app',
+    'https://lms-client-one-lemon.vercel.app',
+    'https://lms-admin-blond.vercel.app',
+    'https://your-frontend.vercel.app'
+  ];
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    if (req.method === 'OPTIONS') {
-      return res.status(200).end();
-    }
   }
-  }
-  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Max-Age', '86400');
-  
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} from origin: ${req.headers.origin}`);
-  console.log('CORS allowed for:', allowedOrigins.includes(origin) ? origin : 'NOT ALLOWED');
-  
-  // Handle OPTIONS requests immediately - CRITICAL FIX
   if (req.method === 'OPTIONS') {
-    console.log('OPTIONS request handled immediately for:', req.path);
     return res.status(200).end();
   }
-  
   next();
 });
 
