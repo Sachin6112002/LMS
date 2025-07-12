@@ -25,7 +25,7 @@ const initialState = {
 };
 
 // Use deployed backend URL for production, fallback to localhost for development
-const backendUrl = process.env.REACT_APP_BACKEND_URL 
+const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const TestimonialForm = () => {
   const [form, setForm] = useState(initialState);
