@@ -53,26 +53,17 @@ const TestimonialsSection = () => {
 						<div>
 							<h2 className="text-2xl font-bold flex items-center gap-2">
 								{t.name}
+								{t.badge && <span className="ml-2 bg-green-200 text-green-800 px-2 py-1 rounded text-xs">{t.badge}</span>}
 							</h2>
 							<p className="text-gray-500">{t.course}</p>
+							{t.institution && <p className="text-gray-500">Institution: {t.institution}</p>}
 						</div>
 					</div>
-					<div className="flex gap-1 items-center mb-1">
-						{[...Array(5)].map((_, i) => (
-							<span
-								key={i}
-								className={
-									i < Math.floor(t.rating?.overall || 0)
-										? 'text-yellow-400 text-lg'
-										: 'text-gray-300 text-lg'
-								}
-							>
-								★
-							</span>
-						))}
-						<span className="ml-2 text-gray-500 text-sm">
-							({t.rating?.overall || 0}/5)
-						</span>
+					<div className="flex flex-wrap gap-2 mb-2">
+						<span className="text-green-800 text-sm">Overall: {t.rating?.overall}</span>
+						<span className="text-green-800 text-sm">Content: {t.rating?.content}</span>
+						<span className="text-green-800 text-sm">Instructor: {t.rating?.instructor}</span>
+						<span className="text-green-800 text-sm">UI/UX: {t.rating?.ux}</span>
 					</div>
 					<div className="mb-2">
 						<span className="font-semibold">Experience:</span> {t.feedback?.experience}<br />
@@ -80,6 +71,8 @@ const TestimonialsSection = () => {
 						<span className="font-semibold">Outcome:</span> {t.feedback?.outcome}<br />
 						<span className="font-semibold">Goal:</span> {t.feedback?.goal}
 					</div>
+					{t.date && <div className="text-green-700 text-xs mb-2">Date: {t.date}</div>}
+					
 				</div>
 			</div>
 		);
