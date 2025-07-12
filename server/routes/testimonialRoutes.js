@@ -1,7 +1,7 @@
 import express from 'express';
 import { createTestimonial, getTestimonials } from '../controllers/testimonialController.js';
 import multer from 'multer';
-const upload = multer({ dest: 'uploads/' }); // You can replace with your cloudinary config
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
