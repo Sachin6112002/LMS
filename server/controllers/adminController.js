@@ -150,7 +150,7 @@ export const loginAdmin = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
+    const token = jwt.sign({ id: admin._id, email: admin.email, role: 'admin' }, process.env.JWT_SECRET || 'devsecret', { expiresIn: '1d' });
     res.json({ 
       success: true, 
       token, 
