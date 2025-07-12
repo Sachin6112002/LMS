@@ -40,7 +40,12 @@ app.use((req, res, next) => {
   ];
   
   if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
+    // Allow all origins for favicon.ico and root requests
+    if (req.path === '/favicon.ico' || req.path === '/') {
+      res.header('Access-Control-Allow-Origin', '*');
+    } else if (allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
