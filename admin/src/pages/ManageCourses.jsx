@@ -180,7 +180,7 @@ const ManageCourses = () => {
                 .map((course, idx) => (
                   <tr key={course._id}>
                     <td className="px-4 py-2">{idx + 1}</td>
-                    <td className="px-4 py-2">{course.title || 'Unknown Course'}</td>
+                    <td className="px-4 py-2">{course.courseName || 'Unknown Course'}</td>
                     <td className="px-4 py-2">
                       {course.discount && course.discount > 0 && course.price
                         ? `₹${Math.round(course.price * (1 - course.discount / 100))} (₹${course.price}, ${course.discount}% off)`
@@ -206,14 +206,7 @@ const ManageCourses = () => {
                         <FaTrash /> Delete
                       </button>
                     </td>
-                    <td className="px-4 py-2">
-                      {(course.createdBy && typeof course.createdBy.name === 'string' && course.createdBy.name.trim().length > 0)
-                        ? course.createdBy.name.trim()
-                        : (course.createdBy && typeof course.createdBy.email === 'string' && course.createdBy.email.trim().length > 0)
-                          ? course.createdBy.email.trim()
-                          : ''
-                      }
-                    </td>
+                    <td className="px-4 py-2">{course.educatorName || ''}</td>
                   </tr>
                 ))
             ) : (
