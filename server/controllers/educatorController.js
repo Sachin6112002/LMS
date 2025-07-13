@@ -42,6 +42,8 @@ export const addCourse = async (req, res) => {
         const courseData = {
             title: req.body.title,
             description: req.body.description,
+            price: Number(req.body.price) || 0,
+            discount: Number(req.body.discount) || 0,
             thumbnail: '', // will be set after upload
             createdBy: new mongoose.Types.ObjectId(educatorId), // Ensure ObjectId with 'new'
             status: 'draft',
