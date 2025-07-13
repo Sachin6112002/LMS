@@ -77,10 +77,11 @@ const AddCourse = () => {
       }
       // Use FormData and let backend handle image upload
       const formData = new FormData();
+      // Always send price and discount as string, fallback to '0' if empty
       formData.append('title', courseTitle);
       formData.append('description', quillRef.current.root.innerHTML);
-      formData.append('price', String(coursePrice));
-      formData.append('discount', String(discount));
+      formData.append('price', typeof coursePrice === 'number' ? String(coursePrice) : (coursePrice ? coursePrice : '0'));
+      formData.append('discount', typeof discount === 'number' ? String(discount) : (discount ? discount : '0'));
       formData.append('image', image);
       const token = await getToken();
       const { data } = await axios.post(
@@ -302,7 +303,7 @@ const AddCourse = () => {
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-green-900">Course Price</label>
-            <input onChange={e => setCoursePrice(Number(e.target.value) || 0)} value={coursePrice} type="number" min={0} placeholder="0" className="outline-none py-2 w-28 px-3 rounded border border-green-200 text-green-900 placeholder-green-600" required />
+            <input onChange={e => setCoursePrice(Number(e.target.value) || 0)} value={coursePrice} type="number" min={0}  className="outline-none py-2 w-28 px-3 rounded border border-green-200 text-green-900 placeholder-green-600" required />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-green-900">Course Thumbnail</label>
@@ -314,7 +315,7 @@ const AddCourse = () => {
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-green-900">Discount %</label>
-            <input onChange={e => setDiscount(Number(e.target.value) || 0)} value={discount} type="number" min={0} max={100} placeholder="0" className="outline-none py-2 w-28 px-3 rounded border border-green-200 text-green-900 placeholder-green-600" required />
+            <input onChange={e => setDiscount(Number(e.target.value) || 0)} value={discount} type="number" min={0} max={100}  className="outline-none py-2 w-28 px-3 rounded border border-green-200 text-green-900 placeholder-green-600" required />
           </div>
           <button type="submit" className="bg-green-600 hover:bg-green-700 text-white w-max py-2.5 px-8 rounded my-4 self-center" disabled={isSubmitting}>
             {isSubmitting ? 'ADDING...' : 'Save Course'}
