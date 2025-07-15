@@ -67,5 +67,3 @@ export const assets = {
     blue_tick_icon,
     lesson_icon
 }
-// Dummy testimonial data removed - use real testimonials from database
-export const dummyTestimonial = [];

@@ -2,7 +2,6 @@ import User from "../models/User.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import upload from '../configs/multer.js';
 import { v2 as cloudinary } from 'cloudinary';
 import stripe from 'stripe';
 import { Purchase } from '../models/Purchase.js';
