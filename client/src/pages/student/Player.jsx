@@ -184,7 +184,7 @@ const Player = ({ }) => {
                   <img src={assets.down_arrow_icon} alt="arrow icon" className={`transform transition-transform ${openSections[index] ? "rotate-180" : ""}`} />
                   <p className="font-medium md:text-base text-sm">{chapter.title || chapter.chapterTitle}</p>
                 </div>
-                 <span className="text-green-600">Duration: {formatDuration(totalSeconds)}</span>
+                
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${openSections[index] ? "max-h-96" : "max-h-0"}`} >
                 <ul className="list-disc md:pl-10 pl-4 pr-4 py-2 text-green-700 border-t border-green-200">
